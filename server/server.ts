@@ -11,6 +11,8 @@ import cookieParser from "cookie-parser";
 import logger from "./utils/logger";
 import connectDB from "./config/db";
 import connectRedis from "./config/redis";
+import { errorHandler } from "./middleware/errorHandler";
+// import { ClerkExpressRequireAuth } from "@clerk/express";
 
 const app: Express = express();
 const PORT = process.env.PORT;
@@ -33,6 +35,14 @@ app.use(
 );
 app.use(cookieParser());
 app.use(express.json());
+
+// Protect a route with Clerk auth
+// app.get("/api/protected", ClerkExpressRequireAuth(), (req, res) => {
+//   res.json({ message: "You are authenticated!", user: req.auth });
+// });
+
+// Global error handler
+app.use(errorHandler);
 
 // Initialize connections and start server
 const startServer = async () => {
