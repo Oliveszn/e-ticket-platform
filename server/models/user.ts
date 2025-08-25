@@ -22,19 +22,18 @@ const userSchema = new mongoose.Schema(
     },
 
     ///for clerk users
-    clerkId: {
-      type: String,
-      required: true,
-      unique: true, // maps directly to Clerk's user.id
-      sparse: true, // allows null if not using Clerk
-    },
+    // clerkId: {
+    //   type: String,
+    //   required: true,
+    //   unique: true, // maps directly to Clerk's user.id
+    //   sparse: true, // allows null if not using Clerk
+    // },
 
     ///for local users
     password: {
       type: String,
       required: true,
       minlength: 6,
-      select: false, // don’t return in queries
     },
 
     ///normal normal
@@ -49,10 +48,6 @@ const userSchema = new mongoose.Schema(
         trim: true,
         maxlength: 300,
         default: "This user has not added a bio yet.",
-      },
-      avatar: {
-        type: String,
-        default: "",
       },
       verification: {
         isVerified: {
@@ -69,4 +64,5 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
+export default User;

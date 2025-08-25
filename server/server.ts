@@ -12,6 +12,7 @@ import logger from "./utils/logger";
 import connectDB from "./config/db";
 import connectRedis from "./config/redis";
 import { errorHandler } from "./middleware/errorHandler";
+import authRoutes from "./routes/authRoutes";
 // import { ClerkExpressRequireAuth } from "@clerk/express";
 
 const app: Express = express();
@@ -40,6 +41,9 @@ app.use(express.json());
 // app.get("/api/protected", ClerkExpressRequireAuth(), (req, res) => {
 //   res.json({ message: "You are authenticated!", user: req.auth });
 // });
+
+///Routes
+app.use("/api", authRoutes);
 
 // Global error handler
 app.use(errorHandler);

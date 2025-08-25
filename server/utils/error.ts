@@ -20,9 +20,9 @@ export class NotFoundError extends ApiError {
 
 export class ValidationError extends ApiError {
   errors: unknown;
-  constructor(message: string, errors = null) {
+  constructor(message: string, statusCode: number) {
     super(message, 400);
-    this.errors = errors;
+    this.statusCode = statusCode;
   }
 }
 
