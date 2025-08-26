@@ -66,12 +66,12 @@ const errorHandler = (
   }
 
   if (err.name === "CastError") {
-    error = new ValidationError(`Invalid ${err.path}: ${err.value}`);
+    error = new ValidationError(`Invalid ${err.path}: ${err.value}`, 400);
   }
 
   // Handle bad JSON
   if (err instanceof SyntaxError && "body" in err) {
-    error = new ValidationError("Invalid JSON payload");
+    error = new ValidationError("Invalid JSON payload", 400);
   }
 
   const statusCode = error.statusCode || 500;
