@@ -14,6 +14,7 @@ import connectRedis from "./config/redis";
 import { errorHandler } from "./middleware/errorHandler";
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
+import eventRoutes from "./routes/eventRoutes";
 // import { ClerkExpressRequireAuth } from "@clerk/express";
 
 const app: Express = express();
@@ -44,8 +45,9 @@ app.use(express.json());
 // });
 
 ///Routes
-app.use("/api", authRoutes);
-app.use("/api", userRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/events", eventRoutes);
 
 // Global error handler
 app.use(errorHandler);

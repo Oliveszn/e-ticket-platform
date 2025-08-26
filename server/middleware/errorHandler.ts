@@ -62,7 +62,11 @@ const errorHandler = (
 
   // Handle Mongo duplicate key
   if (err.code === 11000) {
-    error = new ValidationError("Duplicate field value entered", err.keyValue);
+    error = new ValidationError(
+      "Duplicate field value entered",
+      400,
+      err.keyValue
+    );
   }
 
   if (err.name === "CastError") {

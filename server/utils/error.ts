@@ -20,9 +20,9 @@ export class NotFoundError extends ApiError {
 
 export class ValidationError extends ApiError {
   errors: unknown;
-  constructor(message: string, statusCode: number) {
-    super(message, 400);
-    this.statusCode = statusCode;
+  constructor(message: string, statusCode: number = 400, errors?: unknown) {
+    super(message, statusCode);
+    this.errors = errors;
   }
 }
 
@@ -35,5 +35,12 @@ export class UnauthorizedError extends ApiError {
 export class ConflictError extends ApiError {
   constructor(message: string) {
     super(message, 409);
+  }
+}
+
+export class ForbiddenError extends ApiError {
+  constructor(message: string) {
+    super(message, 403);
+    Object.setPrototypeOf(this, ForbiddenError.prototype);
   }
 }

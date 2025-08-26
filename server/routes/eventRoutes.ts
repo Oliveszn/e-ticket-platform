@@ -1,0 +1,21 @@
+import express from "express";
+import {
+  createEvent,
+  getSingleEvent,
+  deleteEvent,
+  getPromoterEvent,
+  editEvent,
+  searchEvents,
+} from "../controllers/eventController";
+import requireAuth from "../middleware/auth";
+const router = express.Router();
+
+router.post("/create", requireAuth, createEvent);
+router.delete("/:id", requireAuth, deleteEvent);
+router.put("/:id", requireAuth, editEvent);
+router.get("/my-events", requireAuth, getPromoterEvent);
+
+///public
+router.get("/search", searchEvents);
+router.get("/:id", getSingleEvent);
+export default router;

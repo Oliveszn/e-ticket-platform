@@ -16,7 +16,7 @@ const generateTokens = async (user: JwtUserPayload) => {
       email: user.email,
     },
     process.env.JWT_SECRET as string,
-    { expiresIn: "30m" }
+    { expiresIn: "1h" }
   );
 
   ///generate a token
