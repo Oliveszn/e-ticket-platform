@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 import RefreshToken from "../models/RefreshToken";
 import type { Request, Response, NextFunction } from "express";
 import { asyncHandler } from "../middleware/errorHandler";
-import { ValidationError } from "../utils/error";
+import { UnauthorizedError, ValidationError } from "../utils/error";
 
 const resgiterUser = asyncHandler(async (req: Request, res: Response) => {
   logger.info("Registration endpoint hit...");
@@ -16,7 +16,7 @@ const resgiterUser = asyncHandler(async (req: Request, res: Response) => {
     logger.warn("Validation error", error.details[0].message);
     throw new ValidationError(error.details[0].message, 400);
   }
-  const { email, firstName, lastName, password } = req.body;
+  const { email, firstName, lastName, address, number, password } = req.body;
 
   let user = await User.findOne({ email });
   if (user) {
@@ -27,7 +27,14 @@ const resgiterUser = asyncHandler(async (req: Request, res: Response) => {
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
 
-  user = new User({ email, firstName, lastName, password: hash });
+  user = new User({
+    email,
+    firstName,
+    lastName,
+    address,
+    number,
+    password: hash,
+  });
   await user.save();
   logger.warn("User saved successfully", user._id);
 
@@ -126,7 +133,7 @@ const refreshTokenUser = asyncHandler(async (req: Request, res: Response) => {
   ///we confirm if the token is not found or its expired
   if (!storedToken || storedToken.expiresAt < new Date()) {
     logger.warn("Invalid or expired refresh token");
-    throw new ValidationError(`Invalid or expired refresh token`, 401);
+    throw new UnauthorizedError(`Invalid or expired refresh token`);
   }
 
   //we look for the user who owns the token
@@ -134,7 +141,7 @@ const refreshTokenUser = asyncHandler(async (req: Request, res: Response) => {
 
   if (!user) {
     logger.warn("User not found");
-    throw new ValidationError(`User not found`, 401);
+    throw new UnauthorizedError(`User not found`);
   }
   //then genrate new access & refresh tokens if theres a refresh token
   const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
@@ -163,7 +170,7 @@ const logoutUser = asyncHandler(async (req: Request, res: Response) => {
   });
   if (!storedToken) {
     logger.warn("Invalid refresh token provided");
-    throw new ValidationError("Invalid refresh token", 401);
+    throw new UnauthorizedError("Invalid refresh token");
   }
   logger.info("Refresh token deleted for logout");
 

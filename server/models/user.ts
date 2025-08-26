@@ -20,6 +20,16 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    address: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    number: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
     ///for clerk users
     // clerkId: {
@@ -42,23 +52,15 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "promoter", "admin"],
       default: "promoter",
     },
-    profile: {
-      bio: {
-        type: String,
-        trim: true,
-        maxlength: 300,
-        default: "This user has not added a bio yet.",
-      },
-      verification: {
-        isVerified: {
-          type: Boolean,
-          default: false,
-        },
-        verificationDate: {
-          type: Date,
-          default: Date.now,
-        },
-      },
+    bio: {
+      type: String,
+      trim: true,
+      maxlength: 300,
+      default: "This user has not added a bio yet.",
+    },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
