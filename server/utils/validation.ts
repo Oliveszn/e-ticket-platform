@@ -1,5 +1,5 @@
 import { title } from "process";
-import type { EventInput, RegistrationInput } from "../types";
+import type { EventInput, RegistrationInput, TicketInfo } from "../types";
 
 const Joi = require("joi");
 
@@ -73,4 +73,21 @@ const validateEvent = (data: EventInput) => {
   });
   return schema.validate(data);
 };
-export { validateRegistration, validatelogin, validateEvent };
+
+const validateTicketPurchase = (data: TicketInfo) => {
+  const schema = Joi.object({
+    firstName: Joi.string().min(2).max(50).required(),
+    lastName: Joi.string().min(2).max(50).required(),
+    email: Joi.string().email().required(),
+    numberOfTickets: Joi.number().required(),
+    info: Joi.string().allow(""),
+  });
+
+  return schema.validate(data);
+};
+export {
+  validateRegistration,
+  validatelogin,
+  validateEvent,
+  validateTicketPurchase,
+};

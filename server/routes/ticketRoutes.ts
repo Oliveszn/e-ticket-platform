@@ -7,10 +7,11 @@ import {
 } from "../controllers/ticketController";
 const router = express.Router();
 
+//check available
 router.get("/events/:id/tickets/:ticketId", ticketAvailability);
-// /api/tickets/buy
-
-// /api/tickets/:eventId
+// purchase ticket
+router.post("/events/:id/tickets/:ticketId", buyTicket);
+// get tickets
 router.get("/events/:id", getTicket);
 router.get("/events/:id/ticket/:ticketId", getSingleTicket);
 // /api/tickets/my-ticket?email=...&ref=...

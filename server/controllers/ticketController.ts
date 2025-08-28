@@ -5,6 +5,7 @@ import logger from "../utils/logger";
 import { NotFoundError, ValidationError } from "../utils/error";
 import mongoose from "mongoose";
 import type { Ticket } from "../types";
+import { validateTicketPurchase } from "../utils/validation";
 
 ////check ticket availability
 ///we have to first validate theres actually tickets for that particular ticket field(vip, regular)
@@ -47,8 +48,14 @@ const ticketAvailability = asyncHandler(async (req: Request, res: Response) => {
 ////buy ticket
 ///we also have to validate that the amount of tickets the user entered is available
 const buyTicket = asyncHandler(async (req: Request, res: Response) => {
-  ///event id
-  const { id } = req.params;
+  //validate the schema
+  const { error } = validateTicketPurchase(req.body);
+  if (error) {
+    logger.warn("Validation error", error.details[0].message);
+    throw new ValidationError(error.details[0].message, 400);
+  }
+  const { firstName, lastName, email, numberOfTickets, info } = req.body;
+  const { id, ticketId } = req.params;
   //to check if theres an id
   if (!id) {
     throw new ValidationError("Event ID is required", 400);
@@ -57,6 +64,57 @@ const buyTicket = asyncHandler(async (req: Request, res: Response) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw new ValidationError("Invalid event ID", 400);
   }
+
+  //  Find the event
+  const event = await Event.findById(id);
+  if (!event) {
+    throw new NotFoundError("Event not found");
+  }
+
+  //  Find the ticket type
+  const ticket = event.ticket.id(ticketId);
+  if (!ticket) {
+    throw new NotFoundError("Ticket type not found");
+  }
+
+  const available = ticket.quantity - ticket.sold;
+  if (available < numberOfTickets) {
+    throw new ValidationError(
+      `There are only ${available}tickets available`,
+      409
+    );
+  }
+
+  ticket.sold += numberOfTickets;
+  await event.save();
+
+  //  Save purchase record
+  // const purchase = new Purchase({
+  //   eventId: id,
+  //   ticketId,
+  //   firstName,
+  //   lastName,
+  //   email,
+  //   numberOfTickets,
+  //   info,
+  // });
+  // await purchase.save();
+
+  //  Send confirmation email
+  // await sendTicketEmail({ firstName, lastName, email, ticket, numberOfTickets });
+
+  res.status(201).json({
+    success: true,
+    message: "Ticket purchase successful",
+    data: {
+      eventId: id,
+      ticketId: ticket._id,
+      buyer: { firstName, lastName, email, info },
+      numberOfTickets,
+      ticketType: ticket.name,
+      totalPrice: ticket.price * numberOfTickets,
+    },
+  });
 });
 
 ////get ticket details for an event, (types of ticket, vip, genral)

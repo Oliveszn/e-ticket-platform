@@ -36,3 +36,12 @@ export interface EventInput {
   image: string;
   ticket: Ticket[];
 }
+
+//this is the field for when a user wants to purchase tickets
+export interface TicketInfo {
+  firstName: string;
+  lastName: string;
+  email: string;
+  numberOfTickets: number;
+  info?: any;
+}
