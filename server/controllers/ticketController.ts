@@ -1,5 +1,6 @@
 import { asyncHandler } from "../middleware/errorHandler";
 import Event from "../models/Events";
+import Order from "../models/Order";
 import type { Request, Response, NextFunction } from "express";
 import logger from "../utils/logger";
 import { NotFoundError, ValidationError } from "../utils/error";
@@ -54,8 +55,64 @@ const buyTicket = asyncHandler(async (req: Request, res: Response) => {
     logger.warn("Validation error", error.details[0].message);
     throw new ValidationError(error.details[0].message, 400);
   }
-  const { firstName, lastName, email, numberOfTickets, info } = req.body;
+  // `recipients` can be an array of { firstName, lastName, email } if user chose multiple
+  const {
+    firstName,
+    lastName,
+    email,
+    numberOfTickets,
+    info,
+    recipients,
+    sendToMultipleRecipients,
+  } = req.body;
   const { id, ticketId } = req.params;
+
+  //we check if multiplerecip is true and ticket is 1
+  if (sendToMultipleRecipients && numberOfTickets === 1) {
+    throw new ValidationError(
+      "Cannot send to multiple recipients with only 1 ticket. Either buy more tickets or set sendToMultipleRecipients to false.",
+      400
+    );
+  }
+
+  ///if its true recipients array is needed
+  if (sendToMultipleRecipients) {
+    if (!recipients || !Array.isArray(recipients)) {
+      throw new ValidationError(
+        "Recipients array is required when sendToMultipleRecipients is true",
+        400
+      );
+    }
+
+    ///for multiple recipinetts we need numberoftickets - 1
+    ///cos buyer gets one ticket then recipinet for the rest
+    const expectedRecipients = numberOfTickets - 1;
+    if (recipients.length !== expectedRecipients) {
+      throw new ValidationError(
+        `Expected ${expectedRecipients} recipients for ${numberOfTickets} tickets (buyer gets 1 ticket)`,
+        400
+      );
+    }
+
+    // Validate each recipient has required fields
+    for (let i = 0; i < recipients.length; i++) {
+      const recipient = recipients[i];
+      if (!recipient.firstName || !recipient.lastName || !recipient.email) {
+        throw new ValidationError(
+          `Recipient ${
+            i + 1
+          } is missing required fields (firstName, lastName, email)`,
+          400
+        );
+      }
+    }
+  }
+
+  const orderNumber = `ORDER-${Date.now()}-${Math.random()
+    .toString(36)
+    .substr(2, 9)
+    .toUpperCase()}`;
+
   //to check if theres an id
   if (!id) {
     throw new ValidationError("Event ID is required", 400);
@@ -88,17 +145,59 @@ const buyTicket = asyncHandler(async (req: Request, res: Response) => {
   ticket.sold += numberOfTickets;
   await event.save();
 
+  let tickets: any[] = [];
+  if (sendToMultipleRecipients) {
+    // First ticket goes to buyer
+    tickets.push({
+      ticketTypeId: ticketId,
+      ticketType: ticket.name,
+      recipientFirstName: firstName,
+      recipientLastName: lastName,
+      recipientEmail: email,
+      ticketNumber: `${orderNumber}-1`,
+    });
+
+    // Additional tickets go to recipients
+    recipients.forEach((recipient: any, idx: any) => {
+      tickets.push({
+        ticketTypeId: ticketId,
+        ticketType: ticket.name,
+        recipientFirstName: recipient.firstName,
+        recipientLastName: recipient.lastName,
+        recipientEmail: recipient.email,
+        ticketNumber: `${orderNumber}-${idx + 2}`, // Start from 2 since buyer gets ticket 1
+      });
+    });
+  } else {
+    // All tickets go to buyer
+    tickets = Array.from({ length: numberOfTickets }, (_, idx) => ({
+      ticketTypeId: ticketId,
+      ticketType: ticket.name,
+      recipientFirstName: firstName,
+      recipientLastName: lastName,
+      recipientEmail: email,
+      ticketNumber: `${orderNumber}-${idx + 1}`,
+    }));
+  }
+
   //  Save purchase record
-  // const purchase = new Purchase({
-  //   eventId: id,
-  //   ticketId,
-  //   firstName,
-  //   lastName,
-  //   email,
-  //   numberOfTickets,
-  //   info,
-  // });
-  // await purchase.save();
+  const order = new Order({
+    orderNumber,
+    eventId: id,
+    buyer: {
+      firstName,
+      lastName,
+      email,
+      info,
+    },
+    sendToMultipleRecipients,
+    tickets,
+    orderStatus: "CONFIRMED", // since dummy
+    paymentMethod: "DUMMY",
+    paymentStatus: "PAID", // fake it
+    totalAmount: ticket.price * numberOfTickets,
+  });
+  await order.save();
 
   //  Send confirmation email
   // await sendTicketEmail({ firstName, lastName, email, ticket, numberOfTickets });
@@ -106,14 +205,7 @@ const buyTicket = asyncHandler(async (req: Request, res: Response) => {
   res.status(201).json({
     success: true,
     message: "Ticket purchase successful",
-    data: {
-      eventId: id,
-      ticketId: ticket._id,
-      buyer: { firstName, lastName, email, info },
-      numberOfTickets,
-      ticketType: ticket.name,
-      totalPrice: ticket.price * numberOfTickets,
-    },
+    data: order,
   });
 });
 

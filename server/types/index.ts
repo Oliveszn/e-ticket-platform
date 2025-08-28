@@ -44,4 +44,6 @@ export interface TicketInfo {
   email: string;
   numberOfTickets: number;
   info?: any;
+  recipients?: any;
+  sendToMultipleRecipients?: boolean;
 }
