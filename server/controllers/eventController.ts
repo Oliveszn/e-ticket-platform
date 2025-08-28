@@ -5,7 +5,6 @@ import logger from "../utils/logger";
 import { ForbiddenError, NotFoundError, ValidationError } from "../utils/error";
 import { validateEvent } from "../utils/validation";
 import mongoose from "mongoose";
-import { title } from "process";
 
 ///create events for promoters
 const createEvent = asyncHandler(async (req: Request, res: Response) => {

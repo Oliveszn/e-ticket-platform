@@ -7,6 +7,17 @@ export interface RegistrationInput {
   password: string;
 }
 
+export interface Ticket {
+  _id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  sold: number;
+  description: string;
+  benefits: string[];
+  showVolume: boolean;
+}
+
 export interface EventInput {
   title: string;
   slug: string;
@@ -17,19 +28,11 @@ export interface EventInput {
     address: string;
     city: string;
     state: string;
-    isPublic: Boolean;
+    isPublic: boolean;
   };
   charge: string;
   category: string;
   description: string;
   image: string;
-  ticket: {
-    name: string;
-    price: number;
-    quantity: number;
-    sold: number;
-    description: string;
-    benefits: string[];
-    showVolume: boolean;
-  }[];
+  ticket: Ticket[];
 }
