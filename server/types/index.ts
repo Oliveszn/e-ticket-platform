@@ -47,3 +47,18 @@ export interface TicketInfo {
   recipients?: any;
   sendToMultipleRecipients?: boolean;
 }
+
+///deals with emails
+export interface Attachment {
+  filename: string;
+  content: string;
+  contentType: string;
+}
+
+export interface EmailData {
+  to: string | string[];
+  subject: string;
+  html: string;
+  text?: string;
+  attachments?: Attachment[];
+}
