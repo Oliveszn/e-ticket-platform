@@ -1,14 +1,12 @@
+import dotenv from "dotenv";
+dotenv.config();
 import { Resend } from "resend";
-import type { Attachment, EmailData } from "../types";
+import type { EmailData } from "../types";
+import logger from "../utils/logger";
 
-class EmailService {
-  private provider: string;
-  private resend?: Resend;
-  constructor() {
-    this.provider = process.env.EMAIL_PROVIDER || "resend";
-    this.setupProvider();
-  }
-
+const EmailService = {
+  provider: process.env.EMAIL_PROVIDER || "resend",
+  resend: undefined as Resend | undefined,
   setupProvider() {
     switch (this.provider) {
       case "resend":
@@ -18,56 +16,46 @@ class EmailService {
       default:
         throw new Error(`Unsupported email provider: ${this.provider}`);
     }
-  }
+  },
 
   // Send single email
   async sendEmail(emailData: EmailData) {
-    const { to, subject, html, text, attachments = [] } = emailData;
+    const { to, subject, html, text } = emailData;
 
     try {
       switch (this.provider) {
         case "resend":
-          return await this.sendWithResend(
-            to,
-            subject,
-            html ?? "",
-            text ?? "",
-            attachments
-          );
+          return await this.sendWithResend(to, subject, html ?? "", text ?? "");
 
         default:
           throw new Error("Invalid email provider");
       }
     } catch (error) {
-      console.error("Email sending failed:", error);
+      logger.error("Email sending failed:", error);
       throw error;
     }
-  }
+  },
 
-  // Resend implementation
   async sendWithResend(
     to: string | string[],
     subject: string,
     html: string,
-    text: string,
-    attachments: Attachment[] = []
+    text: string
   ) {
     if (!this.resend) throw new Error("Resend client not initialized");
 
     const result = await this.resend.emails.send({
-      from: `${process.env.FROM_NAME || "TicketPlatform"} <${
-        process.env.FROM_EMAIL
-      }>`,
+      from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
       to: Array.isArray(to) ? to : [to],
       subject,
       react: undefined,
       html,
       text,
-      attachments,
     });
+    logger.warn("Resend API Response:", result);
 
     return { messageId: result.data?.id, provider: "resend" };
-  }
+  },
 
   // Template-based email sending
   async sendTicketConfirmation(orderData: any) {
@@ -77,21 +65,13 @@ class EmailService {
     const html = this.generateTicketConfirmationHTML(orderData);
     const text = this.generateTicketConfirmationText(orderData);
 
-    // Generate QR code attachments for each ticket
-    const attachments = tickets.map((ticket: any) => ({
-      filename: `${ticket.ticketNumber}.png`,
-      content: ticket.qrCode.split(",")[1], // Remove data:image/png;base64, prefix
-      contentType: "image/png",
-    }));
-
     return await this.sendEmail({
       to: customerEmail,
-      subject: `Your tickets for ${eventTitle} - Order #${orderNumber}`,
+      subject: `Your tickets for ${eventTitle} - Order #${orderNumber} - Total ${totalAmount}`,
       html,
       text,
-      attachments,
     });
-  }
+  },
 
   async sendIndividualTickets(tickets: any) {
     const promises = tickets.map((ticket: any) => {
@@ -103,18 +83,11 @@ class EmailService {
         subject: `Your ticket for ${ticket.eventTitle}`,
         html,
         text,
-        attachments: [
-          {
-            filename: `${ticket.ticketNumber}.png`,
-            content: ticket.qrCode.split(",")[1],
-            contentType: "image/png",
-          },
-        ],
       });
     });
 
     return await Promise.all(promises);
-  }
+  },
 
   async sendEventReminder(eventData: any, customerEmails: any) {
     const html = this.generateEventReminderHTML(eventData);
@@ -130,7 +103,7 @@ class EmailService {
     );
 
     return await Promise.all(promises);
-  }
+  },
 
   async sendPromoterWelcome(promoterData: any) {
     const html = this.generatePromoterWelcomeHTML(promoterData);
@@ -142,7 +115,7 @@ class EmailService {
       html,
       text,
     });
-  }
+  },
 
   // HTML Template generators
   generateTicketConfirmationHTML(orderData: any) {
@@ -218,7 +191,7 @@ class EmailService {
       </div>
     </body>
     </html>`;
-  }
+  },
 
   generateIndividualTicketHTML(ticketData: any) {
     const {
@@ -275,7 +248,7 @@ class EmailService {
       </div>
     </body>
     </html>`;
-  }
+  },
 
   generateEventReminderHTML(eventData: any) {
     const { title, date, venue, description } = eventData;
@@ -311,7 +284,7 @@ class EmailService {
     </div>
   </body>
   </html>`;
-  }
+  },
 
   generatePromoterWelcomeHTML(promoterData: any) {
     const { firstName } = promoterData;
@@ -347,7 +320,7 @@ class EmailService {
     </div>
   </body>
   </html>`;
-  }
+  },
 
   // Text versions for better deliverability
   generateTicketConfirmationText(orderData: any) {
@@ -363,11 +336,10 @@ Venue: ${orderData.eventVenue}
 Total Paid: ₦${orderData.totalAmount.toLocaleString()}
 
 Your tickets have been sent to the respective email addresses.
-Please check your attachments for QR codes.
 
 Need help? Contact us at support@ticketplatform.com
     `;
-  }
+  },
 
   generateIndividualTicketText(ticketData: any) {
     return `
@@ -383,7 +355,7 @@ Arrive 30 minutes early with valid ID.
 
 See you at the event!
     `;
-  }
+  },
 
   generateEventReminderText(eventData: any) {
     return `
@@ -400,7 +372,7 @@ ${
 
 Need help? Contact us at support@ticketplatform.com
   `;
-  }
+  },
 
   generatePromoterWelcomeText(promoterData: any) {
     return `
@@ -415,7 +387,9 @@ https://yourapp.com/promoter/dashboard
 
 Need help? Contact us at support@ticketplatform.com
   `;
-  }
-}
+  },
+};
+
+EmailService.setupProvider();
 
 export default EmailService;

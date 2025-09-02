@@ -16,6 +16,7 @@ import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import eventRoutes from "./routes/eventRoutes";
 import ticketRoutes from "./routes/ticketRoutes";
+import emailRoutes from "./routes/emailRoutes";
 // import { ClerkExpressRequireAuth } from "@clerk/express";
 
 const app: Express = express();
@@ -50,6 +51,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/tickets", ticketRoutes);
+app.use("/api", emailRoutes);
 
 // Global error handler
 app.use(errorHandler);
