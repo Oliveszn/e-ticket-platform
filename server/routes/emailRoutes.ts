@@ -1,5 +1,7 @@
 import express from "express";
 import EmailService from "../services/emailService";
+import { emailJobs } from "../jobs/emailQueues";
+import logger from "../utils/logger";
 
 const router = express.Router();
 
@@ -21,9 +23,16 @@ router.post("/test-email", async (req, res) => {
 });
 
 router.post("/promoter", async (req, res) => {
-  const { to } = req.body;
-  const result = await EmailService.sendPromoterWelcome({ email: to });
-  res.json({ success: true, result });
+  try {
+    const { email, firstName } = req.body;
+
+    // Instead of sending email directly
+    await emailJobs.sendPromoterWelcome({ email, firstName });
+
+    res.json({ success: true, message: "Promoter registered, email queued!" });
+  } catch (error) {
+    logger.error(error);
+  }
 });
 
 router.post("/confirmation", async (req, res) => {
@@ -34,15 +43,46 @@ router.post("/confirmation", async (req, res) => {
     customerEmail: email,
     orderNumber: "ORDER-123456",
     tickets: [
-      { seat: "A1", event: "Concert Night", price: 50 },
-      { seat: "A2", event: "Concert Night", price: 50 },
+      {
+        _id: "t1",
+        name: "Concert Night",
+        price: 50,
+        quantity: 1,
+        sold: 0,
+        description: "Regular ticket",
+        benefits: ["General Admission"],
+        showVolume: true,
+      },
+      {
+        _id: "t2",
+        name: "Concert Night",
+        price: 50,
+        quantity: 1,
+        sold: 0,
+        description: "Regular ticket",
+        benefits: ["General Admission"],
+        showVolume: true,
+      },
     ],
     totalAmount: 15000,
     eventDate: "2025-09-10",
+    eventTitle: "Summer Music Festival",
+    eventVenue: "Madison Square Garden",
   };
 
-  const result = await EmailService.sendTicketConfirmation(mockOrderData);
+  const result = await emailJobs.sendTicketConfirmation(mockOrderData);
   res.json({ success: true, result });
+});
+
+router.post("/reminder", async (req, res) => {
+  const { customerEmails, eventData } = req.body;
+
+  try {
+    const result = await emailJobs.sendEventReminder(customerEmails, eventData);
+    res.json({ success: true, message: "Reminder email job queued!", result });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
 });
 
 export default router;

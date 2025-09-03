@@ -55,3 +55,18 @@ export interface EmailData {
   html: string;
   text?: string;
 }
+
+export interface PromoterData {
+  email: string;
+  firstName: string;
+}
+
+export interface OrderData {
+  customerEmail: string;
+  orderNumber: string;
+  eventTitle: string;
+  tickets: Ticket[];
+  totalAmount: number;
+  eventDate: string;
+  eventVenue: string;
+}

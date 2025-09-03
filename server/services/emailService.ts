@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import { Resend } from "resend";
-import type { EmailData } from "../types";
+import type { EmailData, OrderData, PromoterData } from "../types";
 import logger from "../utils/logger";
 
 const EmailService = {
@@ -58,7 +58,7 @@ const EmailService = {
   },
 
   // Template-based email sending
-  async sendTicketConfirmation(orderData: any) {
+  async sendTicketConfirmation(orderData: OrderData) {
     const { customerEmail, orderNumber, eventTitle, tickets, totalAmount } =
       orderData;
 
@@ -105,20 +105,25 @@ const EmailService = {
     return await Promise.all(promises);
   },
 
-  async sendPromoterWelcome(promoterData: any) {
+  async sendPromoterWelcome(promoterData: PromoterData) {
+    if (!promoterData) {
+      console.error("❌ promoterData is undefined in sendPromoterWelcome");
+      return;
+    }
+    const { email, firstName } = promoterData;
     const html = this.generatePromoterWelcomeHTML(promoterData);
     const text = this.generatePromoterWelcomeText(promoterData);
 
     return await this.sendEmail({
-      to: promoterData.email,
-      subject: "Welcome to TicketPlatform - Start Selling Today!",
+      to: email,
+      subject: `Welcome to TicketPlatform, ${firstName} - Start Selling Today!`,
       html,
       text,
     });
   },
 
   // HTML Template generators
-  generateTicketConfirmationHTML(orderData: any) {
+  generateTicketConfirmationHTML(orderData: OrderData) {
     const {
       customerEmail,
       orderNumber,
@@ -286,7 +291,7 @@ const EmailService = {
   </html>`;
   },
 
-  generatePromoterWelcomeHTML(promoterData: any) {
+  generatePromoterWelcomeHTML(promoterData: PromoterData) {
     const { firstName } = promoterData;
 
     return `
@@ -323,7 +328,7 @@ const EmailService = {
   },
 
   // Text versions for better deliverability
-  generateTicketConfirmationText(orderData: any) {
+  generateTicketConfirmationText(orderData: OrderData) {
     return `
 TICKET CONFIRMATION
 
@@ -374,7 +379,7 @@ Need help? Contact us at support@ticketplatform.com
   `;
   },
 
-  generatePromoterWelcomeText(promoterData: any) {
+  generatePromoterWelcomeText(promoterData: PromoterData) {
     return `
 WELCOME TO TICKETPLATFORM
 

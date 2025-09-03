@@ -17,6 +17,7 @@ import userRoutes from "./routes/userRoutes";
 import eventRoutes from "./routes/eventRoutes";
 import ticketRoutes from "./routes/ticketRoutes";
 import emailRoutes from "./routes/emailRoutes";
+import { startEmailQueue } from "./jobs/emailQueues";
 // import { ClerkExpressRequireAuth } from "@clerk/express";
 
 const app: Express = express();
@@ -66,7 +67,7 @@ const startServer = async () => {
     await connectRedis();
 
     // Start background jobs
-    // startEmailQueue();
+    startEmailQueue();
     // startCleanupQueue();
 
     app.listen(PORT, () => {

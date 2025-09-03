@@ -2,6 +2,7 @@ import Queue from "bull";
 import EmailService from "../services/emailService";
 import connectRedis from "../config/redis";
 import logger from "../utils/logger";
+import type { OrderData, PromoterData } from "../types";
 
 interface TicketConfirmationJob {
   orderData: {
@@ -22,9 +23,11 @@ interface PromoterWelcomeJob {
   promoterData: Record<string, any>;
 }
 
+///we create a new queue and name it email processing, we also use redis as aack3nd to store queued jobs
 const emailQueue = new Queue("email processing", process.env.REDIS_URL!);
 
-// Process different types of email jobs
+//this is the worker part, "ticket-conrim" listend to jobs of type "ticket-confirm"
+///te number is just the amount of jobs it can process at the same time
 emailQueue.process("ticket-confirmation", 5, async (job) => {
   const { orderData } = job.data;
 
@@ -66,7 +69,7 @@ emailQueue.process("promoter-welcome", 10, async (job) => {
   }
 });
 
-// Queue event handlers
+// Queue event handlers for logging, these are helpful to know when a job succedds, fails or stalled, thst is took to long and might need retries
 emailQueue.on("completed", (job, result) => {
   logger.info(
     `Email job ${job.id} completed: ${result.emailsSent} emails sent`
@@ -81,11 +84,11 @@ emailQueue.on("stalled", (job) => {
   logger.warn(`Email job ${job.id} stalled`);
 });
 
-// Helper functions to add jobs to queue
+// Here we add jobs to queue
 const emailJobs = {
   // Add ticket confirmation to queue
   sendTicketConfirmation: async (
-    orderData: TicketConfirmationJob["orderData"],
+    orderData: OrderData,
     options: { delay?: number } = {}
   ) => {
     return await emailQueue.add(
@@ -120,16 +123,16 @@ const emailJobs = {
 
   // Add promoter welcome to queue
   sendPromoterWelcome: async (
-    promoterData: PromoterWelcomeJob["promoterData"],
+    promoterData: PromoterData,
     options: { delay?: number } = {}
   ) => {
     return await emailQueue.add(
-      "promoter-welcome",
-      { promoterData },
+      "promoter-welcome", //job-type
+      { promoterData }, //job-data
       {
-        delay: options.delay || 0,
-        attempts: 3,
-        backoff: { type: "exponential", delay: 5000 },
+        delay: options.delay || 0, //delays, can be optional
+        attempts: 3, ///how many times to retry
+        backoff: { type: "exponential", delay: 5000 }, ///here we say if it fails, it waits 5 secs before retrying`
       }
     );
   },
@@ -171,7 +174,7 @@ const emailJobs = {
 
 // Start queue processing
 function startEmailQueue() {
-  logger.warn("Email queue started");
+  logger.info("Email queue started");
   return emailQueue;
 }
 
