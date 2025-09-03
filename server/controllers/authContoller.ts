@@ -7,6 +7,7 @@ import RefreshToken from "../models/RefreshToken";
 import type { Request, Response, NextFunction } from "express";
 import { asyncHandler } from "../middleware/errorHandler";
 import { UnauthorizedError, ValidationError } from "../utils/error";
+import { emailJobs } from "../jobs/emailQueues";
 
 const resgiterUser = asyncHandler(async (req: Request, res: Response) => {
   logger.info("Registration endpoint hit...");
@@ -39,6 +40,9 @@ const resgiterUser = asyncHandler(async (req: Request, res: Response) => {
   logger.warn("User saved successfully", user._id);
 
   const { accessToken, refreshToken } = await generateTokens(user);
+
+  await emailJobs.sendPromoterWelcome({ email, firstName });
+  logger.info(`Promoter welcome email queued for ${email}`);
 
   ///here we send both tokens to frontend
   res.status(201).json({
