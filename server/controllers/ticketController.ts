@@ -205,10 +205,10 @@ const buyTicket = asyncHandler(async (req: Request, res: Response) => {
     const orderData = {
       customerEmail: email, // buyer's email
       orderNumber,
-      eventTitle: event.title, // Make sure you have event name
-      eventDate: event.eventDate, // Make sure you have event date
+      eventTitle: event.title, 
+      eventDate: event.eventDate, 
       eventTime: event.eventTime,
-      eventVenue: event.venue.name, // Make sure you have event venue
+      eventVenue: event.venue.name,
       tickets: tickets.map((t) => ({
         ticketNumber: t.ticketNumber,
         recipientEmail: t.recipientEmail,
@@ -239,10 +239,9 @@ const buyTicket = asyncHandler(async (req: Request, res: Response) => {
     res.status(201).json({
       success: true,
       message: "Ticket purchase successful",
-      // data: order,
       data: {
         ...order.toObject(),
-        emailJobs: emailResult, // Include job info for debugging
+        emailJobs: emailResult, 
       },
     });
   } catch (emailError) {

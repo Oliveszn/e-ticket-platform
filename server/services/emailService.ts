@@ -213,63 +213,6 @@ const EmailService = {
     </html>`;
   },
 
-  // generateIndividualTicketHTML(ticketData: any) {
-  //   const {
-  //     ticketNumber,
-  //     eventTitle,
-  //     eventDate,
-  //     eventVenue,
-  //     recipientEmail,
-  //     ticketTypeName,
-  //   } = ticketData;
-
-  //   return `
-  //   <!DOCTYPE html>
-  //   <html>
-  //   <head>
-  //     <style>
-  //       body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-  //       .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-  //       .ticket-card { border: 2px dashed #4CAF50; padding: 30px; margin: 20px 0; text-align: center; }
-  //       .qr-section { background: #f5f5f5; padding: 20px; margin: 20px 0; }
-  //       .instructions { background: #fff3cd; padding: 15px; border-radius: 5px; }
-  //     </style>
-  //   </head>
-  //   <body>
-  //     <div class="container">
-  //       <h1>🎫 Your Event Ticket</h1>
-
-  //       <div class="ticket-card">
-  //         <h2>${eventTitle}</h2>
-  //         <p><strong>Date:</strong> ${new Date(
-  //           eventDate
-  //         ).toLocaleDateString()}</p>
-  //         <p><strong>Venue:</strong> ${eventVenue}</p>
-  //         <p><strong>Ticket Type:</strong> ${ticketTypeName}</p>
-  //         <p><strong>Ticket Number:</strong> ${ticketNumber}</p>
-  //       </div>
-
-  //       <div class="qr-section">
-  //         <h3>📱 Entry Instructions</h3>
-  //         <p>Your QR code is attached to this email. Save it to your phone and show it at the venue entrance.</p>
-  //       </div>
-
-  //       <div class="instructions">
-  //         <h4>⚠️ Important Notes:</h4>
-  //         <ul>
-  //           <li>This ticket is valid for one person only</li>
-  //           <li>Arrive 30 minutes before event start time</li>
-  //           <li>Bring a valid ID for verification</li>
-  //           <li>Screenshots are accepted, but original QR code preferred</li>
-  //         </ul>
-  //       </div>
-
-  //       <p>See you at the event! 🎉</p>
-  //     </div>
-  //   </body>
-  //   </html>`;
-  // },
-
   generateIndividualTicketHTML(ticketData: TicketData) {
     const {
       ticketNumber,
