@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import { Resend } from "resend";
-import type { EmailData, OrderData, PromoterData } from "../types";
+import type { EmailData, OrderData, PromoterData, TicketData } from "../types";
 import logger from "../utils/logger";
 
 const EmailService = {
@@ -57,7 +57,7 @@ const EmailService = {
     return { messageId: result.data?.id, provider: "resend" };
   },
 
-  // Template-based email sending
+  // confirmation data that goes to buyer and summarizes data
   async sendTicketConfirmation(orderData: OrderData) {
     const { customerEmail, orderNumber, eventTitle, tickets, totalAmount } =
       orderData;
@@ -73,22 +73,29 @@ const EmailService = {
     });
   },
 
-  async sendIndividualTickets(tickets: any) {
-    const promises = tickets.map((ticket: any) => {
-      const html = this.generateIndividualTicketHTML(ticket);
-      const text = this.generateIndividualTicketText(ticket);
+  //individual ticket email goes to each recipient with their specific ticket
+  async sendIndividualTicket(ticketData: TicketData) {
+    const html = this.generateIndividualTicketHTML(ticketData);
+    const text = this.generateIndividualTicketText(ticketData);
 
-      return this.sendEmail({
-        to: ticket.recipientEmail,
-        subject: `Your ticket for ${ticket.eventTitle}`,
-        html,
-        text,
-      });
+    return this.sendEmail({
+      to: ticketData.recipientEmail,
+      subject: `Your Ticket - ${ticketData.eventTitle} - ${ticketData.ticketNumber}`,
+      html,
+      text,
+    });
+  },
+
+  // BULK INDIVIDUAL TICKETS (sends to all recipients)
+  async sendIndividualTickets(tickets: TicketData[]) {
+    const promises = tickets.map((ticket) => {
+      return this.sendIndividualTicket(ticket);
     });
 
     return await Promise.all(promises);
   },
 
+  ///event reminder 24 hours before event
   async sendEventReminder(eventData: any, customerEmails: any) {
     const html = this.generateEventReminderHTML(eventData);
     const text = this.generateEventReminderText(eventData);
@@ -105,6 +112,7 @@ const EmailService = {
     return await Promise.all(promises);
   },
 
+  //welcome email when a user(promoter) reisters
   async sendPromoterWelcome(promoterData: PromoterData) {
     if (!promoterData) {
       console.error("❌ promoterData is undefined in sendPromoterWelcome");
@@ -135,7 +143,7 @@ const EmailService = {
     } = orderData;
 
     return `
-    <!DOCTYPE html>
+   <!DOCTYPE html>
     <html>
     <head>
       <style>
@@ -145,67 +153,132 @@ const EmailService = {
         .content { padding: 20px; background: #f9f9f9; }
         .ticket { border: 1px solid #ddd; margin: 10px 0; padding: 15px; background: white; }
         .footer { text-align: center; padding: 20px; color: #666; }
-        .qr-note { background: #e7f3ff; padding: 15px; margin: 20px 0; border-radius: 5px; }
+        .summary { background: #e7f3ff; padding: 15px; margin: 20px 0; border-radius: 5px; }
       </style>
     </head>
     <body>
       <div class="container">
         <div class="header">
-          <h1>🎫 Ticket Confirmation</h1>
+          <h1>🎫 Order Confirmation</h1>
         </div>
         
         <div class="content">
           <h2>Thank you for your purchase!</h2>
           
-          <p><strong>Order Number:</strong> ${orderNumber}</p>
-          <p><strong>Event:</strong> ${eventTitle}</p>
-          <p><strong>Date:</strong> ${new Date(
-            eventDate
-          ).toLocaleDateString()}</p>
-          <p><strong>Venue:</strong> ${eventVenue}</p>
-          <p><strong>Total Paid:</strong> ₦${totalAmount.toLocaleString()}</p>
+          <div class="summary">
+            <p><strong>Order Number:</strong> ${orderNumber}</p>
+            <p><strong>Event:</strong> ${eventTitle}</p>
+            <p><strong>Date:</strong> ${new Date(
+              eventDate
+            ).toLocaleDateString()}</p>
+            <p><strong>Venue:</strong> ${eventVenue}</p>
+            <p><strong>Total Paid:</strong> ₦${totalAmount.toLocaleString()}</p>
+            <p><strong>Number of Tickets:</strong> ${tickets.length}</p>
+          </div>
           
-          <h3>Your Tickets:</h3>
+          <h3>Ticket Distribution:</h3>
           ${tickets
             .map(
               (ticket: any) => `
             <div class="ticket">
               <p><strong>Ticket #:</strong> ${ticket.ticketNumber}</p>
-              <p><strong>Sent to:</strong> ${ticket.recipientEmail}</p>
-              <p><strong>Type:</strong> ${ticket.ticketTypeName}</p>
+              <p><strong>Recipient:</strong> ${ticket.recipientFirstName} ${
+                ticket.recipientLastName
+              }</p>
+              <p><strong>Email:</strong> ${ticket.recipientEmail}</p>
+              <p><strong>Type:</strong> ${
+                ticket.ticketTypeName || "General"
+              }</p>
             </div>
           `
             )
             .join("")}
           
-          <div class="qr-note">
-            <h4>📱 Important Instructions:</h4>
+          <div class="summary">
+            <h4>📧 What happens next?</h4>
             <ul>
-              <li>Each ticket has been sent to the respective email address</li>
-              <li>Show the QR code on your phone at the venue</li>
-              <li>Arrive 30 minutes early for smooth entry</li>
-              <li>Keep this email for your records</li>
+              <li>Each recipient will receive their individual ticket via email</li>
+              <li>Individual tickets might contain QR codes for entry</li>
+              <li>This is your order summary for record keeping</li>
+              <li>Contact us if you need to make changes</li>
             </ul>
           </div>
         </div>
         
         <div class="footer">
           <p>Need help? Contact us at support@ticketplatform.com</p>
-          <p>© 2024 TicketPlatform. All rights reserved.</p>
         </div>
       </div>
     </body>
     </html>`;
   },
 
-  generateIndividualTicketHTML(ticketData: any) {
+  // generateIndividualTicketHTML(ticketData: any) {
+  //   const {
+  //     ticketNumber,
+  //     eventTitle,
+  //     eventDate,
+  //     eventVenue,
+  //     recipientEmail,
+  //     ticketTypeName,
+  //   } = ticketData;
+
+  //   return `
+  //   <!DOCTYPE html>
+  //   <html>
+  //   <head>
+  //     <style>
+  //       body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+  //       .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+  //       .ticket-card { border: 2px dashed #4CAF50; padding: 30px; margin: 20px 0; text-align: center; }
+  //       .qr-section { background: #f5f5f5; padding: 20px; margin: 20px 0; }
+  //       .instructions { background: #fff3cd; padding: 15px; border-radius: 5px; }
+  //     </style>
+  //   </head>
+  //   <body>
+  //     <div class="container">
+  //       <h1>🎫 Your Event Ticket</h1>
+
+  //       <div class="ticket-card">
+  //         <h2>${eventTitle}</h2>
+  //         <p><strong>Date:</strong> ${new Date(
+  //           eventDate
+  //         ).toLocaleDateString()}</p>
+  //         <p><strong>Venue:</strong> ${eventVenue}</p>
+  //         <p><strong>Ticket Type:</strong> ${ticketTypeName}</p>
+  //         <p><strong>Ticket Number:</strong> ${ticketNumber}</p>
+  //       </div>
+
+  //       <div class="qr-section">
+  //         <h3>📱 Entry Instructions</h3>
+  //         <p>Your QR code is attached to this email. Save it to your phone and show it at the venue entrance.</p>
+  //       </div>
+
+  //       <div class="instructions">
+  //         <h4>⚠️ Important Notes:</h4>
+  //         <ul>
+  //           <li>This ticket is valid for one person only</li>
+  //           <li>Arrive 30 minutes before event start time</li>
+  //           <li>Bring a valid ID for verification</li>
+  //           <li>Screenshots are accepted, but original QR code preferred</li>
+  //         </ul>
+  //       </div>
+
+  //       <p>See you at the event! 🎉</p>
+  //     </div>
+  //   </body>
+  //   </html>`;
+  // },
+
+  generateIndividualTicketHTML(ticketData: TicketData) {
     const {
       ticketNumber,
+      recipientFirstName,
+      recipientLastName,
+      ticketTypeName,
       eventTitle,
       eventDate,
       eventVenue,
-      recipientEmail,
-      ticketTypeName,
     } = ticketData;
 
     return `
@@ -215,41 +288,57 @@ const EmailService = {
       <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .ticket-card { border: 2px dashed #4CAF50; padding: 30px; margin: 20px 0; text-align: center; }
-        .qr-section { background: #f5f5f5; padding: 20px; margin: 20px 0; }
-        .instructions { background: #fff3cd; padding: 15px; border-radius: 5px; }
+        .header { background: #2196F3; color: white; padding: 20px; text-align: center; }
+        .ticket-main { border: 2px solid #2196F3; margin: 20px 0; padding: 30px; background: white; border-radius: 10px; }
+        .qr-section { text-align: center; padding: 20px; background: #f5f5f5; margin: 20px 0; border-radius: 5px; }
+        .instructions { background: #fff3cd; padding: 15px; margin: 20px 0; border-radius: 5px; border: 1px solid #ffeaa7; }
+        .footer { text-align: center; padding: 20px; color: #666; }
       </style>
     </head>
     <body>
       <div class="container">
-        <h1>🎫 Your Event Ticket</h1>
-        
-        <div class="ticket-card">
-          <h2>${eventTitle}</h2>
-          <p><strong>Date:</strong> ${new Date(
-            eventDate
-          ).toLocaleDateString()}</p>
-          <p><strong>Venue:</strong> ${eventVenue}</p>
-          <p><strong>Ticket Type:</strong> ${ticketTypeName}</p>
-          <p><strong>Ticket Number:</strong> ${ticketNumber}</p>
+        <div class="header">
+          <h1>🎟️ Your Event Ticket</h1>
         </div>
         
-        <div class="qr-section">
-          <h3>📱 Entry Instructions</h3>
-          <p>Your QR code is attached to this email. Save it to your phone and show it at the venue entrance.</p>
+        <div class="ticket-main">
+          <h2>Hello ${recipientFirstName}!</h2>
+          
+          <div style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;">
+            <h3>${eventTitle}</h3>
+            <p><strong>Date:</strong> ${new Date(
+              eventDate
+            ).toLocaleDateString()}</p>
+            <p><strong>Venue:</strong> ${eventVenue}</p>
+            <p><strong>Ticket Type:</strong> ${
+              ticketTypeName || "General Admission"
+            }</p>
+          </div>
+          
+          <p><strong>Ticket Number:</strong> ${ticketNumber}</p>
+          <p><strong>Holder:</strong> ${recipientFirstName} ${recipientLastName}</p>
+          
+          <div class="qr-section">
+            <h4>🔲 QR Code</h4>
+            <p><em>QR Code will be generated here</em></p>
+            <p style="font-size: 12px; color: #666;">Show this code at the venue entrance</p>
+          </div>
         </div>
         
         <div class="instructions">
-          <h4>⚠️ Important Notes:</h4>
+          <h4>📱 Entry Instructions:</h4>
           <ul>
-            <li>This ticket is valid for one person only</li>
+            <li>Present this email (with QR code) at the venue</li>
             <li>Arrive 30 minutes before event start time</li>
-            <li>Bring a valid ID for verification</li>
-            <li>Screenshots are accepted, but original QR code preferred</li>
+            <li>Bring a valid ID matching the ticket holder name</li>
+            <li>Screenshots or printed copies are acceptable</li>
           </ul>
         </div>
         
-        <p>See you at the event! 🎉</p>
+        <div class="footer">
+          <p>This ticket is non-transferable and valid for one entry only.</p>
+          <p>Need help? Contact support@ticketplatform.com</p>
+        </div>
       </div>
     </body>
     </html>`;

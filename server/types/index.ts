@@ -7,6 +7,7 @@ export interface RegistrationInput {
   password: string;
 }
 
+////ticket and eventiput are both for when a promoter is cretaing an event
 export interface Ticket {
   _id: string;
   name: string;
@@ -61,11 +62,23 @@ export interface PromoterData {
   firstName: string;
 }
 
+export interface TicketData {
+  ticketNumber: string;
+  recipientEmail: string;
+  recipientFirstName: string;
+  recipientLastName: string;
+  ticketTypeName: string;
+  eventTitle: string;
+  eventDate: string;
+  eventVenue: string;
+  qrCode?: string;
+}
+
 export interface OrderData {
   customerEmail: string;
   orderNumber: string;
   eventTitle: string;
-  tickets: Ticket[];
+  tickets: TicketData[];
   totalAmount: number;
   eventDate: string;
   eventVenue: string;

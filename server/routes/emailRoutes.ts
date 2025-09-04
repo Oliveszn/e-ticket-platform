@@ -70,8 +70,8 @@ router.post("/confirmation", async (req, res) => {
     eventVenue: "Madison Square Garden",
   };
 
-  const result = await emailJobs.sendTicketConfirmation(mockOrderData);
-  res.json({ success: true, result });
+  // const result = await emailJobs.sendTicketConfirmation(mockOrderData);
+  // res.json({ success: true, result });
 });
 
 router.post("/reminder", async (req, res) => {
@@ -80,6 +80,53 @@ router.post("/reminder", async (req, res) => {
   try {
     const result = await emailJobs.sendEventReminder(customerEmails, eventData);
     res.json({ success: true, message: "Reminder email job queued!", result });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Add this to your routes for testing
+router.post("/test", async (req, res) => {
+  const mockOrderData = {
+    customerEmail: "ekpealamicheal@gmail.com",
+    orderNumber: "TEST-123",
+    eventTitle: "Test Event",
+    eventDate: "2025-12-25",
+    eventTime: "7:00 PM",
+    eventVenue: "Test Venue",
+    tickets: [
+      {
+        ticketNumber: "TEST-123-1",
+        recipientEmail: "ekpealamicheal@gmail.com",
+        recipientFirstName: "John",
+        recipientLastName: "Buyer",
+        ticketTypeName: "VIP",
+      },
+      {
+        ticketNumber: "TEST-123-2",
+        recipientEmail: "philiplucas893@gmail.com",
+        recipientFirstName: "Jane",
+        recipientLastName: "Recipient",
+        ticketTypeName: "VIP",
+      },
+    ],
+    totalAmount: 20000,
+  };
+
+  const mockIndividualTickets = mockOrderData.tickets.map((t) => ({
+    ...t,
+    eventTitle: mockOrderData.eventTitle,
+    eventDate: mockOrderData.eventDate,
+    eventTime: mockOrderData.eventTime,
+    eventVenue: mockOrderData.eventVenue,
+  }));
+
+  try {
+    const result = await emailJobs.completeTicketPurchase(
+      mockOrderData,
+      mockIndividualTickets
+    );
+    res.json({ success: true, result });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
   }

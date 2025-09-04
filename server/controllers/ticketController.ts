@@ -7,6 +7,7 @@ import { NotFoundError, ValidationError } from "../utils/error";
 import mongoose from "mongoose";
 import type { Ticket } from "../types";
 import { validateTicketPurchase } from "../utils/validation";
+import { emailJobs } from "../jobs/emailQueues";
 
 ////check ticket availability
 ///we have to first validate theres actually tickets for that particular ticket field(vip, regular)
@@ -199,14 +200,62 @@ const buyTicket = asyncHandler(async (req: Request, res: Response) => {
   });
   await order.save();
 
-  //  Send confirmation email
-  // await sendTicketEmail({ firstName, lastName, email, ticket, numberOfTickets });
+  try {
+    // Prepare order confirmation data (goes to buyer)
+    const orderData = {
+      customerEmail: email, // buyer's email
+      orderNumber,
+      eventTitle: event.title, // Make sure you have event name
+      eventDate: event.eventDate, // Make sure you have event date
+      eventTime: event.eventTime,
+      eventVenue: event.venue.name, // Make sure you have event venue
+      tickets: tickets.map((t) => ({
+        ticketNumber: t.ticketNumber,
+        recipientEmail: t.recipientEmail,
+        recipientFirstName: t.recipientFirstName,
+        recipientLastName: t.recipientLastName,
+        ticketTypeName: t.ticketType,
+      })),
+      totalAmount: ticket.price * numberOfTickets,
+    };
 
-  res.status(201).json({
-    success: true,
-    message: "Ticket purchase successful",
-    data: order,
-  });
+    // Prepare individual ticket data (goes to each recipient)
+    const individualTickets = tickets.map((t) => ({
+      ticketNumber: t.ticketNumber,
+      recipientEmail: t.recipientEmail,
+      recipientFirstName: t.recipientFirstName,
+      recipientLastName: t.recipientLastName,
+      ticketTypeName: t.ticketType,
+      eventTitle: event.title,
+      eventDate: event.eventDate,
+      eventTime: event.eventTime,
+      eventVenue: event.venue.name,
+    }));
+    const emailResult = await emailJobs.completeTicketPurchase(
+      orderData,
+      individualTickets
+    );
+    logger.info("email jobs, queued", emailResult);
+    res.status(201).json({
+      success: true,
+      message: "Ticket purchase successful",
+      // data: order,
+      data: {
+        ...order.toObject(),
+        emailJobs: emailResult, // Include job info for debugging
+      },
+    });
+  } catch (emailError) {
+    // Don't fail the ticket purchase if emails fail
+    logger.error("Email job queueing failed:", emailError);
+
+    res.status(201).json({
+      success: true,
+      message: "Ticket purchase successful (emails will be sent shortly)",
+      data: order.toObject(),
+      warning: "Email delivery may be delayed",
+    });
+  }
 });
 
 ////get ticket details for an event, (types of ticket, vip, genral)

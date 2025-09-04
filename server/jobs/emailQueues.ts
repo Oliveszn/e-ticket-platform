@@ -4,13 +4,6 @@ import connectRedis from "../config/redis";
 import logger from "../utils/logger";
 import type { OrderData, PromoterData } from "../types";
 
-interface TicketConfirmationJob {
-  orderData: {
-    tickets: any[]; // replace with your actual ticket type
-    [key: string]: any;
-  };
-}
-
 interface EventReminderJob {
   eventData: {
     dateTime: string;
@@ -19,15 +12,13 @@ interface EventReminderJob {
   customerEmails: string[];
 }
 
-interface PromoterWelcomeJob {
-  promoterData: Record<string, any>;
-}
-
 ///we create a new queue and name it email processing, we also use redis as aack3nd to store queued jobs
 const emailQueue = new Queue("email processing", process.env.REDIS_URL!);
 
 //this is the worker part, "ticket-conrim" listend to jobs of type "ticket-confirm"
 ///te number is just the amount of jobs it can process at the same time
+
+/////ticket confirma sent to buyer
 emailQueue.process("ticket-confirmation", 5, async (job) => {
   const { orderData } = job.data;
 
@@ -36,11 +27,53 @@ emailQueue.process("ticket-confirmation", 5, async (job) => {
     await EmailService.sendTicketConfirmation(orderData);
 
     // Send individual tickets to each recipient
-    await EmailService.sendIndividualTickets(orderData.tickets);
+    // await EmailService.sendIndividualTickets(orderData.tickets);
 
-    return { success: true, emailsSent: orderData.tickets.length + 1 };
+    // return { success: true, emailsSent: orderData.tickets.length + 1 };
+    return { success: true, emailSent: orderData.customerEmail };
   } catch (error) {
     logger.error("Ticket email job failed:", error);
+    throw error;
+  }
+});
+
+//Individual Ticket Job (sends one ticket to one recipient)
+emailQueue.process("individual-ticket", 10, async (job) => {
+  const { ticketData } = job.data;
+
+  try {
+    await EmailService.sendIndividualTicket(ticketData);
+    console.log(`Individual ticket sent to ${ticketData.recipientEmail}`);
+    return { success: true, emailSent: ticketData.recipientEmail };
+  } catch (error) {
+    logger.info("Individual ticket email failed:", error);
+    throw error;
+  }
+});
+
+// 3. Bulk Ticket Distribution Job (sends individual tickets to all recipients)
+emailQueue.process("ticket-distribution", 3, async (job) => {
+  const { tickets } = job.data;
+
+  try {
+    // Create individual jobs for each ticket (better for tracking and retries)
+    const ticketJobs = tickets.map((ticket: any) =>
+      emailQueue.add(
+        "individual-ticket",
+        { ticketData: ticket },
+        {
+          delay: Math.random() * 2000, // Spread out emails over 2 seconds
+          attempts: 3,
+          backoff: { type: "exponential", delay: 3000 },
+        }
+      )
+    );
+
+    await Promise.all(ticketJobs);
+    logger.info(`Distributed ${tickets.length} individual tickets`);
+    return { success: true, ticketsDistributed: tickets.length };
+  } catch (error) {
+    console.error("Ticket distribution failed:", error);
     throw error;
   }
 });
@@ -102,6 +135,63 @@ const emailJobs = {
         removeOnFail: 20,
       }
     );
+  },
+
+  // Send individual ticket to one recipient
+  sendIndividualTicket: async (
+    ticketData: any,
+    options: { delay?: number } = {}
+  ) => {
+    return await emailQueue.add(
+      "individual-ticket",
+      { ticketData },
+      {
+        delay: options.delay || 0,
+        attempts: 3,
+        backoff: { type: "exponential", delay: 3000 },
+        removeOnComplete: 50,
+        removeOnFail: 20,
+      }
+    );
+  },
+
+  // Distribute all tickets to their respective recipients
+  distributeTickets: async (
+    tickets: any[],
+    options: { delay?: number } = {}
+  ) => {
+    return await emailQueue.add(
+      "ticket-distribution",
+      { tickets },
+      {
+        delay: options.delay || 1000, // Small delay to let confirmation email go first
+        attempts: 2,
+        removeOnComplete: 50,
+        removeOnFail: 20,
+      }
+    );
+  },
+
+  // Complete ticket purchase workflow (confirmation + distribution)
+  completeTicketPurchase: async (orderData: any, tickets: any[]) => {
+    try {
+      // 1. Send order confirmation to buyer (immediate)
+      const confirmationJob = await emailJobs.sendTicketConfirmation(orderData);
+
+      // 2. Distribute individual tickets (with small delay)
+      const distributionJob = await emailJobs.distributeTickets(tickets, {
+        delay: 2000,
+      });
+
+      return {
+        confirmationJob: confirmationJob.id,
+        distributionJob: distributionJob.id,
+        totalEmails: tickets.length + 1, // +1 for confirmation
+      };
+    } catch (error) {
+      console.error("Complete ticket purchase workflow failed:", error);
+      throw error;
+    }
   },
 
   // Add event reminder to queue
