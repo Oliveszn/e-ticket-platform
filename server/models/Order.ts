@@ -17,7 +17,7 @@ const orderSchema = new mongoose.Schema(
       firstName: { type: String, required: true },
       lastName: { type: String, required: true },
       email: { type: String, required: true },
-      Info: { type: String }, // could be name/phone/address etc.
+      info: { type: String }, // could be name/phone/address etc.
     },
 
     sendToMultipleRecipients: { type: Boolean, default: false },
@@ -44,6 +44,7 @@ const orderSchema = new mongoose.Schema(
     ],
     orderStatus: {
       type: String,
+      enum: ["PENDING", "PROCESSING", "CONFIRMED", "CANCELLED", "EXPIRED"],
       default: "PENDING", // ["PENDING", "CONFIRMED", "CANCELLED"]
     },
     paymentMethod: {
@@ -51,7 +52,7 @@ const orderSchema = new mongoose.Schema(
     },
     paymentStatus: {
       type: String,
-      default: "UNPAID", // ["UNPAID", "PAID", "FAILED"]
+      default: "PENDING", // ["PENDING", "PAID", "FAILED"]
     },
     totalAmount: {
       type: Number,
@@ -62,6 +63,9 @@ const orderSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+orderSchema.index({ orderNumber: 1 });
+orderSchema.index({ paymentId: 1 });
 
 const Order = mongoose.model("Order", orderSchema);
 export default Order;

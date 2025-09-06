@@ -1,4 +1,5 @@
 import axios from "axios";
+import logger from "../utils/logger";
 export interface PaymentInitResponse {
   authorization_url: string;
   access_code: string;
@@ -16,31 +17,48 @@ export async function initializePayment(
     email,
     amount: amountInKobo,
     metadata,
+    callback_url: `${process.env.CLIENT_BASE_URL}/payment-callback`,
   };
 
-  const response = await axios.post(
-    `${process.env.PAYSTACK_BASE_URL}/transaction/initialize`,
-    payload,
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  try {
+    const response = await axios.post(
+      `${process.env.PAYSTACK_BASE_URL}/transaction/initialize`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-  return response.data.data; // contains authorization_url, reference, etc.
+    return response.data.data; // contains authorization_url, reference, etc.
+  } catch (error: any) {
+    logger.error(
+      "Paystack initialization error:",
+      error.response?.data || error.message
+    );
+    throw new Error("Payment initialization failed");
+  }
 }
 
 export async function verifyPayment(reference: string) {
-  const response = await axios.get(
-    `${process.env.PAYSTACK_BASE_URL}/transaction/verify/${reference}`,
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
-      },
-    }
-  );
+  try {
+    const response = await axios.get(
+      `${process.env.PAYSTACK_BASE_URL}/transaction/verify/${reference}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+        },
+      }
+    );
 
-  return response.data.data; // contains status, amount, etc.
+    return response.data.data; // contains status, amount, etc.
+  } catch (error: any) {
+    console.error(
+      "Paystack verification error:",
+      error.response?.data || error.message
+    );
+    throw new Error("Payment verification failed");
+  }
 }

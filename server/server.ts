@@ -17,6 +17,7 @@ import userRoutes from "./routes/userRoutes";
 import eventRoutes from "./routes/eventRoutes";
 import ticketRoutes from "./routes/ticketRoutes";
 import emailRoutes from "./routes/emailRoutes";
+import webhookRoutes from "./routes/webhookRoutes";
 import { startEmailQueue } from "./jobs/emailQueues";
 // import { ClerkExpressRequireAuth } from "@clerk/express";
 
@@ -52,6 +53,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/tickets", ticketRoutes);
+app.use("/api/webhooks", webhookRoutes);
 app.use("/api", emailRoutes);
 
 // Global error handler
