@@ -7,13 +7,18 @@ import {
   initializeTicketPurchase,
   verifyTicketPurchase,
 } from "../controllers/ticketController";
+import { purchaseLimiter } from "../middleware/rateLimit";
 const router = express.Router();
 
 //check available
 router.get("/events/:id/tickets/:ticketId", ticketAvailability);
 // purchase ticket
 router.post("/events/:id/tickets/:ticketId", buyTicket);
-router.post("/events/:id/tickets/:ticketId/purcase", initializeTicketPurchase);
+router.post(
+  "/events/:id/tickets/:ticketId/purcase",
+  purchaseLimiter,
+  initializeTicketPurchase
+);
 router.get("/events/verify-purchase", verifyTicketPurchase);
 // get tickets
 router.get("/events/:id", getTicket);

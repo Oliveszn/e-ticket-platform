@@ -62,12 +62,8 @@ const createEvent = asyncHandler(async (req: Request, res: Response) => {
 const getSingleEvent = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   //to check if theres an id
-  if (!id) {
-    throw new ValidationError("Event ID is required", 400);
-  }
-  ///actuallyy confirm its a valid mongodb id
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw new ValidationError("Invalid event ID", 400);
+  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    throw new ValidationError("Invalid or No event ID", 400);
   }
   const event = await Event.findById(id);
   if (!event) {
@@ -177,12 +173,8 @@ const deleteEvent = asyncHandler(async (req: Request, res: Response) => {
   ///event id
   const { id } = req.params;
   //to check if theres an id
-  if (!id) {
-    throw new ValidationError("Event ID is required", 400);
-  }
-  ///actuallyy confirm its a valid mongodb id
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw new ValidationError("Invalid event ID", 400);
+  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    throw new ValidationError("Invalid or No event ID", 400);
   }
 
   const existingEvent = await Event.findByIdAndDelete({

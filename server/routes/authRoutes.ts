@@ -8,12 +8,13 @@ import {
   logoutUser,
 } from "../controllers/authContoller";
 import requireAuth from "../middleware/auth";
+import { authLimiter } from "../middleware/rateLimit";
 
 const router = express.Router();
 
-router.post("/register", resgiterUser);
+router.post("/register", authLimiter, resgiterUser);
 router.post("/register/clerk", registerWithClerk);
-router.post("/login", loginUser);
+router.post("/login", authLimiter, loginUser);
 router.post("/logout", logoutUser);
 router.post("/change/password", requireAuth, changePassword);
 router.post("/refresh-token", refreshTokenUser);

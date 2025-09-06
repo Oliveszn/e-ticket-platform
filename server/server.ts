@@ -5,8 +5,7 @@ import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import type { Express } from "express";
-import rateLimit from "express-rate-limit";
-import RedisStore from "rate-limit-redis";
+import Redis from "ioredis";
 import cookieParser from "cookie-parser";
 import logger from "./utils/logger";
 import connectDB from "./config/db";
@@ -19,11 +18,12 @@ import ticketRoutes from "./routes/ticketRoutes";
 import emailRoutes from "./routes/emailRoutes";
 import webhookRoutes from "./routes/webhookRoutes";
 import { startEmailQueue } from "./jobs/emailQueues";
+import { RateLimiterRedis } from "rate-limiter-flexible";
 // import { ClerkExpressRequireAuth } from "@clerk/express";
 
 const app: Express = express();
 const PORT = process.env.PORT;
-
+const redisClient = new Redis(process.env.REDIS_URL!);
 //middleware
 app.use(helmet());
 app.use(
@@ -47,6 +47,26 @@ app.use(express.json());
 // app.get("/api/protected", ClerkExpressRequireAuth(), (req, res) => {
 //   res.json({ message: "You are authenticated!", user: req.auth });
 // });
+
+// ddos protection rate limiter using Redis as storage
+const rateLimiter = new RateLimiterRedis({
+  storeClient: redisClient, // Redis instance for tracking requests
+  keyPrefix: "middleware", // Prefix for Redis keys
+  points: 10,
+  duration: 1,
+});
+
+// Apply middleware globally
+app.use((req, res, next) => {
+  rateLimiter
+    .consume(req.ip as string) // here we deduct a point for thta ip
+    .then(() => next()) // we only contine if theres still points
+    .catch(() => {
+      // If they exceeded their limit, block
+      logger.warn(`Rate limit exceeded for IP: ${req.ip}`);
+      res.status(429).json({ success: false, message: "Too many requests" });
+    });
+});
 
 ///Routes
 app.use("/api/auth", authRoutes);

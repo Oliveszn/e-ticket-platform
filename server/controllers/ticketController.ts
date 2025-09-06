@@ -17,12 +17,8 @@ const ticketAvailability = asyncHandler(async (req: Request, res: Response) => {
   //two ids here, the event itself and ticket id, (vip, regular)
   const { id, ticketId } = req.params;
   //to check if theres an id
-  if (!id) {
-    throw new ValidationError("Event ID is required", 400);
-  }
-  ///actuallyy confirm its a valid mongodb id
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw new ValidationError("Invalid event ID", 400);
+  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    throw new ValidationError("Invalid or No event ID", 400);
   }
 
   const event = await Event.findById(id);
@@ -574,12 +570,8 @@ const verifyTicketPurchase = asyncHandler(
 const getTicket = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   //to check if theres an id
-  if (!id) {
-    throw new ValidationError("Event ID is required", 400);
-  }
-  ///actuallyy confirm its a valid mongodb id
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw new ValidationError("Invalid event ID", 400);
+  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    throw new ValidationError("Invalid or No event ID", 400);
   }
 
   const event = await Event.findById(id);
@@ -613,12 +605,8 @@ const getTicket = asyncHandler(async (req: Request, res: Response) => {
 const getSingleTicket = asyncHandler(async (req: Request, res: Response) => {
   const { id, ticketId } = req.params;
   //to check if theres an id
-  if (!id) {
-    throw new ValidationError("Event ID is required", 400);
-  }
-  ///actuallyy confirm its a valid mongodb id
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw new ValidationError("Invalid event ID", 400);
+  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    throw new ValidationError("Invalid or No event ID", 400);
   }
 
   const event = await Event.findById(id);
