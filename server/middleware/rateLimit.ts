@@ -2,6 +2,7 @@ import rateLimit from "express-rate-limit";
 import RedisStore from "rate-limit-redis";
 import type { RedisReply } from "rate-limit-redis";
 import Redis from "ioredis";
+import { RateLimiterRedis } from "rate-limiter-flexible";
 
 const redisClient = new Redis(process.env.REDIS_URL!);
 
@@ -40,4 +41,12 @@ export const authLimiter = createLimiter({
 export const purchaseLimiter = createLimiter({
   windowMs: 60 * 1000,
   max: 10,
+});
+
+// ddos protection rate limiter using Redis as storage
+export const rateLimiter = new RateLimiterRedis({
+  storeClient: redisClient, // Redis instance for tracking requests
+  keyPrefix: "middleware", // Prefix for Redis keys
+  points: 10,
+  duration: 1,
 });

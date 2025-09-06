@@ -6,6 +6,15 @@ import { ForbiddenError, NotFoundError, ValidationError } from "../utils/error";
 import { validateEvent } from "../utils/validation";
 import mongoose from "mongoose";
 
+const invalidateEventCache = async (
+  req: Request,
+  eventId: string,
+  organizerId: string
+) => {
+  const keysToDelete = [`event:${eventId}`, `events:organizer:${organizerId}`];
+  await req.redisClient.del(...keysToDelete);
+};
+
 ///create events for promoters
 const createEvent = asyncHandler(async (req: Request, res: Response) => {
   //validate the schema
@@ -48,6 +57,7 @@ const createEvent = asyncHandler(async (req: Request, res: Response) => {
   });
 
   await event.save();
+  await invalidateEventCache(req, event._id.toString(), organizerId);
 
   res.status(201).json({
     success: true,
@@ -61,14 +71,27 @@ const createEvent = asyncHandler(async (req: Request, res: Response) => {
 ///get a particular event for public
 const getSingleEvent = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
+  const eventkey = `event:${id}`;
+  const cachedPost = await req.redisClient.get(eventkey);
+
   //to check if theres an id
   if (!id || !mongoose.Types.ObjectId.isValid(id)) {
     throw new ValidationError("Invalid or No event ID", 400);
   }
+  if (cachedPost) {
+    return res.status(200).json({
+      success: true,
+      message: "Event fetched successfully (from cache)",
+      data: JSON.parse(cachedPost),
+    });
+  }
+
   const event = await Event.findById(id);
   if (!event) {
     throw new NotFoundError("Event not found");
   }
+
+  await req.redisClient.setex(eventkey, 3600, JSON.stringify(event));
 
   res.status(200).json({
     success: true,
@@ -154,6 +177,7 @@ const editEvent = asyncHandler(async (req: Request, res: Response) => {
     new: true,
     runValidators: true,
   });
+  await invalidateEventCache(req, event._id.toString(), organizerId);
 
   res.status(200).json({
     success: true,
@@ -177,10 +201,17 @@ const deleteEvent = asyncHandler(async (req: Request, res: Response) => {
     throw new ValidationError("Invalid or No event ID", 400);
   }
 
-  const existingEvent = await Event.findByIdAndDelete({
+  const existingEvent = await Event.findOneAndDelete({
     _id: id,
-    organizerId: organizerId,
+    organizerId,
   });
+
+  if (!existingEvent) {
+    throw new NotFoundError(
+      "Event not found or you are not authorized to delete it"
+    );
+  }
+  await invalidateEventCache(req, id.toString(), organizerId);
   res.status(200).json({
     success: true,
     message: "Event deletion successful",
@@ -230,10 +261,23 @@ const getPromoterEvent = asyncHandler(async (req: Request, res: Response) => {
     throw new NotFoundError("User not found");
   }
 
+  const listKey = `events:organizer:${organizerId}`;
+  const cachedEvent = await req.redisClient.get(listKey);
+
+  if (cachedEvent) {
+    return res.status(200).json({
+      success: true,
+      message: "Successfully retrieved events (from cache)",
+      data: JSON.parse(cachedEvent),
+    });
+  }
+
   const allEvents = await Event.find({ organizerId });
   if (!allEvents) {
     throw new NotFoundError("You have no existing event");
   }
+
+  await req.redisClient.setex(listKey, 43200, JSON.stringify(allEvents)); //save in cache
 
   res.status(200).json({
     success: true,

@@ -18,12 +18,11 @@ import ticketRoutes from "./routes/ticketRoutes";
 import emailRoutes from "./routes/emailRoutes";
 import webhookRoutes from "./routes/webhookRoutes";
 import { startEmailQueue } from "./jobs/emailQueues";
-import { RateLimiterRedis } from "rate-limiter-flexible";
+import { rateLimiter } from "./middleware/rateLimit";
 // import { ClerkExpressRequireAuth } from "@clerk/express";
 
 const app: Express = express();
 const PORT = process.env.PORT;
-const redisClient = new Redis(process.env.REDIS_URL!);
 //middleware
 app.use(helmet());
 app.use(
@@ -47,14 +46,6 @@ app.use(express.json());
 // app.get("/api/protected", ClerkExpressRequireAuth(), (req, res) => {
 //   res.json({ message: "You are authenticated!", user: req.auth });
 // });
-
-// ddos protection rate limiter using Redis as storage
-const rateLimiter = new RateLimiterRedis({
-  storeClient: redisClient, // Redis instance for tracking requests
-  keyPrefix: "middleware", // Prefix for Redis keys
-  points: 10,
-  duration: 1,
-});
 
 // Apply middleware globally
 app.use((req, res, next) => {
