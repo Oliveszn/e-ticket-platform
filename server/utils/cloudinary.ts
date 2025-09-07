@@ -20,6 +20,14 @@ const uploadMediaToCloudinary = (file: any) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
         resource_type: "auto",
+        ///Learning image optimization options
+        quality: "auto:good", // Auto quality optimization
+        fetch_format: "auto", // Auto format selection
+        flags: "progressive", // Progressive JPEG loading
+        //Set reasonable size limits
+        width: 1920,
+        height: 1080,
+        crop: "limit", // Only resize if larger than specified dimensions
       },
       (error, result) => {
         if (error) {
@@ -46,4 +54,18 @@ const deleteMediaFromCloudinary = async (publicId: any) => {
   }
 };
 
-export { deleteMediaFromCloudinary, uploadMediaToCloudinary };
+const getOptimizedImageUrl = (publicId: string, options?: any) => {
+  return cloudinary.url(publicId, {
+    f_auto: true, // Auto format (WebP/AVIF when supported)
+    q_auto: true, // Auto quality
+    w_auto: true, // Auto width
+    dpr_auto: true, // Auto device pixel ratio
+    ...options,
+  });
+};
+
+export {
+  deleteMediaFromCloudinary,
+  uploadMediaToCloudinary,
+  getOptimizedImageUrl,
+};

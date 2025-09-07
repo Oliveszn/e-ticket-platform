@@ -7,6 +7,7 @@ import { validateEvent } from "../utils/validation";
 import mongoose from "mongoose";
 import {
   deleteMediaFromCloudinary,
+  getOptimizedImageUrl,
   uploadMediaToCloudinary,
 } from "../utils/cloudinary";
 
@@ -81,12 +82,18 @@ const createEvent = asyncHandler(async (req: MulterRequest, res: Response) => {
   });
 
   await event.save();
+  // Transform the response to include optimized URLs
+  const eventResponse = event.toObject();
+  eventResponse.image.optimizedUrl = getOptimizedImageUrl(
+    cloudinaryUploadResult.public_id
+  );
   await invalidateEventCache(req, event._id.toString(), organizerId);
 
   res.status(201).json({
     success: true,
     message: "Event created successfully!",
-    data: event,
+    // data: event,
+    data: eventResponse,
   });
 });
 
