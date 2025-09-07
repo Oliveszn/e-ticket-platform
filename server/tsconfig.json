@@ -9,7 +9,7 @@
     "module": "ESNext",
     "target": "ESNext",
     "moduleResolution": "node",
-    "types": ["node"],
+    "types": ["node", "express", "multer"],
     "lib": ["ESNext"],
 
     // Other Outputs

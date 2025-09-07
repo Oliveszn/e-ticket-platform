@@ -5,6 +5,14 @@ import logger from "../utils/logger";
 import { ForbiddenError, NotFoundError, ValidationError } from "../utils/error";
 import { validateEvent } from "../utils/validation";
 import mongoose from "mongoose";
+import {
+  deleteMediaFromCloudinary,
+  uploadMediaToCloudinary,
+} from "../utils/cloudinary";
+
+interface MulterRequest extends Request {
+  file?: Express.Multer.File;
+}
 
 const invalidateEventCache = async (
   req: Request,
@@ -16,7 +24,7 @@ const invalidateEventCache = async (
 };
 
 ///create events for promoters
-const createEvent = asyncHandler(async (req: Request, res: Response) => {
+const createEvent = asyncHandler(async (req: MulterRequest, res: Response) => {
   //validate the schema
   const { error } = validateEvent(req.body);
   if (error) {
@@ -27,6 +35,12 @@ const createEvent = asyncHandler(async (req: Request, res: Response) => {
   const organizerId = req.user?._id;
   if (!organizerId) {
     throw new NotFoundError("User not found");
+  }
+
+  if (!req.file) {
+    return res
+      .status(400)
+      .json({ success: false, message: "No file uploaded" });
   }
 
   const {
@@ -42,6 +56,11 @@ const createEvent = asyncHandler(async (req: Request, res: Response) => {
     ticket,
   } = req.body;
 
+  const { originalname, mimetype } = req.file;
+
+  // Upload to Cloudinary
+  const cloudinaryUploadResult: any = await uploadMediaToCloudinary(req.file);
+
   const event = new Event({
     organizerId: req.user?._id,
     title,
@@ -52,7 +71,12 @@ const createEvent = asyncHandler(async (req: Request, res: Response) => {
     charge,
     category,
     description,
-    image,
+    image: {
+      publicId: cloudinaryUploadResult.public_id,
+      mimeType: mimetype,
+      url: cloudinaryUploadResult.secure_url,
+      originalName: originalname,
+    },
     ticket,
   });
 
@@ -201,7 +225,8 @@ const deleteEvent = asyncHandler(async (req: Request, res: Response) => {
     throw new ValidationError("Invalid or No event ID", 400);
   }
 
-  const existingEvent = await Event.findOneAndDelete({
+  //Find the event first so as to get image.publicId)
+  const existingEvent = await Event.findOne({
     _id: id,
     organizerId,
   });
@@ -211,6 +236,23 @@ const deleteEvent = asyncHandler(async (req: Request, res: Response) => {
       "Event not found or you are not authorized to delete it"
     );
   }
+
+  //Delete the image from cloud if excists
+  if (existingEvent.image?.publicId) {
+    try {
+      await deleteMediaFromCloudinary(existingEvent.image.publicId);
+    } catch (err) {
+      logger.warn(
+        `Failed to delete image from Cloudinary: ${existingEvent.image.publicId}`,
+        err
+      );
+      throw new Error("Couldn't delete image from cloudinary");
+    }
+  }
+
+  //Delete from db
+  await existingEvent.deleteOne();
+
   await invalidateEventCache(req, id.toString(), organizerId);
   res.status(200).json({
     success: true,
