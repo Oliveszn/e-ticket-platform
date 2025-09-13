@@ -17,12 +17,11 @@ export default function RootLayout({
     <html lang="en">
       <body
         className="flex flex-col min-h-screen"
-        // style={{ backgroundColor: "red" }}
         suppressHydrationWarning={true}
       >
         <Navbar />
         {children}
-        <Footer />
+        {/* <Footer /> */}
       </body>
     </html>
   );

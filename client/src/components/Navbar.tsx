@@ -51,9 +51,11 @@ export default function Navbar() {
         </div>
 
         <div>
-          <Button className="bg-blue-500 hover:bg-blue-600 text-white py-2.5 px-4 rounded shadow-lg flex justify-center items-center w-24">
-            Login
-          </Button>
+          <Link href="/auth/login">
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white py-2.5 px-4 rounded shadow-lg flex justify-center items-center w-24">
+              Login
+            </Button>
+          </Link>
         </div>
       </div>
     </nav>
