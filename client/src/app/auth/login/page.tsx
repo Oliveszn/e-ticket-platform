@@ -1,4 +1,4 @@
-import { StagePassLogo } from "@/components/Stagepass-logo";
+import { StagePassLogo } from "@/components/common/Stagepass-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Aperture, Chrome, KeyRound, LockOpen, Mail } from "lucide-react";

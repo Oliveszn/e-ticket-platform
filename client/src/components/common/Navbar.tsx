@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { StagePassLogo } from "./Stagepass-logo";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 
 export default function Navbar() {
   let links = [
