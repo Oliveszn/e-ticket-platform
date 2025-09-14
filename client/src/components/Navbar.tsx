@@ -11,7 +11,7 @@ export default function Navbar() {
     { name: "Pricing", link: "/pricing" },
   ];
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200 px-6 sm:px-8 lg:px-10 sticky top-0">
+    <nav className="bg-white shadow-sm border-b border-gray-200 px-6 sm:px-8 lg:px-10 sticky top-0 z-10">
       <div className="max-w-6xl mx-auto py-4 flex justify-between items-center">
         <div className="flex-shrink-0 cursor-pointer">
           <Link

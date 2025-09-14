@@ -17,7 +17,7 @@ const Register = () => {
       <form className="space-y-5">
         {/* Name Fields */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-1">
+          <div className="space-y-2">
             <label htmlFor="firstName" className="">
               First Name
             </label>
@@ -31,7 +31,7 @@ const Register = () => {
             </div>
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-2">
             <label htmlFor="lastName" className="">
               Last Name
             </label>
@@ -45,14 +45,14 @@ const Register = () => {
             </div>
           </div>
         </div>
-        <p className="text-xs font-medium text-gray-500">
-          <CircleAlert className="size-5" />
+        <p className="text-xs flex items-center gap-4 font-medium text-gray-500">
+          <CircleAlert className="size-7" />
           Your name should be your legal name, because this will be matched with
           your bank account for payouts.
         </p>
 
         {/* Business Name */}
-        <div className="space-y-1">
+        <div className="space-y-2">
           <label htmlFor="lastName" className="">
             Business Name
           </label>
@@ -71,7 +71,7 @@ const Register = () => {
         </div>
 
         {/* Email */}
-        <div className="space-y-1">
+        <div className="space-y-2">
           <label htmlFor="email" className="">
             Email
           </label>
@@ -86,7 +86,7 @@ const Register = () => {
         </div>
 
         {/* Number */}
-        <div className="space-y-1">
+        <div className="space-y-2">
           <label htmlFor="number" className="">
             Phone Number
           </label>
@@ -101,7 +101,7 @@ const Register = () => {
         </div>
 
         {/* Address */}
-        <div className="space-y-1">
+        <div className="space-y-2">
           <label htmlFor="address" className="">
             Address
           </label>
@@ -116,7 +116,7 @@ const Register = () => {
         </div>
 
         {/* Password */}
-        <div className="space-y-1">
+        <div className="space-y-2">
           <label htmlFor="password" className="">
             Password
           </label>

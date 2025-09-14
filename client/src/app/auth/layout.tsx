@@ -20,13 +20,10 @@ export default function AuthLayout({
           fill
           className="object-cover object-center"
           sizes="(min-width:1024px) 50vw, 100vw"
-          // width={730}
-          // height={650}
-          // style={{ maxWidth: "100%", height: "auto" }}
         />
       </div>
-      <div className="flex flex-1 flex-col h-full justify-start items-center px-4 py-12 sm:px-6 lg:px-8">
-        {children}
+      <div className="flex flex-1 h-screen justify-center items-start px-4 sm:px-6 lg:px-8 overflow-y-auto">
+        <div className="w-full flex justify-center py-12">{children}</div>
       </div>
     </div>
   );
