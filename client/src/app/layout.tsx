@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Raleway } from "next/font/google";
 import Navbar from "@/components/common/Navbar";
 import ConditionalFooter from "@/components/common/conditionalFooter";
+
+const raleway = Raleway({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-raleway",
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -14,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${raleway.variable}`}>
       <body
         className="flex flex-col min-h-screen"
         suppressHydrationWarning={true}
