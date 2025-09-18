@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Image from "next/image";
 import eventImage from "../../../public/event.jpg";
 import { experiences } from "@/config/about";
+import Testimonial from "@/components/common/Testimonial";
 
 export const metadata: Metadata = {
   title: "About | My App",
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 const About = () => {
   return (
     <main className="py-16 bg-[url('/pricingpattern.png')] bg-no-repeat bg-top bg-contain px-6 sm:px-8 lg:px-10">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto ">
         <div className="max-w-2xl px-4 sm:px-0 mx-auto z-20 relative space-y-4">
           <p className="font-raleway text-3xl sm:text-6xl text-center font-bold">
             We help you focus on what matters
@@ -50,7 +51,13 @@ const About = () => {
             </p>
           </div>
         </section>
+      </div>
 
+      <div className="-mx-6 sm:-mx-8 lg:-mx-10">
+        <Testimonial />
+      </div>
+
+      <div className="max-w-6xl mx-auto ">
         <section className="py-16 sm:py-20">
           <div className="z-20 relative space-y-4 py-6 text-center">
             <p className="text-3xl font-semibold">Onsite Experiences</p>
