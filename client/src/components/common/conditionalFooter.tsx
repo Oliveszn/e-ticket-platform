@@ -7,7 +7,7 @@ export default function ConditionalFooter() {
   const pathname = usePathname();
 
   // Hide footer on auth pages
-  if (pathname.startsWith("/auth")) {
+  if (pathname.startsWith("/auth") || pathname.startsWith("/dashboard")) {
     return null;
   }
 
