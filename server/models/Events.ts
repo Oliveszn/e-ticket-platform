@@ -47,8 +47,6 @@ const eventSchema = new mongoose.Schema(
         "Health",
         "Seminars",
         "Arts & Culture",
-        "Charity",
-        "Networking",
       ],
       required: true,
     },
