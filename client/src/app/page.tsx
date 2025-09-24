@@ -1,4 +1,6 @@
 import Categories from "@/components/home/Categories";
+import Features from "@/components/home/Features";
+import Reviews from "@/components/home/Reviews";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -37,6 +39,8 @@ export default function Home() {
       <div className="px-6 sm:px-8 lg:px-10">
         <div className="max-w-6xl mx-auto">
           <Categories />
+          <Features />
+          <Reviews />
         </div>
       </div>
     </main>
