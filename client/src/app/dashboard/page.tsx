@@ -2,7 +2,7 @@ import React from "react";
 
 const DashboardPage = () => {
   return (
-    <div>
+    <div className="">
       <h1 className="text-2xl font-bold">Dashboard Overview</h1>
       <p>Welcome to your dashboard.</p>
     </div>

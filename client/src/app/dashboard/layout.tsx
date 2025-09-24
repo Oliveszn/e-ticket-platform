@@ -14,7 +14,7 @@ export default function DashBoardLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="flex h-screen w-full">
+      <div className="flex h-screen w-full bg-gray-100">
         <AppSidebar />
 
         <div className="flex-1 flex flex-col">

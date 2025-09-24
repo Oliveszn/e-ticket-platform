@@ -8,16 +8,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import Link from "next/link";
 
 const Header = () => {
   return (
-    <header className="flex items-center justify-between px-4 py-3 shadow-md">
+    <header className="flex items-center justify-between px-4 py-3 shadow-md bg-white">
       <SidebarTrigger />
       <div className="flex flex-1 justify-end items-center gap-8">
         <div>
-          <button className="bg-blue text-secondary shadow-lg rounded whitespace-nowrap py-2.5 px-4 cursor-pointer">
+          <Link
+            href="/dashboard/events/create"
+            className="bg-blue text-secondary shadow-lg rounded whitespace-nowrap py-2.5 px-4 cursor-pointer"
+          >
             Create Event
-          </button>
+          </Link>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
