@@ -2,26 +2,25 @@
 
 import EventDetails from "@/components/dashboard/create/EventDetails";
 import Tickets from "@/components/dashboard/create/Tickets";
+import { resetForm, saveData, setStep } from "@/store/createevent-slice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { formSchema } from "@/utils/validationSchema";
 import { useFormik } from "formik";
-import { useState } from "react";
 import { toFormikValidationSchema } from "zod-formik-adapter";
-
-type FormValues = {
-  name: string;
-  slug: string;
-  date: string;
-  time: string;
-};
+import { useRouter } from "next/navigation";
+import { FormValues } from "@/utils/types";
 
 const CreateEvent = () => {
-  const [step, setStep] = useState(0);
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const step = useAppSelector((state) => state.form.step);
+  const formData = useAppSelector((state) => state.form.data);
   const formik = useFormik<FormValues>({
     initialValues: {
-      name: "",
-      slug: "",
-      date: "",
-      time: "",
+      name: formData.name || "",
+      slug: formData.slug || "",
+      date: formData.date || "",
+      time: formData.time || "",
     },
     validationSchema: toFormikValidationSchema(formSchema),
     onSubmit: (values) => {
@@ -31,36 +30,43 @@ const CreateEvent = () => {
 
   const handleSubmit = async (data: any) => {
     console.log("Final form submission ", data);
+    dispatch(resetForm());
+    router.push("/dashboard/events");
   };
 
   const nextStep = async () => {
-    ///validate current step before you proceed
+    ///here we create a variable that will hold keys from our ts formvalues
     let fieldsToValidate: (keyof FormValues)[] = [];
 
+    ///here we check and validate the filed by the step we are on
     if (step === 0) {
       fieldsToValidate = ["name", "slug"];
     } else if (step === 1) {
       fieldsToValidate = ["date", "time"];
     }
 
-    ////validate only the fields for the currenrt step
+    ////here validateform validates the field and return the error we set in zod
+    ///// haserrors uses ftv up above to check if any field has erors
     const errors = await formik.validateForm();
     const hasErrors = fieldsToValidate.some((field) => errors[field]);
 
-    ///marking fields as touched to sow errors
+    ///here we map over ftv and set every key to true to set it as touched
     const touchedFields = fieldsToValidate.reduce((acc, field) => {
       acc[field] = true;
       return acc;
     }, {} as Record<string, boolean>);
 
+    ////here we are forcing formik to mark all as touched so it can show all errors (normally formik will only show errors of wats been touched)
     formik.setTouched({ ...formik.touched, ...touchedFields });
 
+    //if theres are no errors
     if (!hasErrors) {
-      setStep((prev) => Math.min(prev + 1, steps.length - 1));
+      dispatch(saveData(formik.values));
+      dispatch(setStep(Math.min(step + 1, steps.length - 1)));
     }
   };
 
-  const prevStep = () => setStep((prev) => Math.max(prev - 1, 0));
+  const prevStep = () => dispatch(setStep(Math.max(step - 1, 0)));
 
   const steps = [
     {

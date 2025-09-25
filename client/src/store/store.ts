@@ -1,12 +1,42 @@
 "use client";
 import { configureStore } from "@reduxjs/toolkit";
 import formReducer from "./createevent-slice";
+import { persistReducer, persistStore } from "redux-persist";
+import storage from "redux-persist/lib/storage"; // localStorage
+import { combineReducers } from "redux";
+import {
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from "redux-persist";
 
-const store = configureStore({
-  reducer: {
-    form: formReducer,
-  },
+const rootReducer = combineReducers({
+  form: formReducer,
+  // temp: tempReducer, // not persisted/
 });
-export default store;
+
+const persistConfig = {
+  key: "root",
+  storage,
+  // whitelist: ["form"], // only form will persist
+};
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+///learnt its best practice to add serializable checks here, especailly when storing complex checks like dates
+export const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
+});
+
+export const persistor = persistStore(store);
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof store.getState>;

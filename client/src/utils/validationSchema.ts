@@ -26,5 +26,3 @@ export const formSchema = z.object({
     error: "Time must be in HH:mm format (24-hour)",
   }),
 });
-
-export type FormSchema = z.infer<typeof formSchema>;
