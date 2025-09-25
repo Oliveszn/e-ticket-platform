@@ -3,6 +3,7 @@ import "./globals.css";
 import { Raleway } from "next/font/google";
 import Navbar from "@/components/common/Navbar";
 import ConditionalFooter from "@/components/common/conditionalFooter";
+import Providers from "./provider";
 
 const raleway = Raleway({
   subsets: ["latin"],
@@ -27,7 +28,7 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         {/* <Navbar /> */}
-        {children}
+        <Providers>{children}</Providers>
         <ConditionalFooter />
       </body>
     </html>
