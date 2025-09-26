@@ -17,10 +17,31 @@ const CreateEvent = () => {
   const formData = useAppSelector((state) => state.form.data);
   const formik = useFormik<FormValues>({
     initialValues: {
-      name: formData.name || "",
+      title: formData.title || "",
       slug: formData.slug || "",
       date: formData.date || "",
       time: formData.time || "",
+      venue: {
+        name: formData.venue?.name || "",
+        address: formData.venue?.address || "",
+        city: formData.venue?.city || "",
+        state: formData.venue?.state || "",
+        isPublic: formData.venue?.isPublic ?? true,
+      },
+      charge: formData.charge || "Host",
+      category: formData.category || "",
+      description: formData.description || "",
+      image: null as any,
+      ticket: formData.ticket || [
+        {
+          name: "",
+          price: 0,
+          quantity: 0,
+          description: "",
+          benefits: [],
+          showVolume: false,
+        },
+      ],
     },
     validationSchema: toFormikValidationSchema(formSchema),
     onSubmit: (values) => {
@@ -34,27 +55,72 @@ const CreateEvent = () => {
     router.push("/dashboard/events");
   };
 
+  function hasNestedError(obj: any): boolean {
+    if (!obj) return false;
+    if (typeof obj === "string") return true;
+    if (typeof obj === "object") {
+      return Object.values(obj).some((value) => hasNestedError(value));
+    }
+    return false;
+  }
+
+  function markTouched(fields: any): any {
+    if (typeof fields === "string" || typeof fields === "number") {
+      return true;
+    }
+    if (Array.isArray(fields)) {
+      return fields.map((item) => markTouched(item));
+    }
+    if (typeof fields === "object" && fields !== null) {
+      return Object.keys(fields).reduce((acc, key) => {
+        acc[key] = markTouched(fields[key]);
+        return acc;
+      }, {} as any);
+    }
+    return true;
+  }
+
   const nextStep = async () => {
     ///here we create a variable that will hold keys from our ts formvalues
     let fieldsToValidate: (keyof FormValues)[] = [];
 
     ///here we check and validate the filed by the step we are on
     if (step === 0) {
-      fieldsToValidate = ["name", "slug"];
+      fieldsToValidate = [
+        "title",
+        "slug",
+        "date",
+        "time",
+        "venue",
+        "charge",
+        "category",
+        "description",
+        "image",
+      ];
     } else if (step === 1) {
-      fieldsToValidate = ["date", "time"];
+      fieldsToValidate = ["ticket"];
     }
 
     ////here validateform validates the field and return the error we set in zod
     ///// haserrors uses ftv up above to check if any field has erors
     const errors = await formik.validateForm();
-    const hasErrors = fieldsToValidate.some((field) => errors[field]);
+    const hasErrors = fieldsToValidate.some((field) =>
+      hasNestedError(errors[field])
+    );
 
     ///here we map over ftv and set every key to true to set it as touched
+    // const touchedFields = fieldsToValidate.reduce((acc, field) => {
+    //   acc[field] = true;
+    //   return acc;
+    // }, {} as Record<string, boolean>);
     const touchedFields = fieldsToValidate.reduce((acc, field) => {
-      acc[field] = true;
+      if (errors[field]) {
+        acc[field] = markTouched(errors[field]);
+      } else {
+        acc[field] = true;
+      }
       return acc;
-    }, {} as Record<string, boolean>);
+    }, {} as Record<string, any>);
 
     ////here we are forcing formik to mark all as touched so it can show all errors (normally formik will only show errors of wats been touched)
     formik.setTouched({ ...formik.touched, ...touchedFields });

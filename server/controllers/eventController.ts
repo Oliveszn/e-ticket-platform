@@ -53,7 +53,6 @@ const createEvent = asyncHandler(async (req: MulterRequest, res: Response) => {
     charge,
     category,
     description,
-    image,
     ticket,
   } = req.body;
 
