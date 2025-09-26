@@ -8,6 +8,7 @@ const validateRegistration = (data: RegistrationInput) => {
     email: Joi.string().email().required(),
     firstName: Joi.string().min(3).max(50).required(),
     lastName: Joi.string().min(3).max(50).required(),
+    businessName: Joi.string().required(),
     address: Joi.string().required(),
     number: Joi.string()
       .pattern(/^[0-9]+$/) // only digits

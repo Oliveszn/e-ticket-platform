@@ -16,8 +16,9 @@ router.post("/register", authLimiter, resgiterUser);
 router.post("/register/clerk", registerWithClerk);
 router.post("/login", authLimiter, loginUser);
 router.post("/logout", logoutUser);
-router.post("/change/password", requireAuth, changePassword);
+router.patch("/change/password", requireAuth, changePassword);
 router.post("/refresh-token", refreshTokenUser);
+router.get("/me", requireAuth);
 
 router.get("/checkAuth", (req, res) => {
   const user = req.user;

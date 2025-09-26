@@ -17,7 +17,15 @@ const resgiterUser = asyncHandler(async (req: Request, res: Response) => {
     logger.warn("Validation error", error.details[0].message);
     throw new ValidationError(error.details[0].message, 400);
   }
-  const { email, firstName, lastName, address, number, password } = req.body;
+  const {
+    email,
+    firstName,
+    lastName,
+    businessName,
+    address,
+    number,
+    password,
+  } = req.body;
 
   let user = await User.findOne({ email });
   if (user) {
@@ -32,6 +40,7 @@ const resgiterUser = asyncHandler(async (req: Request, res: Response) => {
     email,
     firstName,
     lastName,
+    businessName,
     address,
     number,
     password: hash,
@@ -44,10 +53,23 @@ const resgiterUser = asyncHandler(async (req: Request, res: Response) => {
   await emailJobs.sendPromoterWelcome({ email, firstName });
   logger.info(`Promoter welcome email queued for ${email}`);
 
+  //we return the user for the frontend to receive without password
+  const safeUser = {
+    id: user._id,
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    businessName: user.businessName,
+    address: user.address,
+    number: user.number,
+    createdAt: user.createdAt,
+  };
+
   ///here we send both tokens to frontend
   res.status(201).json({
     success: true,
     message: "User registered successfully!",
+    user: safeUser,
     accessToken,
     refreshToken,
   });
@@ -108,10 +130,22 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
 
   const { accessToken, refreshToken } = await generateTokens(existingUser);
 
+  const safeUser = {
+    id: existingUser._id,
+    email: existingUser.email,
+    firstName: existingUser.firstName,
+    lastName: existingUser.lastName,
+    address: existingUser.address,
+    number: existingUser.number,
+    createdAt: existingUser.createdAt,
+  };
+
   res.json({
+    success: true,
+    message: "Login successful!",
+    user: safeUser,
     accessToken,
     refreshToken,
-    userId: existingUser._id,
   });
 });
 

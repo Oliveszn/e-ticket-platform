@@ -20,6 +20,11 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    businessName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     address: {
       type: String,
       required: true,

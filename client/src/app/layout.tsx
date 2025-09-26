@@ -27,7 +27,7 @@ export default function RootLayout({
         className="flex flex-col min-h-screen"
         suppressHydrationWarning={true}
       >
-        {/* <Navbar /> */}
+        <Navbar />
         <Providers>{children}</Providers>
         <ConditionalFooter />
       </body>
