@@ -1,10 +1,29 @@
+"use client";
 import { StagePassLogo } from "@/components/common/Stagepass-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Aperture, Chrome, KeyRound, LockOpen, Mail } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { LoginSchema, loginSchema } from "@/utils/validationSchema";
+import { useFormik } from "formik";
+import { Aperture, KeyRound, LockOpen, Mail } from "lucide-react";
 import Link from "next/link";
+import { toFormikValidationSchema } from "zod-formik-adapter";
 
 const Login = () => {
+  const formik = useFormik<LoginSchema>({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validationSchema: toFormikValidationSchema(loginSchema),
+    onSubmit: (values) => {
+      handleSubmit(values);
+    },
+  });
+
+  const handleSubmit = async (data: any) => {
+    console.log(data);
+  };
   return (
     <div className="w-full max-w-lg space-y-6 bg-white shadow-lg rounded-xl p-8">
       <div className="flex flex-col items-center gap-2 my-6">
@@ -15,41 +34,58 @@ const Login = () => {
       </div>
 
       {/* Form */}
-      <form className="space-y-4 py-4">
+      <form onSubmit={formik.handleSubmit} className="space-y-4 py-4">
         {/* Email */}
         <div className="space-y-1">
-          <label htmlFor="email" className="">
+          <Label htmlFor="email" className="">
             Email
-          </label>
+          </Label>
           <div className="flex items-center border rounded-md focus-within:ring-2 focus-within:ring-blue-500">
             <Mail className="mx-3 text-gray-400 size-5" />
             <Input
               id="email"
               type="email"
+              name="email"
               placeholder="Enter your email"
               className="border-0 focus-visible:ring-0 py-4"
+              onChange={formik.handleChange}
+              value={formik.values.email}
+              onBlur={formik.handleBlur}
             />
           </div>
+          {formik.errors.email && formik.touched.email && (
+            <p className="text-red-500 text-sm">{formik.errors.email}</p>
+          )}
         </div>
 
         {/* // Password */}
         <div className="space-y-1">
-          <label htmlFor="password" className="">
+          <Label htmlFor="password" className="">
             Password
-          </label>
+          </Label>
           <div className="flex items-center border rounded-md focus-within:ring-2 focus-within:ring-blue-500">
             <KeyRound className="mx-3 text-gray-400 size-5" />
             <Input
               id="password"
               type="password"
+              name="password"
               placeholder="Enter your password"
               className="border-0 focus-visible:ring-0 py-4"
+              onChange={formik.handleChange}
+              value={formik.values.password}
+              onBlur={formik.handleBlur}
             />
           </div>
+          {formik.errors.password && formik.touched.password && (
+            <p className="text-red-500 text-sm">{formik.errors.password}</p>
+          )}
         </div>
 
         {/* Login button */}
-        <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2">
+        <Button
+          type="submit"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+        >
           <LockOpen className="size-5" />
           Sign In
         </Button>

@@ -12,16 +12,17 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
+import authReducer from "./auth-slice";
 
 const rootReducer = combineReducers({
   form: formReducer,
-  // temp: tempReducer, // not persisted/
+  auth: authReducer, // not persisted
 });
 
 const persistConfig = {
   key: "root",
   storage,
-  // whitelist: ["form"], // only form will persist
+  whitelist: ["form"], // only form will persist
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

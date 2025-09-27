@@ -1,6 +1,10 @@
 // this is for the cretain event form
 import { z } from "zod";
 
+const phoneRegex = /^(\+\d{1,3}[- ]?)?\d{10}$/;
+const strongPasswordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#^()-_.,></?}{$!%*?&])[A-Za-z\d@$!%*?&]/;
+
 export const formSchema = z.object({
   title: z
     .string("Name cannot be blank")
@@ -83,19 +87,131 @@ export const formSchema = z.object({
 //change password check
 export const changePasswordSchema = z
   .object({
-    oldPassword: z.string().min(1, "Current password is required"),
+    oldPassword: z
+      .string({ error: "Current password is required" })
+      .min(1, "Current password is required"),
     newPassword: z
-      .string()
+      .string({ error: "New password is required" })
       .min(8, "New password must be at least 8 characters")
+      .max(100, "New password must be less than 100 characters")
       .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-        "Password must contain at least one uppercase letter, one lowercase letter, and one number"
+        strongPasswordRegex,
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
       ),
-    confirmPassword: z.string(),
+
+    confirmPassword: z.string({ error: "Please confirm your new password" }),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
+  })
+  .refine((data) => data.oldPassword !== data.newPassword, {
+    message: "New password must be different from current password",
+    path: ["newPassword"],
   });
-
 export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
+
+///// registre
+export const registerSchema = z.object({
+  firstName: z
+    .string({ error: "First name is required" })
+    .min(2, "First name must be at least 2 characters")
+    .max(50, "First name must be less than 50 characters")
+    .regex(/^[a-zA-Z\s]*$/, "First name can only contain letters and spaces")
+    .trim(),
+
+  lastName: z
+    .string({ error: "Last name is required" })
+    .min(2, "Last name must be at least 2 characters")
+    .max(50, "Last name must be less than 50 characters")
+    .regex(/^[a-zA-Z\s]*$/, "Last name can only contain letters and spaces")
+    .trim(),
+
+  businessName: z
+    .string({ error: "Business name is required" })
+    .min(2, "Business name must be at least 2 characters")
+    .max(100, "Business name must be less than 100 characters")
+    .trim(),
+
+  email: z
+    .string({ error: "Email is required" })
+    .email("Please enter a valid email address")
+    .toLowerCase()
+    .trim(),
+
+  number: z
+    .string({ error: "Phone number is required" })
+    .regex(
+      phoneRegex,
+      "Please enter a valid phone number (e.g., +1234567890 or 1234567890)"
+    )
+    .transform((val) => val.replace(/\D/g, "")), // Remove non-digits
+
+  address: z
+    .string({ error: "Address is required" })
+    .min(10, "Address must be at least 10 characters")
+    .max(200, "Address must be less than 200 characters")
+    .trim(),
+
+  password: z
+    .string({ error: "Password is required" })
+    .min(8, "Password must be at least 8 characters")
+    .max(100, "Password must be less than 100 characters")
+    .regex(
+      strongPasswordRegex,
+      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+    ),
+});
+
+export type RegisterSchema = z.infer<typeof registerSchema>;
+
+////LOGIN
+export const loginSchema = z.object({
+  email: z
+    .string({ error: "Email is required" })
+    .email("Please enter a valid email address")
+    .toLowerCase()
+    .trim(),
+
+  password: z
+    .string({ error: "Password is required" })
+    .min(1, "Password is required"),
+});
+
+export type LoginSchema = z.infer<typeof loginSchema>;
+
+///// UPDATE PROFILE SCHEMA
+export const updateProfileSchema = z.object({
+  firstName: z
+    .string({ error: "First name is required" })
+    .min(2, "First name must be at least 2 characters")
+    .max(50, "First name must be less than 50 characters")
+    .regex(/^[a-zA-Z\s]*$/, "First name can only contain letters and spaces")
+    .trim(),
+
+  lastName: z
+    .string({ error: "Last name is required" })
+    .min(2, "Last name must be at least 2 characters")
+    .max(50, "Last name must be less than 50 characters")
+    .regex(/^[a-zA-Z\s]*$/, "Last name can only contain letters and spaces")
+    .trim(),
+
+  businessName: z
+    .string({ error: "Business name is required" })
+    .min(2, "Business name must be at least 2 characters")
+    .max(100, "Business name must be less than 100 characters")
+    .trim(),
+
+  number: z
+    .string({ error: "Phone number is required" })
+    .regex(phoneRegex, "Please enter a valid phone number")
+    .transform((val) => val.replace(/\D/g, "")),
+
+  address: z
+    .string({ error: "Address is required" })
+    .min(10, "Address must be at least 10 characters")
+    .max(200, "Address must be less than 200 characters")
+    .trim(),
+});
+
+export type UpdateProfileSchema = z.infer<typeof updateProfileSchema>;

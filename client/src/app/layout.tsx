@@ -4,6 +4,7 @@ import { Raleway } from "next/font/google";
 import Navbar from "@/components/common/Navbar";
 import ConditionalFooter from "@/components/common/conditionalFooter";
 import Providers from "./provider";
+import { Toaster } from "sonner";
 
 const raleway = Raleway({
   subsets: ["latin"],
@@ -27,6 +28,7 @@ export default function RootLayout({
         className="flex flex-col min-h-screen"
         suppressHydrationWarning={true}
       >
+        <Toaster position="top-right" richColors />
         <Navbar />
         <Providers>{children}</Providers>
         <ConditionalFooter />
