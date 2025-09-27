@@ -2,10 +2,14 @@ export class ApiError extends Error {
   statusCode: number;
   isOperational: boolean;
   status: string;
-  constructor(message: string, statusCode: number) {
+  constructor(
+    message: string,
+    statusCode: number,
+    isOperational: boolean = true
+  ) {
     super(message);
     this.statusCode = statusCode;
-    this.isOperational = true;
+    this.isOperational = statusCode < 500 ? isOperational : false;
     this.status = `${statusCode}`.startsWith("4") ? "fail" : "error";
 
     Error.captureStackTrace(this, this.constructor);
@@ -20,8 +24,12 @@ export class NotFoundError extends ApiError {
 
 export class ValidationError extends ApiError {
   errors: unknown;
+  statusCode: number;
+  isOperational: boolean;
   constructor(message: string, statusCode: number = 400, errors?: unknown) {
     super(message, statusCode);
+    this.isOperational = true;
+    this.statusCode = statusCode;
     this.errors = errors;
   }
 }

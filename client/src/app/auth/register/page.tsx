@@ -52,13 +52,10 @@ const Register = () => {
       toast.success(result.message || "Registration Successful");
       formik.resetForm();
       router.push("/dashboard");
-
-      toast.error(result.message);
     } catch (error) {
       const message =
         typeof error === "string" ? error : "An unexpected error occurred";
       toast.error(message);
-      console.error("Registration error:", error);
     }
   };
 
@@ -351,7 +348,7 @@ const Register = () => {
               Creating Account...
             </div>
           ) : (
-            <div>
+            <div className="flex items-center gap-3">
               <LockOpen className="size-5" />
               Sign Up
             </div>

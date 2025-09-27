@@ -12,7 +12,8 @@ const validateRegistration = (data: RegistrationInput) => {
     address: Joi.string().required(),
     number: Joi.string()
       .pattern(/^[0-9]+$/) // only digits
-      .length(11)
+      .min(10)
+      .max(15)
       .required(),
     password: Joi.string().min(6).required(),
   });

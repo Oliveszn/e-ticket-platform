@@ -79,47 +79,29 @@ const errorHandler = (
   }
 
   const statusCode = error.statusCode || 500;
-  // Determine the response based on environment
+
+  const responseData: any = {
+    success: false,
+    message: error.message || err.message || "Unknown error",
+    statusCode: statusCode,
+    timestamp: new Date().toISOString(),
+  };
+
   if (process.env.NODE_ENV === "development") {
-    return res.status(statusCode).json({
-      success: false,
-      error: {
-        name: error.name || err.name || "Error",
-        message: error.message || err.message || "Unknown error",
-        statusCode: statusCode,
-        stack: error.stack || err.stack,
-        ...(error.errors && { errors: error.errors }),
-        ...(err.code && { code: err.code }),
-      },
-      request: {
-        method: req?.method || "UNKNOWN",
-        url: req?.originalUrl || "UNKNOWN",
-      },
-    });
-  }
-
-  // Production mode
-  if (error.isOperational) {
-    const apiError = {
-      success: false,
-      message: error.message || "An error occurred",
-      error: error.name || "Error",
-      timestamp: new Date().toISOString(),
-      statusCode,
+    responseData.debug = {
+      name: error.name || err.name || "Error",
+      stack: error.stack || err.stack,
+      ...(error.errors && { errors: error.errors }),
+      ...(err.code && { code: err.code }),
     };
-
-    return res.status(statusCode).json(apiError);
   } else {
-    const apiError = {
-      success: false,
-      message: "Something went wrong on our end. Please try again later.",
-      error: "InternalServerError",
-      timestamp: new Date().toISOString(),
-      statusCode: 500,
-    };
-
-    return res.status(500).json(apiError);
+    ////wehn in production we hide sensitive detials
+    if (!error.isOperational || statusCode >= 500) {
+      responseData.message = "Something went wrong. Please try again later.";
+    }
   }
+
+  return res.status(statusCode).json(responseData);
 };
 
 const asyncHandler = <T extends (...args: any[]) => Promise<any>>(fn: T) => {
