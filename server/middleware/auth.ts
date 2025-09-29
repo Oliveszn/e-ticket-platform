@@ -8,7 +8,7 @@ const requireAuth = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     ///get token from multiple sources
     const token =
-      req.cookies?.token ||
+      req.cookies?.accessToken ||
       req.headers.authorization?.replace("Bearer", "").trim() ||
       req.headers["x-access-token"];
 

@@ -61,7 +61,16 @@ export const loginUser = createAsyncThunk(
         }
       );
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
+      // Check for network-related errors
+      // if (error.code === "ERR_NETWORK") {
+      //   return rejectWithValue(
+      //     "No internet connection. Please check your network."
+      //   );
+      // }
+      // if (error.message?.includes("timeout")) {
+      //   return rejectWithValue("Request timed out. Try again.");
+      // }
       return rejectWithValue(handleApiError(error));
     }
   }
@@ -112,7 +121,7 @@ export const checkAuthStatus = createAsyncThunk(
         withCredentials: true,
       });
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       return rejectWithValue(handleApiError(error));
     }
   }

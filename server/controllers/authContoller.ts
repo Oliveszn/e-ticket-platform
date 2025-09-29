@@ -127,7 +127,6 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     logger.warn("Invalid password");
     throw new ValidationError("Invalid Password", 400);
   }
-
   const { accessToken, refreshToken } = await generateTokens(existingUser);
 
   const safeUser = {
@@ -140,6 +139,21 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     createdAt: existingUser.createdAt,
   };
 
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 15 * 60 * 1000, // 15 min
+    path: "/",
+  });
+
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+
   res.json({
     success: true,
     message: "Login successful!",
@@ -151,8 +165,8 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
 
 const refreshTokenUser = asyncHandler(async (req: Request, res: Response) => {
   logger.info("Refresh token endpoint hit...");
-  //refresh sent from body
-  const { refreshToken } = req.body;
+  //had to change were we got refreshtoken from get it from cookies instead of body
+  const refreshToken = req.cookies?.refreshToken;
   //we check if refresh token is missing
   if (!refreshToken) {
     logger.warn("Refresh token missing");
@@ -187,10 +201,36 @@ const refreshTokenUser = asyncHandler(async (req: Request, res: Response) => {
 
   //delete the old refresh token cos we generated a new one
   await RefreshToken.deleteOne({ _id: storedToken._id });
+
+  res.cookie("accessToken", newAccessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 15 * 60 * 1000, // 15 min
+    path: "/",
+  });
+
+  res.cookie("refreshToken", newRefreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+
   //send tokens back
   res.json({
     accessToken: newAccessToken,
     refreshToken: newRefreshToken,
+  });
+});
+
+const getMe = asyncHandler(async (req: Request, res: Response) => {
+  // Send the user data back to frontend
+  res.json({
+    success: true,
+    user: (req as any).user,
+    isAuthenticated: (req as any).isAuthenticated,
+    message: "User authenticated successfully",
   });
 });
 
@@ -257,4 +297,5 @@ export {
   refreshTokenUser,
   logoutUser,
   changePassword,
+  getMe,
 };

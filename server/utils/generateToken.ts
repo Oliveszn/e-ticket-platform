@@ -1,4 +1,3 @@
-// const jwt = require("jsonwebtoken");
 import RefreshToken from "../models/RefreshToken";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -9,6 +8,12 @@ type JwtUserPayload = {
 };
 
 const generateTokens = async (user: JwtUserPayload) => {
+  // Clean up old refresh tokens for this user when tokens are generated we delete expired ones
+  await RefreshToken.deleteMany({
+    user: user._id,
+    expiresAt: { $lt: new Date() },
+  });
+
   ///here we create an accesstoken using jwt
   const accessToken = jwt.sign(
     {
@@ -16,7 +21,7 @@ const generateTokens = async (user: JwtUserPayload) => {
       email: user.email,
     },
     process.env.JWT_SECRET as string,
-    { expiresIn: "1h" }
+    { expiresIn: "15m" }
   );
 
   ///generate a token

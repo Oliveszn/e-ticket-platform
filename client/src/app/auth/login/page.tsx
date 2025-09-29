@@ -3,13 +3,22 @@ import { StagePassLogo } from "@/components/common/Stagepass-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { loginUser } from "@/store/auth-slice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { startTokenRefreshCycle } from "@/utils/token-timer";
 import { LoginSchema, loginSchema } from "@/utils/validationSchema";
 import { useFormik } from "formik";
 import { Aperture, KeyRound, LockOpen, Mail } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 
 const Login = () => {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { status } = useAppSelector((state) => state.auth);
+  const isLoading = status === "loading";
   const formik = useFormik<LoginSchema>({
     initialValues: {
       email: "",
@@ -21,8 +30,30 @@ const Login = () => {
     },
   });
 
+  //   const handleLogout = async () => {
+  //   try {
+  //     await dispatch(logoutUser()).unwrap();
+  //     clearTokenRefresh(); // Stop automatic refresh
+  //     router.push('/auth/login');
+  //   } catch (error) {
+  // dispatch(logout());
+  // router.push("/auth/login");
+  //     console.error('Logout error:', error);
+  //   }
+  // };
+
   const handleSubmit = async (data: any) => {
-    console.log(data);
+    try {
+      const result = await dispatch(loginUser(data)).unwrap();
+
+      toast.success(result.message || "Registration Successful");
+      formik.resetForm();
+      router.push("/dashboard");
+    } catch (error) {
+      const message =
+        typeof error === "string" ? error : "An unexpected error occurred";
+      toast.error(message);
+    }
   };
   return (
     <div className="w-full max-w-lg space-y-6 bg-white shadow-lg rounded-xl p-8">
@@ -84,10 +115,24 @@ const Login = () => {
         {/* Login button */}
         <Button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+          disabled={isLoading || !formik.isValid}
+          className={`w-full text-white transition-colors ${
+            isLoading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
         >
-          <LockOpen className="size-5" />
-          Sign In
+          {isLoading ? (
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Logging...
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <LockOpen className="size-5" />
+              Sign In
+            </div>
+          )}
         </Button>
 
         {/* OR divider */}

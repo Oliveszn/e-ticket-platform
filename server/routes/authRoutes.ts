@@ -6,6 +6,7 @@ import {
   refreshTokenUser,
   changePassword,
   logoutUser,
+  getMe,
 } from "../controllers/authContoller";
 import requireAuth from "../middleware/auth";
 import { authLimiter } from "../middleware/rateLimit";
@@ -18,21 +19,6 @@ router.post("/login", authLimiter, loginUser);
 router.post("/logout", logoutUser);
 router.patch("/change/password", requireAuth, changePassword);
 router.post("/refresh-token", refreshTokenUser);
-router.get("/me", requireAuth);
-
-router.get("/checkAuth", (req, res) => {
-  const user = req.user;
-  if (user) {
-    return res.status(200).json({
-      success: true,
-      message: "Authenticated user!",
-      user,
-    });
-  }
-  res.status(200).json({
-    success: false,
-    message: "No user authenticated",
-  });
-});
+router.get("/me", requireAuth, getMe);
 
 export default router;
