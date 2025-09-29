@@ -4,6 +4,7 @@ import formReducer from "./createevent-slice";
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // localStorage
 import { combineReducers } from "redux";
+import { injectStore } from "@/utils/axios-interceptor";
 import {
   FLUSH,
   REHYDRATE,
@@ -37,6 +38,8 @@ export const store = configureStore({
       },
     }),
 });
+
+injectStore(store);
 
 export const persistor = persistStore(store);
 export type AppDispatch = typeof store.dispatch;

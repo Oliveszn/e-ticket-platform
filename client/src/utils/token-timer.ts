@@ -6,14 +6,17 @@ let isRefreshing = false;
 
 // Refresh token every 14 minutes (access token expires in 15)
 export const setupTokenRefresh = () => {
+
   clearTokenRefresh();
   refreshTimer = setInterval(async () => {
     const state = store.getState();
     if (state.auth.isAuthenticated && isRefreshing) {
       isRefreshing = true;
       try {
+
         await store.dispatch(refreshTokenThunk()).unwrap();
       } catch (error) {
+
         clearTokenRefresh();
       } finally {
         isRefreshing = false;
@@ -30,7 +33,6 @@ export const clearTokenRefresh = () => {
   isRefreshing = false;
 };
 
-// Call this after successful login
 export const startTokenRefreshCycle = () => {
   clearTokenRefresh(); // Clear any existing timer
   setupTokenRefresh();

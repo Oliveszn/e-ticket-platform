@@ -7,7 +7,8 @@ import {
   RegisterFormData,
 } from "@/utils/types";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+// import axios from "axios";
+import axios from "@/utils/axios-interceptor";
 import { AxiosError } from "axios";
 
 const initialState: AuthState = {
@@ -105,7 +106,6 @@ export const refreshTokenThunk = createAsyncThunk(
           withCredentials: true,
         }
       );
-
       return response.data;
     } catch (err: any) {
       return rejectWithValue(err.response?.data || "Failed to refresh token");

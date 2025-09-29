@@ -1,7 +1,15 @@
 ///this thunk is to et our refreshtoken thunk and we call it in our app/layout.tsx
+///plus this will be used throuhout our slices
 import axios from "axios";
-import { store } from "@/store/store";
+// import { store } from "@/store/store";
 import { logout, refreshTokenThunk } from "@/store/auth-slice";
+
+let store: any; // will be injected later
+
+// Helper to inject the store after it's created
+export const injectStore = (_store: any) => {
+  store = _store;
+};
 
 let isRefreshing = false;
 
@@ -59,7 +67,6 @@ axios.interceptors.response.use(
       ///if it succeds clear the queue then retey the original request
       ///if not redirect to login and logout
       try {
-        console.log("401 error caught, trying refresh...");
         await store.dispatch(refreshTokenThunk()).unwrap();
         processQueue(null);
         return axios(originalRequest);

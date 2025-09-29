@@ -165,6 +165,8 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
 
 const refreshTokenUser = asyncHandler(async (req: Request, res: Response) => {
   logger.info("Refresh token endpoint hit...");
+  logger.info("Cookies received:", req.cookies);
+
   //had to change were we got refreshtoken from get it from cookies instead of body
   const refreshToken = req.cookies?.refreshToken;
   //we check if refresh token is missing
@@ -225,6 +227,7 @@ const refreshTokenUser = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const getMe = asyncHandler(async (req: Request, res: Response) => {
+  logger.info("getme endpoint hit...");
   // Send the user data back to frontend
   res.json({
     success: true,
