@@ -17,20 +17,18 @@ export default function DashBoardLayout({
 }) {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
   return (
-    <CheckAuth isAuthenticated={isAuthenticated}>
-      <SidebarProvider>
-        <div className="flex h-screen w-full bg-gray-100">
-          <AppSidebar />
+    // <CheckAuth isAuthenticated={isAuthenticated}>
+    <SidebarProvider>
+      <div className="flex h-screen w-full bg-gray-100">
+        <AppSidebar />
 
-          <div className="flex-1 flex flex-col">
-            <Header />
+        <div className="flex-1 flex flex-col">
+          <Header />
 
-            <main className="flex-1 overflow-y-auto p-4 md:p-6">
-              {children}
-            </main>
-          </div>
+          <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
         </div>
-      </SidebarProvider>
-    </CheckAuth>
+      </div>
+    </SidebarProvider>
+    // </CheckAuth>
   );
 }

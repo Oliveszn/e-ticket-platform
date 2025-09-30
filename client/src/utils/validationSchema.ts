@@ -70,14 +70,14 @@ export const formSchema = z.object({
       }
     ),
 
-  ticket: z
+  tickets: z
     .array(
       z.object({
-        name: z.string({ error: "Ticket name is required" }),
-        price: z.number({ error: "Ticket price is required" }),
-        quantity: z.number({ error: "Quantity is required" }),
+        name: z.string({ message: "Ticket name is required" }),
+        price: z.number({ message: "Ticket price is required" }),
+        quantity: z.number({ message: "Quantity is required" }),
         description: z.string().optional(),
-        benefits: z.array(z.string()).optional(),
+        benefits: z.string().optional(),
         showVolume: z.boolean().default(false),
       })
     )

@@ -32,16 +32,7 @@ const CreateEvent = () => {
       category: formData.category || "",
       description: formData.description || "",
       image: null as any,
-      ticket: formData.ticket || [
-        {
-          name: "",
-          price: 0,
-          quantity: 0,
-          description: "",
-          benefits: [],
-          showVolume: false,
-        },
-      ],
+      tickets: formData.ticket || [],
     },
     validationSchema: toFormikValidationSchema(formSchema),
     onSubmit: (values) => {
@@ -50,9 +41,11 @@ const CreateEvent = () => {
   });
 
   const handleSubmit = async (data: any) => {
-    console.log("Final form submission ", data);
-    dispatch(resetForm());
-    router.push("/dashboard/events");
+    console.log("🎉 FORM SUBMITTED SUCCESSFULLY!");
+    console.log("Final form submission:", data);
+    console.log("Tickets:", data.tickets);
+    // dispatch(resetForm());
+    // router.push("/dashboard/events");
   };
 
   function hasNestedError(obj: any): boolean {
@@ -98,7 +91,7 @@ const CreateEvent = () => {
         "image",
       ];
     } else if (step === 1) {
-      fieldsToValidate = ["ticket"];
+      fieldsToValidate = ["tickets"];
     }
 
     ////here validateform validates the field and return the error we set in zod
@@ -206,8 +199,44 @@ const CreateEvent = () => {
                 </button>
               ) : (
                 <button
-                  type="submit"
-                  onClick={() => alert("Submit form here")}
+                  type="button"
+                  onClick={async () => {
+                    console.log("=== SUBMIT CLICKED ===");
+                    console.log("Tickets in form:", formik.values.tickets);
+                    console.log(
+                      "Number of tickets:",
+                      formik.values.tickets.length
+                    );
+
+                    const errors = await formik.validateForm();
+                    console.log("Validation errors:", errors);
+
+                    if (errors.tickets) {
+                      console.log("TICKETS ERROR:", errors.tickets);
+                      console.log(
+                        "TICKETS ERROR:",
+                        JSON.stringify(errors.tickets, null, 2)
+                      );
+                    }
+
+                    // Check all errors
+                    const errorKeys = Object.keys(errors);
+                    console.log("Fields with errors:", errorKeys);
+
+                    if (errorKeys.length > 0) {
+                      console.log("❌ Form has errors, cannot submit");
+                      // Mark all errored fields as touched
+                      const newTouched = errorKeys.reduce((acc, key) => {
+                        acc[key] = true;
+                        return acc;
+                      }, {} as any);
+                      formik.setTouched({ ...formik.touched, ...newTouched });
+                      return;
+                    }
+
+                    console.log("✅ No errors, submitting...");
+                    formik.handleSubmit();
+                  }}
                   className="px-6 py-2 rounded bg-green-500 text-white hover:bg-green-600"
                 >
                   Submit

@@ -21,7 +21,7 @@ export type FormValues = {
     | "Arts & Culture";
   description?: string;
   image: File;
-  ticket: {
+  tickets: {
     name: string;
     price: number;
     quantity: number;
