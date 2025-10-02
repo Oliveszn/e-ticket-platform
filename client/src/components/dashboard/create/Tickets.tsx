@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import Toggle from "../Toggle";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface TicketProps {
   formik: any;
@@ -21,12 +22,13 @@ interface TicketProps {
 
 const Tickets = ({ formik }: TicketProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [generalError, setGeneralError] = useState("");
   const [newTicket, setNewTicket] = useState({
     name: "",
-    price: 0,
-    quantity: 0,
+    price: "",
+    quantity: "",
     description: "",
-    benefits: [],
+    benefits: "",
     showVolume: false,
   });
 
@@ -37,13 +39,32 @@ const Tickets = ({ formik }: TicketProps) => {
   const resetNewTicket = () => {
     setNewTicket({
       name: "",
-      price: 0,
-      quantity: 0,
+      price: "",
+      quantity: "",
       description: "",
-      benefits: [],
+      benefits: "",
       showVolume: false,
     });
   };
+
+  const handleSaveTicket = async () => {
+    if (!newTicket.name || !newTicket.price || !newTicket.quantity) {
+      toast.error("Please fill in ticket name, price, and quantity.");
+      setGeneralError("Please fill in ticket name, price, and quantity.");
+      return;
+    }
+
+    // add ticket into Formik
+    const currentTickets = formik.values.tickets;
+    formik.setFieldValue("tickets", [...currentTickets, newTicket]);
+
+    //reset local state and close dialog
+    resetNewTicket();
+    setIsDialogOpen(false);
+
+    toast.success("Ticket saved!");
+  };
+
   return (
     <div className="space-y-8">
       <div className="pb-5">
@@ -81,7 +102,7 @@ const Tickets = ({ formik }: TicketProps) => {
                   <span>Create Ticket</span>
                 </button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px]">
+              <DialogContent className="sm:max-w-[600px] ">
                 <DialogHeader>
                   <DialogTitle>Create a Ticket</DialogTitle>
                   <DialogDescription>
@@ -90,9 +111,9 @@ const Tickets = ({ formik }: TicketProps) => {
                   </DialogDescription>
                 </DialogHeader>
 
-                <div>
+                <div className="max-h-[60vh] overflow-y-auto pr-2">
                   {/* NAME  */}
-                  <div className="space-y-2">
+                  <div className="space-y-3 my-2">
                     <Label
                       htmlFor="ticket-name"
                       className="text-sm font-medium leading-none"
@@ -113,16 +134,10 @@ const Tickets = ({ formik }: TicketProps) => {
                     <p className="text-slate-500 text-xs">
                       VIP, General, Regular
                     </p>
-                    {formik.errors.ticket?.[0]?.name &&
-                      formik.touched.ticket?.[0]?.name && (
-                        <p className="text-red-500 text-sm">
-                          {formik.errors.ticket?.[0]?.name}
-                        </p>
-                      )}
                   </div>
 
                   {/* PRICE  */}
-                  <div className="space-y-2">
+                  <div className="space-y-3 my-2">
                     <Label
                       htmlFor="ticket.price"
                       className="text-sm font-medium leading-none"
@@ -132,7 +147,7 @@ const Tickets = ({ formik }: TicketProps) => {
                     <Input
                       id="ticket.price"
                       type="number"
-                      placeholder="0"
+                      placeholder="1000"
                       value={newTicket.price}
                       onChange={(e) =>
                         handleInputChange("price", Number(e.target.value))
@@ -140,16 +155,10 @@ const Tickets = ({ formik }: TicketProps) => {
                       onBlur={formik.handleBlur}
                       className="flex h-10 w-full border-slate-200 focus-visible:ring-slate-950 rounded-md border bg-white px-3 py-2 text-base placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50 md:text-sm"
                     />
-                    {formik.touched.ticket?.[0]?.price &&
-                      formik.errors.ticket?.[0]?.price && (
-                        <p className="text-sm text-red-500">
-                          {formik.errors.ticket?.[0]?.price}
-                        </p>
-                      )}
                   </div>
 
                   {/* QUANTITY  */}
-                  <div className="space-y-2">
+                  <div className="space-y-3 my-2">
                     <Label
                       htmlFor="ticket.quantity"
                       className="text-sm font-medium leading-none"
@@ -163,19 +172,19 @@ const Tickets = ({ formik }: TicketProps) => {
                       onChange={(e) =>
                         handleInputChange("quantity", Number(e.target.value))
                       }
-                      placeholder="0"
+                      placeholder="50"
                       onBlur={formik.handleBlur}
                       className="flex h-10 w-full border-slate-200 focus-visible:ring-slate-950 rounded-md border bg-white px-3 py-2 text-base placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50 md:text-sm"
                     />
                   </div>
 
                   {/* DESCRIPTION  */}
-                  <div className="space-y-2">
+                  <div className="space-y-3 my-2">
                     <Label
                       htmlFor="ticket.desciption"
                       className="text-sm font-medium leading-none"
                     >
-                      Any added description
+                      Any added description (optional)
                     </Label>
                     <Input
                       id="ticket.desciption"
@@ -191,12 +200,12 @@ const Tickets = ({ formik }: TicketProps) => {
                   </div>
 
                   {/* BENEFITS  */}
-                  <div className="space-y-2">
+                  <div className="space-y-3 my-2">
                     <Label
                       htmlFor="ticket.benefits"
                       className="text-sm font-medium leading-none"
                     >
-                      Ticket benefits
+                      Ticket benefits (optional)
                     </Label>
                     <Input
                       id="ticket.benefits"
@@ -209,10 +218,13 @@ const Tickets = ({ formik }: TicketProps) => {
                       onBlur={formik.handleBlur}
                       className="flex h-10 w-full border-slate-200 focus-visible:ring-slate-950 rounded-md border bg-white px-3 py-2 text-base placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50 md:text-sm"
                     />
+                    <p className="text-slate-500 text-xs">
+                      e.g: Free drinks, Backstage access
+                    </p>
                   </div>
 
                   {/* VOLUME  */}
-                  <div className="space-y-2 flex items-center gap-6">
+                  <div className="space-y-3 flex items-center gap-6 my-2">
                     <div>
                       <label
                         htmlFor="venue-isPublic"
@@ -234,27 +246,17 @@ const Tickets = ({ formik }: TicketProps) => {
                 </div>
 
                 <DialogFooter>
+                  {generalError && (
+                    <p className="text-red-500 text-sm mt-2">{generalError}</p>
+                  )}
                   <DialogClose asChild>
                     <Button type="button" variant="outline">
                       Cancel
                     </Button>
                   </DialogClose>
-                  <DialogClose asChild>
-                    <Button
-                      type="submit"
-                      onClick={() => {
-                        const currentTickets = formik.values.tickets;
-                        formik.setFieldValue("tickets", [
-                          ...currentTickets,
-                          newTicket,
-                        ]);
-                        resetNewTicket();
-                        setIsDialogOpen(false);
-                      }}
-                    >
-                      Save Ticket
-                    </Button>
-                  </DialogClose>
+                  <Button type="submit" onClick={handleSaveTicket}>
+                    Save Ticket
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>

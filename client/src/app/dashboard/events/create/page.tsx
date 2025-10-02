@@ -9,12 +9,19 @@ import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { useRouter } from "next/navigation";
 import { FormValues } from "@/utils/types";
+import {
+  base64ToFile,
+  convertFileToBase64,
+  hasNestedError,
+  markTouched,
+} from "@/utils/helperFunction";
 
 const CreateEvent = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const step = useAppSelector((state) => state.form.step);
   const formData = useAppSelector((state) => state.form.data);
+
   const formik = useFormik<FormValues>({
     initialValues: {
       title: formData.title || "",
@@ -31,7 +38,15 @@ const CreateEvent = () => {
       charge: formData.charge || "Host",
       category: formData.category || "",
       description: formData.description || "",
-      image: null as any,
+      // image: null as any,
+      image: formData.image?.base64
+        ? base64ToFile(
+            formData.image.base64,
+            formData.image.name,
+            formData.image.type
+          )
+        : null,
+
       tickets: formData.ticket || [],
     },
     validationSchema: toFormikValidationSchema(formSchema),
@@ -44,34 +59,9 @@ const CreateEvent = () => {
     console.log("🎉 FORM SUBMITTED SUCCESSFULLY!");
     console.log("Final form submission:", data);
     console.log("Tickets:", data.tickets);
-    // dispatch(resetForm());
-    // router.push("/dashboard/events");
+    dispatch(resetForm());
+    router.push("/dashboard/events");
   };
-
-  function hasNestedError(obj: any): boolean {
-    if (!obj) return false;
-    if (typeof obj === "string") return true;
-    if (typeof obj === "object") {
-      return Object.values(obj).some((value) => hasNestedError(value));
-    }
-    return false;
-  }
-
-  function markTouched(fields: any): any {
-    if (typeof fields === "string" || typeof fields === "number") {
-      return true;
-    }
-    if (Array.isArray(fields)) {
-      return fields.map((item) => markTouched(item));
-    }
-    if (typeof fields === "object" && fields !== null) {
-      return Object.keys(fields).reduce((acc, key) => {
-        acc[key] = markTouched(fields[key]);
-        return acc;
-      }, {} as any);
-    }
-    return true;
-  }
 
   const nextStep = async () => {
     ///here we create a variable that will hold keys from our ts formvalues
@@ -102,10 +92,6 @@ const CreateEvent = () => {
     );
 
     ///here we map over ftv and set every key to true to set it as touched
-    // const touchedFields = fieldsToValidate.reduce((acc, field) => {
-    //   acc[field] = true;
-    //   return acc;
-    // }, {} as Record<string, boolean>);
     const touchedFields = fieldsToValidate.reduce((acc, field) => {
       if (errors[field]) {
         acc[field] = markTouched(errors[field]);
@@ -120,7 +106,20 @@ const CreateEvent = () => {
 
     //if theres are no errors
     if (!hasErrors) {
-      dispatch(saveData(formik.values));
+      // Convert File to base64 before saving to Redux
+      const dataToSave = { ...formik.values };
+
+      if (formik.values.image instanceof File) {
+        const base64 = await convertFileToBase64(formik.values.image);
+        dataToSave.image = {
+          base64,
+          name: formik.values.image.name,
+          type: formik.values.image.type,
+          size: formik.values.image.size,
+        };
+      }
+      // dispatch(saveData(formik.values));
+      dispatch(saveData(dataToSave));
       dispatch(setStep(Math.min(step + 1, steps.length - 1)));
     }
   };

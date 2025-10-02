@@ -5,6 +5,15 @@ const phoneRegex = /^(\+\d{1,3}[- ]?)?\d{10}$/;
 const strongPasswordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#^()-_.,></?}{$!%*?&])[A-Za-z\d@$!%*?&]/;
 
+export const ticketSchema = z.object({
+  name: z.string().min(1, "Ticket name is required"),
+  price: z.number().min(1, "Price must be at least 1"),
+  quantity: z.number().min(1, "Quantity is required"),
+  description: z.string().optional(),
+  benefits: z.string().optional(),
+  showVolume: z.boolean().default(false),
+});
+
 export const formSchema = z.object({
   title: z
     .string("Name cannot be blank")
@@ -58,31 +67,49 @@ export const formSchema = z.object({
   description: z.string().optional(),
 
   image: z
-    .instanceof(File, { message: "Select at least one image" })
-    .refine((file) => file.size <= 5 * 1024 * 1024, {
-      // 5MB limit
-      message: "Image must be less than 5MB",
-    })
+    .union([
+      // Handle File object
+      z.any().refine(
+        (file) => {
+          return (
+            file &&
+            typeof file === "object" &&
+            "name" in file &&
+            "size" in file &&
+            "type" in file &&
+            file instanceof File
+          );
+        },
+        { message: "Select at least one image" }
+      ),
+      // Handle base64 stored object
+      z.object({
+        base64: z.string(),
+        name: z.string(),
+        type: z.string(),
+        size: z.number(),
+      }),
+    ])
     .refine(
-      (file) => ["image/jpeg", "image/png", "image/webp"].includes(file.type),
-      {
-        message: "Only JPEG, PNG, and WebP images are allowed",
-      }
+      (file: any) => {
+        if (file?.size) return file.size <= 5 * 1024 * 1024;
+        return true;
+      },
+      { message: "Image must be less than 5MB" }
+    )
+    .refine(
+      (file: any) => {
+        if (file?.type)
+          return ["image/jpeg", "image/png", "image/webp"].includes(file.type);
+        return true;
+      },
+      { message: "Only JPEG, PNG, and WebP images are allowed" }
     ),
 
-  tickets: z
-    .array(
-      z.object({
-        name: z.string({ message: "Ticket name is required" }),
-        price: z.number({ message: "Ticket price is required" }),
-        quantity: z.number({ message: "Quantity is required" }),
-        description: z.string().optional(),
-        benefits: z.string().optional(),
-        showVolume: z.boolean().default(false),
-      })
-    )
-    .min(1, { message: "At least one ticket must be provided" }),
+  tickets: z.array(ticketSchema).min(1, "At least one ticket is required"),
 });
+
+export type FormSchema = z.infer<typeof formSchema>;
 
 //change password check
 export const changePasswordSchema = z

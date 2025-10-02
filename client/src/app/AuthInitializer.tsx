@@ -16,9 +16,9 @@ export default function AuthInitializer() {
     queryFn: () => dispatch(checkAuthStatus()).unwrap(),
     retry: false,
     staleTime: Infinity, // we never reftech cos the refresh cycle handles it
-    refetchOnWindowFocus: true, // Recheck when user returns to tab
-    refetchOnMount: true,
-    refetchOnReconnect: true,
+    refetchOnWindowFocus: false, // Recheck when user returns to tab
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 
   // Start/stop token refresh based on auth status
@@ -34,7 +34,7 @@ export default function AuthInitializer() {
     };
   }, [isAuthenticated]);
 
-  if (isLoading) {
+  if (!data && isLoading) {
     return (
       <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
         <div className="flex flex-col items-center gap-3">
@@ -44,12 +44,6 @@ export default function AuthInitializer() {
       </div>
     );
   }
-
-  //   Handle auth failure
-  //   if (isError || !data?.success) {
-  //     router.push("/auth/login");
-  //     return null;
-  //   }
 
   // doesnt render anyting visible no need to return children
   return null;

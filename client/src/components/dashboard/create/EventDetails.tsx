@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import Toggle from "../Toggle";
+import ImageUpload from "@/components/common/ImageUpload";
 
 interface EventDetailsProps {
   formik: any;
 }
 
 const EventDetails = ({ formik }: EventDetailsProps) => {
-  const [preview, setPreview] = useState<string | null>(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>("");
+  const [imageLoadingState, setImageLoadingState] = useState(false);
   return (
     <div className="space-y-8">
       {/* Event Name */}
@@ -361,9 +363,7 @@ const EventDetails = ({ formik }: EventDetailsProps) => {
 
       {/* IMAGE PART  */}
       <div className="space-y-3 py-8">
-        <p className="text-sm font-bold">
-          Add a few images to your event banner.*
-        </p>
+        <p className="text-sm font-bold">Add an image to your event banner.*</p>
         <p className="text-xs text-gray-800">
           Upload colorful and vibrant images as the banner for your event! See
           how beautiful images help your event details page.
@@ -371,46 +371,15 @@ const EventDetails = ({ formik }: EventDetailsProps) => {
         <div>
           <div className="mt-1 flex flex-col justify-center items-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6">
             <div className="space-y-1 text-center">
-              <svg
-                className="mx-auto h-12 w-12 text-gray-400"
-                stroke="currentColor"
-                fill="none"
-                viewBox="0 0 48 48"
-                aria-hidden="true"
-              >
-                <path
-                  d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                ></path>
-              </svg>
               <div className="flex text-sm text-gray-600">
-                <label className="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500">
-                  <span>Upload an image</span>
-                  <input
-                    id="file-upload"
-                    type="file"
-                    accept=".jpg,.png,.jpeg,.gif"
-                    className="sr-only"
-                    name="file-upload"
-                    onChange={(event) => {
-                      const file = event.currentTarget.files?.[0];
-                      if (file) {
-                        formik.setFieldValue("image", file); // store File
-                        setPreview(URL.createObjectURL(file)); // to see the image
-                      }
-                    }}
-                  />
-                  {preview && (
-                    <img
-                      src={preview}
-                      alt="Preview"
-                      className="mt-4 h-40 w-full object-cover rounded-md"
-                    />
-                  )}
-                </label>
-                <p className="pl-1">or drag and drop</p>
+                <ImageUpload
+                  imageFile={formik.values.image}
+                  uploadedImageUrl={uploadedImageUrl}
+                  setUploadedImageUrl={setUploadedImageUrl}
+                  setImageFile={(file) => formik.setFieldValue("image", file)}
+                  setImageLoadingState={setImageLoadingState}
+                  imageLoadingState={formik.isSubmitting}
+                />
               </div>
               <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
             </div>

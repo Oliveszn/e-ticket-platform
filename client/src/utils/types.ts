@@ -20,7 +20,11 @@ export type FormValues = {
     | "Seminars"
     | "Arts & Culture";
   description?: string;
-  image: File;
+  // image: File;
+  image:
+    | File
+    | { base64: string; name: string; type: string; size: number }
+    | null;
   tickets: {
     name: string;
     price: number;
@@ -82,4 +86,43 @@ export interface ChangePasswordFormData {
 export interface ChangePasswordResponse {
   success: boolean;
   message: string;
+}
+
+////THIS IS FOR EVENT SLICE
+export interface Event {
+  title: string;
+  slug: string;
+  eventDate: string;
+  eventTime: string;
+  venue: {
+    name: string;
+    address: string;
+    city: string;
+    state: string;
+    isPublic: boolean;
+  };
+  charge: boolean;
+  category: string;
+  description?: string;
+  image: File;
+  tickets: {
+    name: string;
+    price: number;
+    quantity: number;
+    description?: string;
+    benefits?: string;
+    showVolume: boolean;
+  }[];
+}
+
+export interface EventResponse {
+  success: boolean;
+  message: string;
+  event: Event;
+}
+
+export interface EventState {
+  status: "idle" | "loading" | "succeeded" | "failed";
+  error?: string | null;
+  data: Event;
 }
