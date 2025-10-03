@@ -23,6 +23,7 @@ import { rateLimiter } from "./middleware/rateLimit";
 
 const app: Express = express();
 const PORT = process.env.PORT;
+let redisClient: Redis;
 //middleware
 app.use(helmet());
 app.use(
@@ -62,7 +63,14 @@ app.use((req, res, next) => {
 ///Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/events", eventRoutes);
+app.use(
+  "/api/events",
+  (req, res, next) => {
+    req.redisClient = redisClient;
+    next();
+  },
+  eventRoutes
+);
 app.use("/api/tickets", ticketRoutes);
 app.use("/api/webhooks", webhookRoutes);
 app.use("/api", emailRoutes);
@@ -77,7 +85,7 @@ const startServer = async () => {
     await connectDB();
 
     // Connect to Redis
-    await connectRedis();
+    redisClient = await connectRedis();
 
     // Start background jobs
     startEmailQueue();

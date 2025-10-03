@@ -57,9 +57,8 @@ const validateEvent = (data: EventInput) => {
         "Networking"
       )
       .required(),
-    description: Joi.string().required(),
-    image: Joi.string().required(),
-    ticket: Joi.array()
+    description: Joi.string(),
+    tickets: Joi.array()
       .items(
         Joi.object({
           name: Joi.string().required(),
@@ -67,7 +66,7 @@ const validateEvent = (data: EventInput) => {
           quantity: Joi.number().required(),
           sold: Joi.number().default(0),
           description: Joi.string().allow(""), // optional but allow empty
-          benefits: Joi.array().items(Joi.string()),
+          benefits: Joi.string().allow(""),
           showVolume: Joi.boolean().required(),
         })
       )

@@ -4,7 +4,7 @@ import EventDetails from "@/components/dashboard/create/EventDetails";
 import Tickets from "@/components/dashboard/create/Tickets";
 import { resetForm, saveData, setStep } from "@/store/createevent-slice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { formSchema } from "@/utils/validationSchema";
+import { FormSchema, formSchema } from "@/utils/validationSchema";
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { useRouter } from "next/navigation";
@@ -15,6 +15,8 @@ import {
   hasNestedError,
   markTouched,
 } from "@/utils/helperFunction";
+import { createEvent, resetEvent } from "@/store/event-slice";
+import { toast } from "sonner";
 
 const CreateEvent = () => {
   const dispatch = useAppDispatch();
@@ -38,7 +40,6 @@ const CreateEvent = () => {
       charge: formData.charge || "Host",
       category: formData.category || "",
       description: formData.description || "",
-      // image: null as any,
       image: formData.image?.base64
         ? base64ToFile(
             formData.image.base64,
@@ -56,11 +57,18 @@ const CreateEvent = () => {
   });
 
   const handleSubmit = async (data: any) => {
-    console.log("🎉 FORM SUBMITTED SUCCESSFULLY!");
-    console.log("Final form submission:", data);
-    console.log("Tickets:", data.tickets);
-    dispatch(resetForm());
-    router.push("/dashboard/events");
+    try {
+      const result = await dispatch(createEvent(data)).unwrap();
+
+      toast.success(result.message);
+      dispatch(resetForm());
+      dispatch(resetEvent());
+      router.push("/dashboard/events");
+    } catch (error) {
+      const message =
+        typeof error === "string" ? error : "An unexpected error occurred";
+      toast.error(message);
+    }
   };
 
   const nextStep = async () => {
@@ -200,30 +208,12 @@ const CreateEvent = () => {
                 <button
                   type="button"
                   onClick={async () => {
-                    console.log("=== SUBMIT CLICKED ===");
-                    console.log("Tickets in form:", formik.values.tickets);
-                    console.log(
-                      "Number of tickets:",
-                      formik.values.tickets.length
-                    );
-
                     const errors = await formik.validateForm();
-                    console.log("Validation errors:", errors);
-
-                    if (errors.tickets) {
-                      console.log("TICKETS ERROR:", errors.tickets);
-                      console.log(
-                        "TICKETS ERROR:",
-                        JSON.stringify(errors.tickets, null, 2)
-                      );
-                    }
 
                     // Check all errors
                     const errorKeys = Object.keys(errors);
-                    console.log("Fields with errors:", errorKeys);
 
                     if (errorKeys.length > 0) {
-                      console.log("❌ Form has errors, cannot submit");
                       // Mark all errored fields as touched
                       const newTouched = errorKeys.reduce((acc, key) => {
                         acc[key] = true;
@@ -233,7 +223,6 @@ const CreateEvent = () => {
                       return;
                     }
 
-                    console.log("✅ No errors, submitting...");
                     formik.handleSubmit();
                   }}
                   className="px-6 py-2 rounded bg-green-500 text-white hover:bg-green-600"

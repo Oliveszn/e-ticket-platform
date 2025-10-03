@@ -61,12 +61,17 @@ const errorHandler = (
   }
 
   // Handle Mongo duplicate key
-  if (err.code === 11000) {
-    error = new ValidationError(
-      "Duplicate field value entered",
-      400,
-      err.keyValue
-    );
+  ///for a case like slug which is unique
+  if (err.code === 11000 && err.keyValue) {
+    const keys = Object.keys(err.keyValue);
+    if (keys.length > 0) {
+      const field = keys[0] as string;
+      const value = err.keyValue[field];
+      return res.status(400).json({
+        success: false,
+        message: `The ${field} "${value}" already exists. Please choose another.`,
+      });
+    }
   }
 
   if (err.name === "CastError") {

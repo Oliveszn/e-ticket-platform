@@ -1,4 +1,3 @@
-console.log("helper loaded");
 // Helper function to convert File to base64
 export const convertFileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {

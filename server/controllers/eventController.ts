@@ -26,17 +26,9 @@ const invalidateEventCache = async (
 
 ///create events for promoters
 const createEvent = asyncHandler(async (req: MulterRequest, res: Response) => {
-  //validate the schema
-  const { error } = validateEvent(req.body);
-  if (error) {
-    logger.warn("Validation error", error.details[0].message);
-    throw new ValidationError(error.details[0].message, 400);
-  }
-
-  const organizerId = req.user?._id;
-  if (!organizerId) {
-    throw new NotFoundError("User not found");
-  }
+  // when you send multipart data you cant send nested objects directly, you have to parse it
+  const parsedVenue = JSON.parse(req.body.venue);
+  const parsedTickets = JSON.parse(req.body.tickets);
 
   if (!req.file) {
     return res
@@ -44,17 +36,33 @@ const createEvent = asyncHandler(async (req: MulterRequest, res: Response) => {
       .json({ success: false, message: "No file uploaded" });
   }
 
+  const organizerId = req.user?._id;
+  if (!organizerId) {
+    throw new NotFoundError("User not found");
+  }
+
   const {
     title,
     slug,
     eventDate,
     eventTime,
-    venue,
+    // venue,
     charge,
     category,
     description,
-    ticket,
+    // tickets,
   } = req.body;
+
+  //validate the schema
+  const { error } = validateEvent({
+    ...req.body,
+    venue: parsedVenue,
+    tickets: parsedTickets,
+  });
+  if (error) {
+    logger.warn("Validation error", error.details[0].message);
+    throw new ValidationError(error.details[0].message, 400);
+  }
 
   const { originalname, mimetype } = req.file;
 
@@ -67,7 +75,7 @@ const createEvent = asyncHandler(async (req: MulterRequest, res: Response) => {
     slug,
     eventDate,
     eventTime,
-    venue,
+    venue: parsedVenue,
     charge,
     category,
     description,
@@ -77,7 +85,7 @@ const createEvent = asyncHandler(async (req: MulterRequest, res: Response) => {
       url: cloudinaryUploadResult.secure_url,
       originalName: originalname,
     },
-    ticket,
+    tickets: parsedTickets,
   });
 
   await event.save();

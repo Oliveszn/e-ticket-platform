@@ -14,10 +14,12 @@ import {
   REGISTER,
 } from "redux-persist";
 import authReducer from "./auth-slice";
+import eventReducer from "./event-slice";
 
 const rootReducer = combineReducers({
   form: formReducer,
   auth: authReducer, // not persisted
+  event: eventReducer,
 });
 
 const persistConfig = {

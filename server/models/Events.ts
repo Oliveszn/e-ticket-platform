@@ -71,7 +71,7 @@ const eventSchema = new mongoose.Schema(
         required: true,
       },
     },
-    ticket: [
+    tickets: [
       {
         name: { type: String, required: true },
         price: { type: Number, required: true },

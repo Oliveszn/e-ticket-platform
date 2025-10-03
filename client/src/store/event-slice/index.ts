@@ -2,7 +2,14 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "@/utils/axios-interceptor";
 import { AxiosError } from "axios";
 import { FormSchema } from "@/utils/validationSchema";
-import { EventResponse } from "@/utils/types";
+import { EventResponse, EventState } from "@/utils/types";
+import { base64ToFile } from "@/utils/helperFunction";
+
+const initialState: EventState = {
+  status: "idle",
+  error: null,
+  event: null,
+};
 
 const handleApiError = (error: unknown): string => {
   if (error instanceof AxiosError) {
@@ -37,11 +44,27 @@ export const createEvent = createAsyncThunk(
       // append nested venue (stringify it)
       fd.append("venue", JSON.stringify(form.venue));
 
+      // append image file
+      // Handle image - convert base64 back to File if needed
+      if (form.image instanceof File) {
+        fd.append("image", form.image);
+      } else if (
+        form.image &&
+        typeof form.image === "object" &&
+        "base64" in form.image
+      ) {
+        // Convert base64 back to File
+        const imageFile = base64ToFile(
+          form.image.base64,
+          form.image.name,
+          form.image.type
+        );
+        fd.append("image", imageFile);
+      } else {
+      }
+
       // append tickets array (stringify it)
       fd.append("tickets", JSON.stringify(form.tickets));
-
-      // append image file
-      fd.append("image", form.image);
       const response = await axios.post<EventResponse>(
         `${apiUrl}/api/events/create`,
         fd,
@@ -58,3 +81,34 @@ export const createEvent = createAsyncThunk(
     }
   }
 );
+
+const eventSlice = createSlice({
+  name: "event",
+  initialState,
+  reducers: {
+    resetEvent: (state) => {
+      state.status = "idle";
+      state.error = null;
+      state.event = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(createEvent.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(createEvent.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.error = null;
+        state.event = action.payload.event;
+      })
+      .addCase(createEvent.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
+      });
+  },
+});
+
+export const { resetEvent } = eventSlice.actions;
+export default eventSlice.reducer;

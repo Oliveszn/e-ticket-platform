@@ -63,21 +63,6 @@ export interface AuthState {
   refreshToken: string | null;
 }
 
-export interface RegisterFormData {
-  firstName: string;
-  lastName: string;
-  businessName: string;
-  email: string;
-  number: string;
-  address: string;
-  password: string;
-}
-
-export interface LoginFormData {
-  email: string;
-  password: string;
-}
-
 export interface ChangePasswordFormData {
   oldPassword: string;
   newPassword: string;
@@ -101,7 +86,7 @@ export interface Event {
     state: string;
     isPublic: boolean;
   };
-  charge: boolean;
+  charge: "Host" | "Buyer";
   category: string;
   description?: string;
   image: File;
@@ -124,5 +109,5 @@ export interface EventResponse {
 export interface EventState {
   status: "idle" | "loading" | "succeeded" | "failed";
   error?: string | null;
-  data: Event;
+  event: Event | null;
 }

@@ -3,13 +3,12 @@ import {
   AuthState,
   ChangePasswordFormData,
   ChangePasswordResponse,
-  LoginFormData,
-  RegisterFormData,
 } from "@/utils/types";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 // import axios from "axios";
 import axios from "@/utils/axios-interceptor";
 import { AxiosError } from "axios";
+import { LoginSchema, RegisterSchema } from "@/utils/validationSchema";
 
 const initialState: AuthState = {
   status: "idle",
@@ -34,7 +33,7 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export const registerUser = createAsyncThunk(
   "auth/register",
-  async (formData: RegisterFormData, { rejectWithValue }) => {
+  async (formData: RegisterSchema, { rejectWithValue }) => {
     try {
       const response = await axios.post<AuthResponse>(
         `${apiUrl}/api/auth/register`,
@@ -52,7 +51,7 @@ export const registerUser = createAsyncThunk(
 
 export const loginUser = createAsyncThunk(
   "auth/login",
-  async (formData: LoginFormData, { rejectWithValue }) => {
+  async (formData: LoginSchema, { rejectWithValue }) => {
     try {
       const response = await axios.post<AuthResponse>(
         `${apiUrl}/api/auth/login`,

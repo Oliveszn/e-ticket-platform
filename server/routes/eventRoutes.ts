@@ -8,9 +8,12 @@ import {
   searchEvents,
 } from "../controllers/eventController";
 import requireAuth from "../middleware/auth";
+import multer from "multer";
 const router = express.Router();
 
-router.post("/create", requireAuth, createEvent);
+const upload = multer({ storage: multer.memoryStorage() });
+
+router.post("/create", requireAuth, upload.single("image"), createEvent);
 router.delete("/:id", requireAuth, deleteEvent);
 router.put("/:id", requireAuth, editEvent);
 router.get("/my-events", requireAuth, getPromoterEvent);
