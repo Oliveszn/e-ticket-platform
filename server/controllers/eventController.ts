@@ -20,7 +20,16 @@ const invalidateEventCache = async (
   eventId: string,
   organizerId: string
 ) => {
-  const keysToDelete = [`event:${eventId}`, `events:organizer:${organizerId}`];
+  //// * means to match anything related
+  const keysToDelete = [
+    `event:${eventId}`,
+    `events:organizer:${organizerId}`,
+    `events:all:*`,
+    `events:category:*`,
+    `events:trending:*`,
+    `events:trending:top5`,
+    `event:organizer:*`,
+  ];
   await req.redisClient.del(...keysToDelete);
 };
 
@@ -104,7 +113,95 @@ const createEvent = asyncHandler(async (req: MulterRequest, res: Response) => {
   });
 });
 
-///get all evenst for public with filters
+export const paginate = (page: number = 1, limit: number = 10) => {
+  const skip = (page - 1) * limit;
+  return { skip, limit };
+};
+
+///get all evenst for public
+const getAllEvents = asyncHandler(async (req: Request, res: Response) => {
+  logger.info("get all events endpoint hit");
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const { skip } = paginate(page, limit);
+
+  const cacheKey = `events:all:page:${page}:limit:${limit}`;
+
+  ///we firts of all check if its exists in cache then fetch
+  const cached = await req.redisClient.get(cacheKey);
+  if (cached) {
+    return res.json(JSON.parse(cached));
+  }
+
+  const [events, total] = await Promise.all([
+    Event.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
+    Event.countDocuments(),
+  ]);
+
+  if (!events) {
+    throw new NotFoundError(
+      "No event available at this time, check back later"
+    );
+  }
+
+  const response = {
+    success: true,
+    data: events,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+
+  await req.redisClient.set(cacheKey, JSON.stringify(response), "EX", 300); ///5 mins ttl
+
+  res.status(200).json(response);
+});
+
+//get event by category for public
+const getEventsByCategory = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { category } = req.query;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const { skip } = paginate(page, limit);
+
+    if (!category || typeof category !== "string") {
+      throw new ValidationError("Category is required", 400);
+    }
+
+    const cacheKey = `events:category:${category}:page:${page}:limit:${limit}`;
+    const cached = await req.redisClient.get(cacheKey);
+    if (cached) {
+      return res.status(200).json(JSON.parse(cached));
+    }
+
+    const [events, total] = await Promise.all([
+      Event.find({ category }).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      Event.countDocuments({ category }),
+    ]);
+
+    if (!events) {
+      throw new NotFoundError("No events with this category");
+    }
+
+    const response = {
+      success: true,
+      data: events,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+
+    await req.redisClient.set(cacheKey, JSON.stringify(response), "EX", 300);
+    res.status(200).json(response);
+  }
+);
 
 ///get a particular event for public
 const getSingleEvent = asyncHandler(async (req: Request, res: Response) => {
@@ -136,6 +233,69 @@ const getSingleEvent = asyncHandler(async (req: Request, res: Response) => {
     message: "Event fetched successfully",
     data: event,
   });
+});
+
+///get trending events for public and we determine what events are trending by the tickets sold
+const getTrendingEvents = asyncHandler(async (req: Request, res: Response) => {
+  const cacheKey = `events:trending:top5`;
+  const cached = await req.redisClient.get(cacheKey);
+  if (cached) {
+    return res.status(200).json(JSON.parse(cached));
+  }
+
+  const events = await Event.aggregate([
+    { $unwind: "$tickets" },
+    {
+      $group: {
+        _id: "$_id",
+        totalSold: { $sum: "$tickets.sold" },
+        organizerId: { $first: "$organizerId" },
+        title: { $first: "$title" },
+        slug: { $first: "$slug" },
+        eventDate: { $first: "$eventDate" },
+        eventTime: { $first: "$eventTime" },
+        venue: { $first: "$venue" },
+        charge: { $first: "$charge" },
+        category: { $first: "$category" },
+        description: { $first: "$description" },
+        image: { $first: "$image" },
+        allTickets: { $push: "$tickets" },
+        createdAt: { $first: "$createdAt" },
+        updatedAt: { $first: "$updatedAt" },
+      },
+    },
+    //sort by total sold
+    { $sort: { totalSold: -1 } },
+    { $limit: 5 },
+    {
+      $project: {
+        _id: 1,
+        organizerId: 1,
+        title: 1,
+        slug: 1,
+        eventDate: 1,
+        eventTime: 1,
+        venue: 1,
+        charge: 1,
+        category: 1,
+        description: 1,
+        image: 1,
+        tickets: "$allTickets",
+        totalSold: 1,
+        createdAt: 1,
+        updatedAt: 1,
+      },
+    },
+  ]);
+
+  const response = {
+    success: true,
+    message: "Top trending events fetched successfully",
+    data: events,
+  };
+
+  await req.redisClient.set(cacheKey, JSON.stringify(response), "EX", 300);
+  res.status(200).json(response);
 });
 
 ////edit event for promoters
@@ -342,6 +502,53 @@ const getPromoterEvent = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+// GET SINGLE EVENT FOR PROMOTER (requires auth)
+const getPromoterSingleEvent = asyncHandler(
+  async (req: Request, res: Response) => {
+    const organizerId = req.user?._id;
+    const { id } = req.params;
+
+    if (!organizerId) {
+      throw new NotFoundError("User not found");
+    }
+
+    // Validate event ID
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      throw new ValidationError("Invalid or missing event ID", 400);
+    }
+
+    const eventKey = `event:organizer:${organizerId}:${id}`;
+    const cachedEvent = await req.redisClient.get(eventKey);
+
+    if (cachedEvent) {
+      return res.status(200).json(JSON.parse(cachedEvent));
+    }
+
+    // Find event and verify ownership
+    const event = await Event.findOne({
+      _id: id,
+      organizerId: organizerId,
+    });
+
+    if (!event) {
+      throw new NotFoundError(
+        "Event not found or you don't have permission to view it"
+      );
+    }
+
+    const response = {
+      success: true,
+      message: "Event retrieved successfully",
+      data: event,
+    };
+
+    // Cache for 1 hour (3600 seconds)
+    await req.redisClient.setex(eventKey, 3600, JSON.stringify(response));
+
+    res.status(200).json(response);
+  }
+);
+
 export {
   createEvent,
   getSingleEvent,
@@ -349,4 +556,8 @@ export {
   getPromoterEvent,
   editEvent,
   searchEvents,
+  getAllEvents,
+  getEventsByCategory,
+  getPromoterSingleEvent,
+  getTrendingEvents,
 };
