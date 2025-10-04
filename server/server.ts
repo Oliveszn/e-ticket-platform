@@ -19,6 +19,7 @@ import emailRoutes from "./routes/emailRoutes";
 import webhookRoutes from "./routes/webhookRoutes";
 import { startEmailQueue } from "./jobs/emailQueues";
 import { rateLimiter } from "./middleware/rateLimit";
+import { databaseErrorHandler } from "./middleware/databaseErrorHandler";
 // import { ClerkExpressRequireAuth } from "@clerk/express";
 
 const app: Express = express();
@@ -76,6 +77,7 @@ app.use("/api/webhooks", webhookRoutes);
 app.use("/api", emailRoutes);
 
 // Global error handler
+app.use(databaseErrorHandler);
 app.use(errorHandler);
 
 // Initialize connections and start server

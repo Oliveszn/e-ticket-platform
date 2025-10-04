@@ -3,7 +3,9 @@ import logger from "../utils/logger";
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI as string);
+    const conn = await mongoose.connect(process.env.MONGODB_URI as string, {
+      serverSelectionTimeoutMS: 5000, //// Timeout after 5s instead of 30s
+    });
     const { host } = conn.connection;
     const { name: dbName } = conn.connection;
 
@@ -12,8 +14,23 @@ const connectDB = async () => {
     );
   } catch (error) {
     logger.error("MongoDB connection error:", error);
-    process.exit(1); // Exit process with failure
+    // Don't exit in development, just log
+    if (process.env.NODE_ENV === "production") {
+      process.exit(1);
+    }
   }
 };
+
+mongoose.connection.on("disconnected", () => {
+  logger.warn("MongoDB disconnected. Attempting to reconnect...");
+});
+
+mongoose.connection.on("error", (err) => {
+  logger.error("MongoDB error:", err.message);
+});
+
+mongoose.connection.on("reconnected", () => {
+  logger.info("MongoDB reconnected");
+});
 
 export default connectDB;
