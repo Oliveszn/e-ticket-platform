@@ -98,15 +98,16 @@ export interface Event {
   category: string;
   description?: string;
   image: EventImage;
-  tickets: {
-    name: string;
-    price: number;
-    quantity: number;
-    sold: number;
-    description?: string;
-    benefits?: string;
-    showVolume: boolean;
-  }[];
+  tickets: Ticket[];
+  // tickets: {
+  //   name: string;
+  //   price: number;
+  //   quantity: number;
+  //   sold: number;
+  //   description?: string;
+  //   benefits?: string;
+  //   showVolume: boolean;
+  // }[];
 }
 
 export interface SingleEventResponse {
@@ -146,4 +147,36 @@ export interface EventState {
     limit: number;
     totalPages: number;
   };
+}
+
+///THIS FOR TICKET SLICE
+export interface Ticket {
+  id?: number;
+  name: string;
+  price: number;
+  quantity: number;
+  sold: number;
+  available?: number;
+  description?: string;
+  benefits?: string;
+  showVolume: boolean;
+}
+
+export interface TicketResponse {
+  success: string;
+  message: string;
+  data: Ticket[];
+}
+
+export interface SingleTicketResponse {
+  success: string;
+  message: string;
+  data: Ticket;
+}
+
+export interface TicketState {
+  status: "idle" | "loading" | "succeeded" | "failed";
+  error?: string | null;
+  data: Ticket[] | null;
+  currentTicket: Ticket | null;
 }

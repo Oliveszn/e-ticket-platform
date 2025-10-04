@@ -15,7 +15,7 @@ router.get("/events/:id/tickets/:ticketId", ticketAvailability);
 // purchase ticket
 router.post("/events/:id/tickets/:ticketId", buyTicket);
 router.post(
-  "/events/:id/tickets/:ticketId/purcase",
+  "/events/:id/tickets/:ticketId/purchase",
   purchaseLimiter,
   initializeTicketPurchase
 );

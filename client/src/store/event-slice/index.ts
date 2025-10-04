@@ -3,14 +3,12 @@ import axios from "@/utils/axios-interceptor";
 import { AxiosError } from "axios";
 import { FormSchema } from "@/utils/validationSchema";
 import {
-  Event,
   EventsListResponse,
   EventState,
   SingleEventResponse,
   TrendingEventsResponse,
 } from "@/utils/types";
 import { base64ToFile } from "@/utils/helperFunction";
-import { log } from "console";
 
 const initialState: EventState = {
   status: "idle",
@@ -106,7 +104,6 @@ export const getAllEvents = createAsyncThunk(
         `${apiUrl}/api/events`,
         { params: { page, limit } }
       );
-      console.log(response.data);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(handleApiError(error));
@@ -121,8 +118,6 @@ export const getAnEvent = createAsyncThunk(
       const response = await axios.get<SingleEventResponse>(
         `${apiUrl}/api/events/${id}`
       );
-      console.log(response);
-      console.log(response.data);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(handleApiError(error));
@@ -237,9 +232,6 @@ const eventSlice = createSlice({
         state.status = "succeeded";
         state.data = action.payload.data;
         state.pagination = action.payload.pagination;
-        // console.log("data data", action.payload.data.data);
-        console.log("data", action.payload.data);
-        console.log("pag", action.payload.pagination);
       })
       .addCase(getAllEvents.rejected, (state, action) => {
         state.status = "failed";

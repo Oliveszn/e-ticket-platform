@@ -1,6 +1,8 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { getAnEvent } from "@/store/event-slice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { getTickets } from "@/store/tickets-slice";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -11,12 +13,14 @@ const EventDetails = () => {
   const { currentEvent, status, error } = useAppSelector(
     (state) => state.event
   );
+  const { data: ticket } = useAppSelector((state) => state.ticket);
 
   const eventId = params.id as string;
 
   useEffect(() => {
     if (eventId) {
       dispatch(getAnEvent(eventId));
+      dispatch(getTickets(eventId));
     }
   }, [dispatch, eventId]);
 
@@ -196,11 +200,11 @@ const EventDetails = () => {
             )}
 
             {/* Tickets Section */}
-            {currentEvent.tickets && currentEvent.tickets.length > 0 && (
+            {ticket && ticket.length > 0 && (
               <div>
                 <h2 className="text-2xl font-bold mb-4">Available Tickets</h2>
                 <div className="space-y-4">
-                  {currentEvent.tickets.map((ticket, index) => (
+                  {ticket.map((ticket, index) => (
                     <div
                       key={index}
                       className="border rounded-lg p-5 hover:border-blue-500 transition"
@@ -210,25 +214,33 @@ const EventDetails = () => {
                           <h3 className="text-xl font-semibold mb-1">
                             {ticket.name}
                           </h3>
-                          {ticket.description && (
-                            <p className="text-gray-600 text-sm mb-2">
-                              {ticket.description}
-                            </p>
-                          )}
+                          <p className="text-2xl font-bold text-blue-600">
+                            ₦{ticket.price.toLocaleString()}
+                          </p>
                           {ticket.benefits && ticket.benefits.length > 0 && (
                             <div className="flex flex-wrap gap-2">
                               {ticket.benefits}
                             </div>
                           )}
                         </div>
-                        <div className="text-right">
-                          <p className="text-2xl font-bold text-blue-600">
-                            ₦{ticket.price.toLocaleString()}
-                          </p>
-                          {ticket.showVolume && (
+                        <div className="">
+                          {/* {ticket.showVolume && (
                             <p className="text-sm text-gray-500">
                               {ticket.quantity - ticket.sold} left
                             </p>
+                          )} */}
+                          {ticket.available === 0 ? (
+                            <Button
+                              className="cursor-not-allowed bg-gray-200 whitespace-nowrap"
+                              size="sm"
+                              variant="secondary"
+                            >
+                              Sold Out
+                            </Button>
+                          ) : (
+                            <Button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 bg-blue-500 text-white hover:bg-blue-500/90 h-10 px-4 py-2 cursor-pointer">
+                              Select
+                            </Button>
                           )}
                         </div>
                       </div>

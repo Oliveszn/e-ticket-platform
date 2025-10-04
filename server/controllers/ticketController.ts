@@ -27,7 +27,7 @@ const ticketAvailability = asyncHandler(async (req: Request, res: Response) => {
   }
 
   //this is a mongoose helper to check in objects
-  const ticket = event?.ticket.id(ticketId);
+  const ticket = event?.tickets.id(ticketId);
   if (!ticket) {
     throw new ValidationError("Ticket sold out", 409);
   }
@@ -579,7 +579,7 @@ const getTicket = asyncHandler(async (req: Request, res: Response) => {
     throw new NotFoundError("Event not found");
   }
 
-  const tickets = event.ticket.map((t: Ticket) => ({
+  const tickets = event.tickets.map((t: Ticket) => ({
     id: t._id,
     name: t.name,
     quantity: t.quantity,
@@ -587,13 +587,15 @@ const getTicket = asyncHandler(async (req: Request, res: Response) => {
     benefits: t.benefits,
     available: t.quantity - t.sold,
     sold: t.sold,
+    showVolume: t.showVolume,
   }));
 
-  if (tickets === 0) {
-    throw new ValidationError(
-      "No ticket available at this time, Check Later",
-      409
-    );
+  if (tickets.length === 0) {
+    res.status(200).json({
+      success: true,
+      message: "No tickets available",
+      data: [],
+    });
   }
   res.status(200).json({
     success: true,
@@ -612,6 +614,10 @@ const getSingleTicket = asyncHandler(async (req: Request, res: Response) => {
   const event = await Event.findById(id);
   if (!event) {
     throw new NotFoundError("Event not found");
+  }
+
+  if (!ticketId || !mongoose.Types.ObjectId.isValid(ticketId)) {
+    throw new ValidationError("Invalid ticket ID", 400);
   }
 
   //this is a mongoose helper to check in objects

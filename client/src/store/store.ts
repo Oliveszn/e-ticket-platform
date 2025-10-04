@@ -15,11 +15,13 @@ import {
 } from "redux-persist";
 import authReducer from "./auth-slice";
 import eventReducer from "./event-slice";
+import ticketReducer from "./tickets-slice";
 
 const rootReducer = combineReducers({
   form: formReducer,
   auth: authReducer, // not persisted
   event: eventReducer,
+  ticket: ticketReducer,
 });
 
 const persistConfig = {

@@ -78,7 +78,7 @@ const eventSchema = new mongoose.Schema(
         quantity: { type: Number, required: true },
         sold: { type: Number, default: 0 },
         description: { type: String },
-        benefits: [{ type: String }],
+        benefits: { type: String },
         showVolume: { type: Boolean, default: false },
       },
     ],
