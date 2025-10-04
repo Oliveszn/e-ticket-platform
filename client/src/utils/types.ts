@@ -74,6 +74,14 @@ export interface ChangePasswordResponse {
 }
 
 ////THIS IS FOR EVENT SLICE
+interface EventImage {
+  url: string;
+  publicId?: string;
+  mimeType?: string;
+  originalName?: string;
+  optimizedUrl?: string;
+}
+
 export interface Event {
   title: string;
   slug: string;
@@ -89,25 +97,53 @@ export interface Event {
   charge: "Host" | "Buyer";
   category: string;
   description?: string;
-  image: File;
+  image: EventImage;
   tickets: {
     name: string;
     price: number;
     quantity: number;
+    sold: number;
     description?: string;
     benefits?: string;
     showVolume: boolean;
   }[];
 }
 
-export interface EventResponse {
+export interface SingleEventResponse {
   success: boolean;
   message: string;
-  event: Event;
+  data: Event;
+}
+
+export interface TrendingEventsResponse {
+  success: boolean;
+  message: string;
+  data: Event[];
+}
+
+export interface EventsListResponse {
+  success: boolean;
+  message: string;
+  data: Event[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }
 
 export interface EventState {
   status: "idle" | "loading" | "succeeded" | "failed";
   error?: string | null;
-  event: Event | null;
+  data: Event[] | null;
+  currentEvent: Event | null;
+  trendingEvents: Event[] | null;
+  promoterEvents: Event[] | null;
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }

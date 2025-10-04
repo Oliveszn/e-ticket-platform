@@ -489,9 +489,6 @@ const getPromoterEvent = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const allEvents = await Event.find({ organizerId });
-  if (!allEvents) {
-    throw new NotFoundError("You have no existing event");
-  }
 
   await req.redisClient.setex(listKey, 43200, JSON.stringify(allEvents)); //save in cache
 
