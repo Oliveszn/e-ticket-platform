@@ -15,7 +15,7 @@ export const databaseErrorHandler = (
   ) {
     return res.status(503).json({
       success: false,
-      message: "Database connection error. Please try again later.",
+      message: "Check your network connection or try again later.",
       error: process.env.NODE_ENV === "development" ? err.message : undefined,
     });
   }

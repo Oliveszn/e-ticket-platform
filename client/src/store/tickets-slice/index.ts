@@ -50,7 +50,6 @@ export const getSingleTickets = createAsyncThunk(
       const response = await axios.get<SingleTicketResponse>(
         `${apiUrl}/api/tickets/events/${id}/ticket/${ticketId}`
       );
-      console.log(response.data);
       return response.data;
     } catch (error: unknown) {
       return rejectWithValue(handleApiError(error));
@@ -59,7 +58,7 @@ export const getSingleTickets = createAsyncThunk(
 );
 
 const ticketSlice = createSlice({
-  name: "tickets",
+  name: "ticket",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -83,6 +82,7 @@ const ticketSlice = createSlice({
       .addCase(getSingleTickets.pending, (state) => {
         state.status = "loading";
         state.error = null;
+        state.currentTicket = null;
       })
       .addCase(getSingleTickets.fulfilled, (state, action) => {
         state.status = "succeeded";

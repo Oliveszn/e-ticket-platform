@@ -611,17 +611,17 @@ const getSingleTicket = asyncHandler(async (req: Request, res: Response) => {
     throw new ValidationError("Invalid or No event ID", 400);
   }
 
+  if (!ticketId || !mongoose.Types.ObjectId.isValid(ticketId)) {
+    throw new ValidationError("Invalid ticket ID", 400);
+  }
+
   const event = await Event.findById(id);
   if (!event) {
     throw new NotFoundError("Event not found");
   }
 
-  if (!ticketId || !mongoose.Types.ObjectId.isValid(ticketId)) {
-    throw new ValidationError("Invalid ticket ID", 400);
-  }
-
   //this is a mongoose helper to check in objects
-  const ticket = event?.ticket.id(ticketId);
+  const ticket = event?.tickets.id(ticketId);
   if (!ticket) {
     throw new NotFoundError("Ticket type not found");
   }

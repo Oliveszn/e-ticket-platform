@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { getAnEvent } from "@/store/event-slice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { getTickets } from "@/store/tickets-slice";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -16,7 +17,6 @@ const EventDetails = () => {
   const { data: ticket } = useAppSelector((state) => state.ticket);
 
   const eventId = params.id as string;
-
   useEffect(() => {
     if (eventId) {
       dispatch(getAnEvent(eventId));
@@ -231,6 +231,7 @@ const EventDetails = () => {
                           )} */}
                           {ticket.available === 0 ? (
                             <Button
+                              // disabled
                               className="cursor-not-allowed bg-gray-200 whitespace-nowrap"
                               size="sm"
                               variant="secondary"
@@ -238,9 +239,12 @@ const EventDetails = () => {
                               Sold Out
                             </Button>
                           ) : (
-                            <Button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 bg-blue-500 text-white hover:bg-blue-500/90 h-10 px-4 py-2 cursor-pointer">
+                            <Link
+                              href={`/explore/${eventId}/ticket/${ticket.id}`}
+                              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 bg-blue-500 text-white hover:bg-blue-500/90 h-10 px-4 py-2 cursor-pointer"
+                            >
                               Select
-                            </Button>
+                            </Link>
                           )}
                         </div>
                       </div>
