@@ -39,7 +39,10 @@ axios.interceptors.response.use(
     const originalRequest = error.config;
 
     ///////don't retry if it's the refresh endpoint itself failing else e go be infinte loop
-    if (originalRequest.url?.includes("/refresh-token")) {
+    if (
+      originalRequest.url?.includes("/refresh-token") &&
+      error.response?.status === 401
+    ) {
       store.dispatch(logout());
       window.location.href = "/auth/login";
       return Promise.reject(error);
