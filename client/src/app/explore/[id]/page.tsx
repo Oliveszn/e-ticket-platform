@@ -224,11 +224,6 @@ const EventDetails = () => {
                           )}
                         </div>
                         <div className="">
-                          {/* {ticket.showVolume && (
-                            <p className="text-sm text-gray-500">
-                              {ticket.quantity - ticket.sold} left
-                            </p>
-                          )} */}
                           {ticket.available === 0 ? (
                             <Button
                               // disabled

@@ -27,11 +27,6 @@ export default function PurchaseForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // TODO: Dispatch purchase action
-    // dispatch(purchaseTicket({ eventId, ticketId, quantity, ...formData }));
-
-    // Redirect to checkout or success page
     router.push(`/checkout/${ticketId}`);
   };
 

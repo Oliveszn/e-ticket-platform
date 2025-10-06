@@ -242,3 +242,99 @@ export const updateProfileSchema = z.object({
 });
 
 export type UpdateProfileSchema = z.infer<typeof updateProfileSchema>;
+
+////PURCHASING TICKETS
+export const ticketPurchaseSchema = z
+  .object({
+    firstName: z
+      .string({ error: "First name is required" })
+      .min(1, "First name is required"),
+    lastName: z
+      .string({ error: "Last name is required" })
+      .min(1, "Last name is required"),
+    email: z
+      .string({ error: "Email is required" })
+      .email("Invalid email address"),
+    numberOfTickets: z.preprocess((val) => {
+      // here we check for values that are not numbers and also convert strings to numbers
+      if (val === "" || val === undefined || val === null) return undefined;
+      if (typeof val === "string") {
+        const num = Number(val);
+        return Number.isNaN(num) ? val : num;
+      }
+      return val;
+    }, z.number().int().min(1, "Must purchase at least 1 ticket")),
+    info: z.string().optional(),
+    sendToMultipleRecipients: z.preprocess((val) => {
+      // here we convert string to boolean
+      if (typeof val === "string") {
+        const lower = val.toLowerCase();
+        if (lower === "true") return true;
+        if (lower === "false") return false;
+      }
+      return Boolean(val);
+    }, z.boolean()),
+    // Validate each recipient's shape; make the whole array optional (we'll handle presence via superRefine)
+    recipients: z
+      .array(
+        z.object({
+          firstName: z
+            .string({ error: "First name is required" })
+            .min(1, "Recipient first name is required"),
+          lastName: z
+            .string({ error: "Last name is required" })
+            .min(1, "Recipient last name is required"),
+          email: z
+            .string({ error: "Email is required" })
+            .min(1, "Recipient email is required")
+            .email("Invalid recipient email"),
+        })
+      )
+      .optional(),
+  })
+  .superRefine((data, ctx) => {
+    // Only validate if sendToMultipleRecipients is true
+    if (data.sendToMultipleRecipients) {
+      // Check numberOfTickets is valid
+      if (
+        typeof data.numberOfTickets !== "number" ||
+        data.numberOfTickets <= 1
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["numberOfTickets"],
+          message:
+            "Must purchase at least 2 tickets to send to multiple recipients.",
+        });
+        return; // Stop further validation
+      }
+
+      // Check recipients array exists
+      if (!data.recipients || !Array.isArray(data.recipients)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["recipients"],
+          message: "Recipients are required when sending to multiple people.",
+        });
+        return;
+      }
+
+      // Check count matches
+      const expected = data.numberOfTickets - 1;
+      const actual = data.recipients.length;
+
+      if (actual !== expected) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["recipients"],
+          message: `Please add ${expected} recipient${
+            expected !== 1 ? "s" : ""
+          } (you get 1 ticket, ${expected} other${
+            expected !== 1 ? "s" : ""
+          } needed).`,
+        });
+      }
+    }
+  });
+
+export type TicketPurchaseSchema = z.infer<typeof ticketPurchaseSchema>;

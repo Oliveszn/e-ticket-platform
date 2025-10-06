@@ -267,7 +267,7 @@ const initializeTicketPurchase = asyncHandler(
       email,
       numberOfTickets,
       info,
-      recipients,
+      recipients, ///this only required when sendtomultiple is true
       sendToMultipleRecipients,
     } = req.body;
     const { id, ticketId } = req.params;
@@ -579,15 +579,18 @@ const getTicket = asyncHandler(async (req: Request, res: Response) => {
     throw new NotFoundError("Event not found");
   }
 
-  const tickets = event.tickets.map((t: Ticket) => ({
+  const tickets = event.tickets.map((t: any) => ({
+    // id: t._id,
+    // name: t.name,
+    // quantity: t.quantity,
+    // price: t.price,
+    // benefits: t.benefits,
+    // available: t.quantity - t.sold,
+    // sold: t.sold,
+    // showVolume: t.showVolume,
+    ...t.toObject(), // converts document to plain js
     id: t._id,
-    name: t.name,
-    quantity: t.quantity,
-    price: t.price,
-    benefits: t.benefits,
     available: t.quantity - t.sold,
-    sold: t.sold,
-    showVolume: t.showVolume,
   }));
 
   if (tickets.length === 0) {
@@ -635,10 +638,14 @@ const getSingleTicket = asyncHandler(async (req: Request, res: Response) => {
     success: true,
     message: "Ticket Available",
     data: {
+      // id: ticket._id,
+      // name: ticket.name,
+      // price: ticket.price,
+      // benefits: ticket.benefits,
+      // available,
+      // showVolume: ticket.showVolume,
+      ...ticket.toObject(), // converts document to plain js
       id: ticket._id,
-      name: ticket.name,
-      price: ticket.price,
-      benefits: ticket.benefits,
       available,
     },
   });
