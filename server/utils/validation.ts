@@ -1,4 +1,3 @@
-import { title } from "process";
 import type { EventInput, RegistrationInput, TicketInfo } from "../types";
 
 const Joi = require("joi");
@@ -66,7 +65,7 @@ const validateEvent = (data: EventInput) => {
           quantity: Joi.number().required(),
           sold: Joi.number().default(0),
           description: Joi.string().allow(""), // optional but allow empty
-          benefits: Joi.string().allow(""),
+          personsPerTicket: Joi.number().default(1),
           showVolume: Joi.boolean().required(),
         })
       )

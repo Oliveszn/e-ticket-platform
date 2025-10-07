@@ -15,7 +15,7 @@ export interface Ticket {
   quantity: number;
   sold: number;
   description: string;
-  benefits: string[];
+  personsPerTicket: number;
   showVolume: boolean;
 }
 
