@@ -28,7 +28,7 @@ const Tickets = ({ formik }: TicketProps) => {
     price: "",
     quantity: "",
     description: "",
-    benefits: "",
+    personsPerTicket: "",
     showVolume: false,
   });
 
@@ -42,7 +42,7 @@ const Tickets = ({ formik }: TicketProps) => {
       price: "",
       quantity: "",
       description: "",
-      benefits: "",
+      personsPerTicket: "",
       showVolume: false,
     });
   };
@@ -199,27 +199,31 @@ const Tickets = ({ formik }: TicketProps) => {
                     />
                   </div>
 
-                  {/* BENEFITS  */}
+                  {/* PERSONS PER TICKET  */}
                   <div className="space-y-3 my-2">
                     <Label
-                      htmlFor="ticket.benefits"
+                      htmlFor="ticket.personsPerTicket"
                       className="text-sm font-medium leading-none"
                     >
-                      Ticket benefits (optional)
+                      Number of persons to this ticket
                     </Label>
                     <Input
-                      id="ticket.benefits"
+                      id="ticket.personsPerTicket"
                       type="text"
-                      value={newTicket.benefits}
+                      value={newTicket.personsPerTicket}
                       onChange={(e) =>
-                        handleInputChange("benefits", e.target.value)
+                        handleInputChange(
+                          "personsPerTicket",
+                          Number(e.target.value)
+                        )
                       }
-                      placeholder="What benefits does this ticket include?"
+                      placeholder=""
                       onBlur={formik.handleBlur}
                       className="flex h-10 w-full border-slate-200 focus-visible:ring-slate-950 rounded-md border bg-white px-3 py-2 text-base placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50 md:text-sm"
                     />
                     <p className="text-slate-500 text-xs">
-                      e.g: Free drinks, Backstage access
+                      How many persons does this ticket admit, Example 1, 2, 4
+                      persons.
                     </p>
                   </div>
 
@@ -368,7 +372,7 @@ const Tickets = ({ formik }: TicketProps) => {
                         </div>
                       </div>
 
-                      {/* Benefits */}
+                      {/* persons per ticket */}
                       <div className="flex gap-2 sm:gap-4">
                         <div className="bg-gray-50 rounded-full p-2 sm:p-4">
                           <svg
@@ -386,9 +390,11 @@ const Tickets = ({ formik }: TicketProps) => {
                           </svg>
                         </div>
                         <div className="flex flex-col justify-center">
-                          <span className="text-xs font-light">Benefits</span>
+                          <span className="text-xs font-light">
+                            Person(s) per ticket
+                          </span>
                           <b className="text-sm font-semibold">
-                            {ticket.benefits}
+                            {ticket.personsPerTicket}
                           </b>
                         </div>
                       </div>

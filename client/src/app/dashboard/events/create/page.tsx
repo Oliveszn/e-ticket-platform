@@ -69,6 +69,7 @@ const CreateEvent = () => {
         typeof error === "string" ? error : "An unexpected error occurred";
       toast.error(message);
     }
+    console.log(data);
   };
 
   const nextStep = async () => {

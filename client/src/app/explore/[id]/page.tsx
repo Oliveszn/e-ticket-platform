@@ -217,9 +217,9 @@ const EventDetails = () => {
                           <p className="text-2xl font-bold text-blue-600">
                             ₦{ticket.price.toLocaleString()}
                           </p>
-                          {ticket.benefits && ticket.benefits.length > 0 && (
+                          {ticket.personsPerTicket && (
                             <div className="flex flex-wrap gap-2">
-                              {ticket.benefits}
+                              {ticket.personsPerTicket}
                             </div>
                           )}
                         </div>

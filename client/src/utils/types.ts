@@ -30,7 +30,7 @@ export type FormValues = {
     price: number;
     quantity: number;
     description?: string;
-    benefits?: string[];
+    personsPerTicket?: string[];
     showVolume?: boolean; // optional because backend defaults to false
   }[];
 };
@@ -158,7 +158,7 @@ export interface Ticket {
   sold: number;
   available?: number;
   description?: string;
-  benefits?: string;
+  personsPerTicket?: number;
   showVolume: boolean;
 }
 

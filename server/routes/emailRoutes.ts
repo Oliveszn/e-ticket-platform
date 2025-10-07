@@ -50,7 +50,7 @@ router.post("/confirmation", async (req, res) => {
         quantity: 1,
         sold: 0,
         description: "Regular ticket",
-        benefits: ["General Admission"],
+        personsPerTicket: 1,
         showVolume: true,
       },
       {
@@ -60,7 +60,7 @@ router.post("/confirmation", async (req, res) => {
         quantity: 1,
         sold: 0,
         description: "Regular ticket",
-        benefits: ["General Admission"],
+        personsPerTicket: 1,
         showVolume: true,
       },
     ],

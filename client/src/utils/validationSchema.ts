@@ -10,7 +10,7 @@ export const ticketSchema = z.object({
   price: z.number().min(1, "Price must be at least 1"),
   quantity: z.number().min(1, "Quantity is required"),
   description: z.string().optional(),
-  benefits: z.string().optional(),
+  personsPerTicket: z.number().default(1),
   showVolume: z.boolean().default(false),
 });
 
