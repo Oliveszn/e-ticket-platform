@@ -94,7 +94,7 @@ const validateTicketPurchase = (data: TicketInfo) => {
       "number.min": "Must purchase at least 1 ticket",
       "number.integer": "Number of tickets must be a whole number",
     }),
-    info: Joi.string().optional(),
+    info: Joi.string().allow("").optional(),
     sendToMultipleRecipients: Joi.boolean().default(false),
 
     // recipients: Joi.array().items(),

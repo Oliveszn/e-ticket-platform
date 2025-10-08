@@ -11,6 +11,8 @@ import {
   TicketPurchaseSchema,
 } from "@/utils/validationSchema";
 import Toggle from "@/components/dashboard/Toggle";
+import { toast } from "sonner";
+import { purchaseTickets } from "@/store/order-slice";
 
 const TicketPurchaePage = () => {
   const params = useParams();
@@ -30,28 +32,51 @@ const TicketPurchaePage = () => {
       numberOfTickets: 1,
       info: "",
       sendToMultipleRecipients: false,
-      recipients: [
-        {
-          firstName: "",
-          lastName: "",
-          email: "",
-        },
-      ],
+      recipients: undefined,
+      // recipients: [
+      //   {
+      //     firstName: "",
+      //     lastName: "",
+      //     email: "",
+      //   },
+      // ],
     },
     validationSchema: toFormikValidationSchema(ticketPurchaseSchema),
     onSubmit: (values) => {
-      console.log("✅ SUBMITTING", values);
-      console.log(formik.errors);
+      console.log("Formik onSubmit triggered ✅");
+      console.log("Values:", values);
+      console.log("Errors:", formik.errors);
+      console.log("sendToMultipleRecipients:", values.sendToMultipleRecipients);
+      console.log("recipients:", values.recipients);
       handleSubmit(values);
     },
   });
 
-  const handleSubmit = async (data: TicketPurchaseSchema) => {
-    console.log(data);
-    console.log(formik.errors);
+  const handleSubmit = async (data: any) => {
+    try {
+      console.log("Submitting:", data);
+      const result = await dispatch(
+        purchaseTickets({
+          id: eventId,
+          ticketId: ticketId,
+          form: data,
+        })
+      ).unwrap();
+      console.log("Purchase result:", result);
+
+      // Redirect to payment URL
+      if (result.data?.paymentUrl) {
+        window.location.href = result.data.paymentUrl;
+      }
+    } catch (error) {
+      console.error("Purchase failed:", error);
+      const message =
+        typeof error === "string" ? error : "An unexpected error occurred";
+      toast.error(message);
+    }
   };
 
-  const fees = 250 * formik.values.numberOfTickets;
+  const fees = 250 * formik.values.numberOfTickets + 100;
   const subTotal = (currentTicket?.price ?? 0) * formik.values.numberOfTickets;
   useEffect(() => {
     if (eventId && ticketId) {
@@ -67,48 +92,6 @@ const TicketPurchaePage = () => {
     return <div>Ticket not found</div>;
   }
   return (
-    // <div className="container mx-auto px-4 py-8">
-    //   <div className="grid md:grid-cols-2 gap-8">
-    //     {/* Left: Ticket Details */}
-    //     <div className="bg-white p-6 rounded-lg shadow">
-    //       <h1 className="text-2xl font-bold mb-4">{currentTicket.name}</h1>
-    //       <div className="space-y-3">
-    //         <div>
-    //           <span className="text-gray-600">Price:</span>
-    //           <span className="ml-2 text-xl font-bold">
-    //             ${currentTicket.price}
-    //           </span>
-    //         </div>
-    //         <div>
-    //           <span className="text-gray-600">Available:</span>
-    //           <span className="ml-2">{currentTicket.available} tickets</span>
-    //         </div>
-    //         {currentTicket.benefits && (
-    //           <div>
-    //             <span className="text-gray-600">Benefits:</span>
-    //             <p className="mt-1">{currentTicket.benefits}</p>
-    //           </div>
-    //         )}
-    //         {currentTicket.description && (
-    //           <div>
-    //             <span className="text-gray-600">Description:</span>
-    //             <p className="mt-1">{currentTicket.description}</p>
-    //           </div>
-    //         )}
-    //       </div>
-    //     </div>
-
-    //     {/* Right: Purchase Form */}
-    //     <div className="bg-white p-6 rounded-lg shadow">
-    //       <h2 className="text-xl font-bold mb-4">Purchase Ticket</h2>
-    //       <PurchaseForm
-    //         ticketId={ticketId}
-    //         eventId={eventId}
-    //         price={currentTicket.price}
-    //       />
-    //     </div>
-    //   </div>
-    // </div>
     <form onSubmit={formik.handleSubmit}>
       <div className="grid sm:grid-cols-12 gap-4">
         <div className="sm:col-span-8">
@@ -165,7 +148,6 @@ const TicketPurchaePage = () => {
                   )}
                 </div>
               </div>
-
               <div>
                 <div className="relative w-full">
                   <div className="flex flex-col gap-2 mb-4">
@@ -236,7 +218,6 @@ const TicketPurchaePage = () => {
                   </select>
                 </div>
               </div>
-
               <div className="py-4 border-t mt-4">
                 <h3 className="font-semibold mb-4">Additional Information</h3>
                 <div className="mb-4">
@@ -261,7 +242,6 @@ const TicketPurchaePage = () => {
                   </div>
                 </div>
               </div>
-
               <div>
                 <div className="space-y-2 flex flex-row-reverse items-center justify-end gap-5 py-5">
                   <div className="space-y-0.5">
@@ -306,7 +286,6 @@ const TicketPurchaePage = () => {
                   />
                 </div>
               </div>
-
               {formik.values.sendToMultipleRecipients && (
                 <div className="space-y-2 py-5">
                   {Array.from({
@@ -418,7 +397,7 @@ const TicketPurchaePage = () => {
         <div className="sm:col-span-4">
           <div className="border rounded">
             <p className="p-5 border-b flex justify-between items-center">
-              Ticket Information{" "}
+              Ticket Information
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -528,7 +507,7 @@ const TicketPurchaePage = () => {
             <div className="px-5 space-y-4 pb-5">
               <button
                 type="submit"
-                className="bg-blue-500 shadow-lg rounded whitespace-nowrap gap-2 justify-center flex text-white items-center py-2.5 px-4 text-sm w-full"
+                className="bg-blue-500 shadow-lg rounded whitespace-nowrap gap-2 justify-center flex text-white items-center py-2.5 px-4 text-sm w-full hover:bg-blue-600 cursor-pointer"
               >
                 <span>Proceed To Payment</span>
               </button>

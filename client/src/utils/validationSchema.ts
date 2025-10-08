@@ -275,22 +275,35 @@ export const ticketPurchaseSchema = z
       return Boolean(val);
     }, z.boolean()),
     // Validate each recipient's shape; make the whole array optional (we'll handle presence via superRefine)
+    // recipients: z
+    //   .array(
+    //     z.object({
+    //       firstName: z
+    //         .string({ error: "First name is required" })
+    //         .min(1, "Recipient first name is required"),
+    //       lastName: z
+    //         .string({ error: "Last name is required" })
+    //         .min(1, "Recipient last name is required"),
+    //       email: z
+    //         .string({ error: "Email is required" })
+    //         .min(1, "Recipient email is required")
+    //         .email("Invalid recipient email"),
+    //     })
+    //   )
+    //   .optional(),
     recipients: z
       .array(
         z.object({
-          firstName: z
-            .string({ error: "First name is required" })
-            .min(1, "Recipient first name is required"),
-          lastName: z
-            .string({ error: "Last name is required" })
-            .min(1, "Recipient last name is required"),
+          firstName: z.string().min(1, "Recipient first name is required"),
+          lastName: z.string().min(1, "Recipient last name is required"),
           email: z
-            .string({ error: "Email is required" })
+            .string()
             .min(1, "Recipient email is required")
             .email("Invalid recipient email"),
         })
       )
-      .optional(),
+      .optional()
+      .nullable(), // Add nullable here
   })
   .superRefine((data, ctx) => {
     // Only validate if sendToMultipleRecipients is true

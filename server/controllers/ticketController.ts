@@ -256,10 +256,19 @@ const buyTicket = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
+const calculateServiceFee = (numberOfTickets: number) => {
+  return Math.round(250 * numberOfTickets) + 100;
+};
+
 const initializeTicketPurchase = asyncHandler(
   async (req: Request, res: Response) => {
+    logger.info("ticket purchase endpoint hit");
+    logger.info("Request body:", JSON.stringify(req.body, null, 2));
     const { error } = validateTicketPurchase(req.body);
-    if (error) throw new ValidationError(error.details[0].message, 400);
+    if (error) {
+      logger.error("Validation error:", error.details[0].message);
+      throw new ValidationError(error.details[0].message, 400);
+    }
 
     const {
       firstName,
@@ -323,7 +332,7 @@ const initializeTicketPurchase = asyncHandler(
     if (!event) throw new NotFoundError("Event not found");
 
     //find the ticket with the ticket id
-    const ticket = event.ticket.id(ticketId);
+    const ticket = event.tickets.id(ticketId);
     if (!ticket) throw new NotFoundError("Ticket type not found");
 
     //we check if it available by quantity - sold,
@@ -338,6 +347,25 @@ const initializeTicketPurchase = asyncHandler(
       .toString(36)
       .substr(2, 9)
       .toUpperCase()}`;
+
+    // calculate amounts
+    const subtotal = Math.round(ticket.price * numberOfTickets);
+
+    // calculate service fee based on who pays
+    let serviceFee = 0;
+    if (event.charge === "Buyer") {
+      serviceFee = calculateServiceFee(numberOfTickets);
+    }
+
+    const totalAmount = Math.round(subtotal + serviceFee);
+
+    if (subtotal <= 0 || totalAmount <= 0) {
+      throw new ValidationError("Invalid ticket amount", 400);
+    }
+
+    if (serviceFee < 0) {
+      throw new ValidationError("Invalid service fee", 400);
+    }
 
     //here we set an empty array for tickets,
     let tickets: any[] = [];
@@ -386,28 +414,60 @@ const initializeTicketPurchase = asyncHandler(
       orderStatus: "PENDING",
       paymentMethod: "PAYSTACK",
       paymentStatus: "PENDING",
-      totalAmount: ticket.price * numberOfTickets,
+      subtotal,
+      serviceFee,
+      totalAmount,
+      feesPaidBy: event.charge,
     });
     await order.save();
 
     try {
       // initialize paystack payment
-      const paymentInit = await initializePayment(email, order.totalAmount, {
-        orderNumber,
-        eventId: id,
-        ticketId,
-        orderId: order._id.toString(),
-      });
+      // const paymentInit = await initializePayment(email, totalAmount, {
+      //   orderNumber,
+      //   eventId: id,
+      //   ticketId,
+      //   orderId: order._id.toString(),
+      // });
+
+      const { authorization_url, reference } = await initializePayment(
+        email,
+        totalAmount, // amount in Naira
+        {
+          orderNumber,
+          eventId: id,
+          ticketId,
+          numberOfTickets,
+          orderId: order._id.toString(),
+        }
+      );
+
+      ///// Save payment reference early (important for tracking before verification)
+      order.paymentId = reference;
+      await order.save();
+
+      ///// if payment init failed
+      if (!authorization_url) {
+        await order.deleteOne();
+        throw new ValidationError(
+          "Failed to initialize payment. Please try again.",
+          500
+        );
+      }
 
       res.status(201).json({
         success: true,
         message: "Payment initialized",
         data: {
-          paymentUrl: paymentInit.authorization_url,
-          reference: paymentInit.reference,
+          paymentUrl: authorization_url,
+          reference: reference,
           orderId: order._id,
           orderNumber: order.orderNumber,
-          totalAmount: order.totalAmount,
+          breakdown: {
+            subtotal,
+            serviceFee,
+            totalAmount,
+          },
           expiresIn: "15 minutes", // paystack payments typically expire in 15 mins
         },
       });
@@ -468,14 +528,17 @@ const verifyTicketPurchase = asyncHandler(
       // check payment amount matches order amount
       const paidAmountInNaira = result.amount / 100; // Convert from kobo
       if (paidAmountInNaira !== order.totalAmount) {
-        throw new ValidationError("Payment amount mismatch", 400);
+        throw new ValidationError(
+          `Payment amount mismatch. Expected ₦${order.totalAmount}, received ₦${paidAmountInNaira}`,
+          400
+        );
       }
 
       // Find event and update ticket sold count
       const event = await Event.findById(order.eventId);
       if (!event) throw new NotFoundError("Event not found");
 
-      const ticket = event.ticket.id(result.metadata.ticketId);
+      const ticket = event.tickets.id(result.metadata.ticketId);
       if (!ticket) throw new NotFoundError("Ticket type not found");
 
       //check availability again before marking as sold
@@ -545,6 +608,11 @@ const verifyTicketPurchase = asyncHandler(
         message: "Payment verified successfully! Your tickets are confirmed.",
         data: {
           order: order.toObject(),
+          breakdown: {
+            subtotal: order.subtotal,
+            serviceFee: order.serviceFee,
+            totalAmount: order.totalAmount,
+          },
           paymentDetails: {
             reference: result.reference,
             amount: result.amount / 100,

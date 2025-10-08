@@ -180,3 +180,14 @@ export interface TicketState {
   data: Ticket[] | null;
   currentTicket: Ticket | null;
 }
+
+///THIS IS FOR ORDER SLICE FOR PURCHASING TICKETS
+export interface PaymentState {
+  status: "idle" | "loading" | "succeeded" | "failed";
+  error: string | null;
+  success: boolean;
+  paymentUrl: string | null;
+  reference: string | null;
+  orderId: string | null;
+  order: any;
+}

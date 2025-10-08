@@ -16,12 +16,14 @@ import {
 import authReducer from "./auth-slice";
 import eventReducer from "./event-slice";
 import ticketReducer from "./tickets-slice";
+import paymentReducer from "./order-slice";
 
 const rootReducer = combineReducers({
   form: formReducer,
   auth: authReducer, // not persisted
   event: eventReducer,
   ticket: ticketReducer,
+  payment: paymentReducer,
 });
 
 const persistConfig = {

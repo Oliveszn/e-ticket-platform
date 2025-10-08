@@ -54,8 +54,21 @@ const orderSchema = new mongoose.Schema(
       type: String,
       default: "PENDING", // ["PENDING", "PAID", "FAILED"]
     },
+    subtotal: {
+      type: Number,
+      required: true,
+    },
+    serviceFee: {
+      type: Number,
+      default: 0,
+    },
     totalAmount: {
       type: Number,
+      required: true,
+    },
+    feesPaidBy: {
+      type: String,
+      enum: ["Host", "Buyer"],
       required: true,
     },
     paymentId: String,
