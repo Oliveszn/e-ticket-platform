@@ -1,7 +1,6 @@
 "use client";
-// src/pages/payment-callback.tsx (or /app/payment-callback/page.tsx if using Next.js App Router)
 import { useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation"; // or from "next/navigation" if using Next.js
+import { useSearchParams, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { verifyTicketPurchase } from "@/store/order-slice";
 

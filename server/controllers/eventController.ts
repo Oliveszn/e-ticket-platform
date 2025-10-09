@@ -113,7 +113,7 @@ const createEvent = asyncHandler(async (req: MulterRequest, res: Response) => {
   });
 });
 
-export const paginate = (page: number = 1, limit: number = 10) => {
+export const paginate = (page: number, limit: number) => {
   const skip = (page - 1) * limit;
   return { skip, limit };
 };

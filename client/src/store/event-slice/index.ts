@@ -92,24 +92,37 @@ export const createEvent = createAsyncThunk(
   }
 );
 
-export const getAllEvents = createAsyncThunk(
-  "/get/events",
-  async (
-    params: { page?: number; limit?: number } = {},
-    { rejectWithValue }
-  ) => {
-    try {
-      const { page = 1, limit = 10 } = params;
-      const response = await axios.get<EventsListResponse>(
-        `${apiUrl}/api/events`,
-        { params: { page, limit } }
-      );
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(handleApiError(error));
-    }
-  }
-);
+// export const getAllEvents = createAsyncThunk(
+//   "/get/events",
+//   async (
+//     params: { page?: number; limit?: number } = {},
+//     { rejectWithValue }
+//   ) => {
+//     try {
+//       const { page = 1, limit = 10 } = params;
+//       const response = await axios.get<EventsListResponse>(
+//         `${apiUrl}/api/events`,
+//         { params: { page, limit } }
+//       );
+//       return response.data;
+//     } catch (error: any) {
+//       return rejectWithValue(handleApiError(error));
+//     }
+//   }
+// );
+
+export const getAllEvents = async ({
+  page,
+  limit,
+}: {
+  page?: number;
+  limit?: number;
+}) => {
+  const response = await axios.get<EventsListResponse>(`${apiUrl}/api/events`, {
+    params: { page, limit },
+  });
+  return response.data;
+};
 
 export const getAnEvent = createAsyncThunk(
   "/get/event",
@@ -141,24 +154,40 @@ export const getTrendingEvents = createAsyncThunk(
   }
 );
 
-export const getEventsByCategory = createAsyncThunk(
-  "/get/events/category",
-  async (
-    params: { category: string; page?: number; limit?: number },
-    { rejectWithValue }
-  ) => {
-    try {
-      const { category, page = 1, limit = 10 } = params;
-      const response = await axios.get<EventsListResponse>(
-        `${apiUrl}/api/events/category`,
-        { params: { category, page, limit } }
-      );
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(handleApiError(error));
-    }
-  }
-);
+// export const getEventsByCategory = createAsyncThunk(
+//   "/get/events/category",
+//   async (
+//     params: { category: string; page?: number; limit?: number },
+//     { rejectWithValue }
+//   ) => {
+//     try {
+//       const { category, page = 1, limit = 10 } = params;
+//       const response = await axios.get<EventsListResponse>(
+//         `${apiUrl}/api/events/category`,
+//         { params: { category, page, limit } }
+//       );
+//       return response.data;
+//     } catch (error: any) {
+//       return rejectWithValue(handleApiError(error));
+//     }
+//   }
+// );
+
+export const getEventsByCategory = async ({
+  category,
+  page,
+  limit,
+}: {
+  category: string;
+  page?: number;
+  limit?: number;
+}) => {
+  const response = await axios.get<EventsListResponse>(
+    `${apiUrl}/api/events/category`,
+    { params: { category, page, limit } }
+  );
+  return response.data;
+};
 
 // GET ALL EVENTS FOR PROMOTER (requires auth)
 export const getPromoterEvents = createAsyncThunk(
@@ -224,19 +253,19 @@ const eventSlice = createSlice({
       })
 
       ///GETTING ALL EVENTS
-      .addCase(getAllEvents.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
-      .addCase(getAllEvents.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.data = action.payload.data;
-        state.pagination = action.payload.pagination;
-      })
-      .addCase(getAllEvents.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload as string;
-      })
+      // .addCase(getAllEvents.pending, (state) => {
+      //   state.status = "loading";
+      //   state.error = null;
+      // })
+      // .addCase(getAllEvents.fulfilled, (state, action) => {
+      //   state.status = "succeeded";
+      //   state.data = action.payload.data;
+      //   state.pagination = action.payload.pagination;
+      // })
+      // .addCase(getAllEvents.rejected, (state, action) => {
+      //   state.status = "failed";
+      //   state.error = action.payload as string;
+      // })
 
       ///GETTING SINGLE EVENT
       .addCase(getAnEvent.pending, (state) => {
@@ -267,19 +296,19 @@ const eventSlice = createSlice({
       })
 
       ////CATEGORY EVENTS
-      .addCase(getEventsByCategory.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
-      .addCase(getEventsByCategory.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.data = action.payload.data;
-        state.pagination = action.payload.pagination;
-      })
-      .addCase(getEventsByCategory.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload as string;
-      })
+      // .addCase(getEventsByCategory.pending, (state) => {
+      //   state.status = "loading";
+      //   state.error = null;
+      // })
+      // .addCase(getEventsByCategory.fulfilled, (state, action) => {
+      //   state.status = "succeeded";
+      //   state.data = action.payload.data;
+      //   state.pagination = action.payload.pagination;
+      // })
+      // .addCase(getEventsByCategory.rejected, (state, action) => {
+      //   state.status = "failed";
+      //   state.error = action.payload as string;
+      // })
 
       ///GETTING EVENTS FOR PROMOTERS
       .addCase(getPromoterEvents.pending, (state) => {

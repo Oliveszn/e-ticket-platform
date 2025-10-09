@@ -9,13 +9,13 @@ export default function PaymentSuccessPage() {
   const { order } = useAppSelector((state) => state.payment);
 
   useEffect(() => {
-    // If no order in state, redirect home
+    /////If no order in state, redirect home
     if (!order) {
       router.push("/");
     }
   }, [order, router]);
 
-  // Show loading state while checking
+  /////Show loading state while checking
   if (!order) {
     return (
       <div className="flex justify-center items-center h-screen">

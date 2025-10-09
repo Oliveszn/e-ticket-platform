@@ -1,44 +1,11 @@
+"use client";
+import { categories } from "@/config/explore";
+import { useCategoryNavigation } from "@/hooks/useCategoryNavigation";
 import Image from "next/image";
 import Link from "next/link";
 
 const Categories = () => {
-  const categories = [
-    {
-      name: "Community",
-      query: "community",
-      img: "/categories/community.png",
-    },
-    {
-      name: "Art & Culture",
-      query: "art%20%26%20culture",
-      img: "/categories/art-culture.png",
-    },
-    {
-      name: "Sports",
-      query: "sports%20%26%20wellness",
-      img: "/categories/sports.png",
-    },
-    {
-      name: "Tech",
-      query: "career%20%26%20business",
-      img: "/categories/career.png",
-    },
-    {
-      name: "Education",
-      query: "spirituality%20%26%20religion",
-      img: "/categories/spirituality.png",
-    },
-    {
-      name: "Seminars",
-      query: "food%20%26%20drink",
-      img: "/categories/food-drink.png",
-    },
-    {
-      name: "Music",
-      query: "music%20%26%20performances",
-      img: "/categories/music-performances.png",
-    },
-  ];
+  const { goToCategory } = useCategoryNavigation();
   return (
     <section className="mx-auto max-w-7xl py-16">
       <div className="flex flex-col md:flex-row justify-between gap-4 md:gap-10 md:items-end text-[#161b26] text-center md:text-left py-8">
@@ -52,25 +19,27 @@ const Categories = () => {
       </div>
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-8 place-items-center py-8">
-        {categories.map((cat) => (
-          <Link
-            key={cat.query}
-            href={`/events/all?category=${cat.query}`}
-            className="flex flex-col items-center group"
-          >
-            <div className="rounded-lg transition-colors group-hover:bg-blue-100/30 p-3">
-              <Image
-                src={cat.img}
-                alt={`${cat.name} image`}
-                width={0}
-                height={0}
-                sizes="100vw"
-                className="size-24 sm:size-32 md:size-40 object-contain"
-              />
+        {categories
+          .filter((cat) => cat.name !== "All Events")
+          .map((cat) => (
+            <div
+              key={cat.query}
+              onClick={() => goToCategory(cat.name, "/explore")}
+              className="flex flex-col items-center group"
+            >
+              <div className="rounded-lg transition-colors group-hover:bg-blue-100/30 p-3">
+                <Image
+                  src={cat.img}
+                  alt={`${cat.name} image`}
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                  className="size-24 sm:size-32 md:size-40 object-contain"
+                />
+              </div>
+              <div className="mt-2">{cat.name}</div>
             </div>
-            <div className="mt-2">{cat.name}</div>
-          </Link>
-        ))}
+          ))}
       </div>
 
       <div className="w-full overflow-hidden py-8">
