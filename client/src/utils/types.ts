@@ -99,15 +99,6 @@ export interface Event {
   description?: string;
   image: EventImage;
   tickets: Ticket[];
-  // tickets: {
-  //   name: string;
-  //   price: number;
-  //   quantity: number;
-  //   sold: number;
-  //   description?: string;
-  //   benefits?: string;
-  //   showVolume: boolean;
-  // }[];
 }
 
 export interface SingleEventResponse {

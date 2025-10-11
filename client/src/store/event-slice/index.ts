@@ -124,19 +124,26 @@ export const getAllEvents = async ({
   return response.data;
 };
 
-export const getAnEvent = createAsyncThunk(
-  "/get/event",
-  async (id: string, { rejectWithValue }) => {
-    try {
-      const response = await axios.get<SingleEventResponse>(
-        `${apiUrl}/api/events/${id}`
-      );
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(handleApiError(error));
-    }
-  }
-);
+// export const getAnEvent = createAsyncThunk(
+//   "/get/event",
+//   async (id: string, { rejectWithValue }) => {
+//     try {
+//       const response = await axios.get<SingleEventResponse>(
+//         `${apiUrl}/api/events/${id}`
+//       );
+//       return response.data;
+//     } catch (error: any) {
+//       return rejectWithValue(handleApiError(error));
+//     }
+//   }
+// );
+
+export const getAnEvent = async ({ id }: { id: string }) => {
+  const response = await axios.get<SingleEventResponse>(
+    `${apiUrl}/api/events/${id}`
+  );
+  return response.data;
+};
 
 export const getTrendingEvents = createAsyncThunk(
   "/trending",
@@ -268,18 +275,18 @@ const eventSlice = createSlice({
       // })
 
       ///GETTING SINGLE EVENT
-      .addCase(getAnEvent.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
-      .addCase(getAnEvent.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.currentEvent = action.payload.data;
-      })
-      .addCase(getAnEvent.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload as string;
-      })
+      // .addCase(getAnEvent.pending, (state) => {
+      //   state.status = "loading";
+      //   state.error = null;
+      // })
+      // .addCase(getAnEvent.fulfilled, (state, action) => {
+      //   state.status = "succeeded";
+      //   state.currentEvent = action.payload.data;
+      // })
+      // .addCase(getAnEvent.rejected, (state, action) => {
+      //   state.status = "failed";
+      //   state.error = action.payload as string;
+      // })
 
       ////GETTING TRENDING EVENT
       .addCase(getTrendingEvents.pending, (state) => {
