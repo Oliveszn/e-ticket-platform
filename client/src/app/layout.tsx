@@ -34,7 +34,7 @@ export default function RootLayout({
 
         <Providers>
           <AuthInitializer />
-          <Navbar />
+          {/* <Navbar /> */}
           {children}
           <ConditionalFooter />
         </Providers>

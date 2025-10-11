@@ -18,7 +18,6 @@ export default function AuthInitializer() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["authStatus"],
-    // queryFn: () => dispatch(checkAuthStatus()).unwrap(),
     queryFn: async () => {
       if (!isProtected) return null; // skip check on public pages
       return await dispatch(checkAuthStatus()).unwrap();

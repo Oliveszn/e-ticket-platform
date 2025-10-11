@@ -21,20 +21,23 @@ const CheckAuth = ({ isAuthenticated, children }: CheckAuthProps) => {
       return;
     }
 
-    // Not authenticated, trying to access restricted areas
-    if (!isAuthenticated && pathname.startsWith("/dashboard")) {
-      router.replace("/");
-      return;
-    }
+    // Only redirect after auth check is complete
+    if (status === "succeeded") {
+      // Not authenticated, trying to access restricted areas
+      if (!isAuthenticated && pathname.startsWith("/dashboard")) {
+        router.replace("/");
+        return;
+      }
 
-    // If authenticated and trying to access auth pages
-    if (
-      isAuthenticated &&
-      (pathname.startsWith("/auth/login") ||
-        pathname.startsWith("/auth/register"))
-    ) {
-      router.replace("/dashboard");
-      return;
+      // If authenticated and trying to access auth pages
+      if (
+        isAuthenticated &&
+        (pathname.startsWith("/auth/login") ||
+          pathname.startsWith("/auth/register"))
+      ) {
+        router.replace("/dashboard");
+        return;
+      }
     }
   }, [isAuthenticated, pathname, router, status]);
 
