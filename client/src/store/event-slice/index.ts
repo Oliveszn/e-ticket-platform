@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "@/utils/axios-interceptor";
+import apiClient from "@/api/client";
 import { AxiosError } from "axios";
 import { FormSchema } from "@/utils/validationSchema";
 import {
@@ -79,7 +79,7 @@ export const createEvent = createAsyncThunk(
 
       // append tickets array (stringify it)
       fd.append("tickets", JSON.stringify(form.tickets));
-      const response = await axios.post(`${apiUrl}/api/events/create`, fd, {
+      const response = await apiClient.post(`${apiUrl}/api/events/create`, fd, {
         withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data",
@@ -100,7 +100,7 @@ export const createEvent = createAsyncThunk(
 //   ) => {
 //     try {
 //       const { page = 1, limit = 10 } = params;
-//       const response = await axios.get<EventsListResponse>(
+//       const response = await apiClient.get<EventsListResponse>(
 //         `${apiUrl}/api/events`,
 //         { params: { page, limit } }
 //       );
@@ -118,9 +118,12 @@ export const getAllEvents = async ({
   page?: number;
   limit?: number;
 }) => {
-  const response = await axios.get<EventsListResponse>(`${apiUrl}/api/events`, {
-    params: { page, limit },
-  });
+  const response = await apiClient.get<EventsListResponse>(
+    `${apiUrl}/api/events`,
+    {
+      params: { page, limit },
+    }
+  );
   return response.data;
 };
 
@@ -128,7 +131,7 @@ export const getAllEvents = async ({
 //   "/get/event",
 //   async (id: string, { rejectWithValue }) => {
 //     try {
-//       const response = await axios.get<SingleEventResponse>(
+//       const response = await apiClient.get<SingleEventResponse>(
 //         `${apiUrl}/api/events/${id}`
 //       );
 //       return response.data;
@@ -139,7 +142,7 @@ export const getAllEvents = async ({
 // );
 
 export const getAnEvent = async ({ id }: { id: string }) => {
-  const response = await axios.get<SingleEventResponse>(
+  const response = await apiClient.get<SingleEventResponse>(
     `${apiUrl}/api/events/${id}`
   );
   return response.data;
@@ -149,7 +152,7 @@ export const getTrendingEvents = createAsyncThunk(
   "/trending",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get<TrendingEventsResponse>(
+      const response = await apiClient.get<TrendingEventsResponse>(
         `${apiUrl}/api/events/trending`
       );
       console.log(response);
@@ -169,7 +172,7 @@ export const getTrendingEvents = createAsyncThunk(
 //   ) => {
 //     try {
 //       const { category, page = 1, limit = 10 } = params;
-//       const response = await axios.get<EventsListResponse>(
+//       const response = await apiClient.get<EventsListResponse>(
 //         `${apiUrl}/api/events/category`,
 //         { params: { category, page, limit } }
 //       );
@@ -189,7 +192,7 @@ export const getEventsByCategory = async ({
   page?: number;
   limit?: number;
 }) => {
-  const response = await axios.get<EventsListResponse>(
+  const response = await apiClient.get<EventsListResponse>(
     `${apiUrl}/api/events/category`,
     { params: { category, page, limit } }
   );
@@ -201,7 +204,7 @@ export const getPromoterEvents = createAsyncThunk(
   "/get/promoter/events",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get<TrendingEventsResponse>(
+      const response = await apiClient.get<TrendingEventsResponse>(
         `${apiUrl}/api/events/promoter`,
         {
           withCredentials: true,
@@ -219,7 +222,7 @@ export const getPromoterSingleEvent = createAsyncThunk(
   "/get/promoter/event",
   async (id: string, { rejectWithValue }) => {
     try {
-      const response = await axios.get<SingleEventResponse>(
+      const response = await apiClient.get<SingleEventResponse>(
         `${apiUrl}/api/events/promoter/${id}`,
         {
           withCredentials: true,

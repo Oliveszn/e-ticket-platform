@@ -4,7 +4,6 @@ import formReducer from "./createevent-slice";
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // localStorage
 import { combineReducers } from "redux";
-import { injectStore } from "@/utils/axios-interceptor";
 import {
   FLUSH,
   REHYDRATE,
@@ -17,6 +16,7 @@ import authReducer from "./auth-slice";
 import eventReducer from "./event-slice";
 import ticketReducer from "./tickets-slice";
 import paymentReducer from "./order-slice";
+import { injectStore } from "@/api/client";
 
 const rootReducer = combineReducers({
   form: formReducer,

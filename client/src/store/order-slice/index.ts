@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "@/utils/axios-interceptor";
+import apiClient from "@/api/client";
 import { AxiosError } from "axios";
 import { TicketPurchaseSchema } from "@/utils/validationSchema";
 import { PaymentState } from "@/utils/types";
@@ -37,7 +37,7 @@ export const purchaseTickets = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await axios.post(
+      const response = await apiClient.post(
         `${apiUrl}/api/tickets/events/${id}/tickets/${ticketId}/purchase`,
         form
       );
@@ -52,7 +52,7 @@ export const verifyTicketPurchase = createAsyncThunk(
   "tickets/verifyPurchase",
   async (reference: string, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
+      const response = await apiClient.get(
         `${apiUrl}/api/tickets/events/verify-purchase`,
         { params: { reference } }
       );

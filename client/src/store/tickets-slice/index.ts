@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "@/utils/axios-interceptor";
+import apiClient from "@/api/client";
 import { AxiosError } from "axios";
 import {
   SingleTicketResponse,
@@ -41,7 +41,7 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 // );
 
 export const getTickets = async ({ id }: { id: string }) => {
-  const response = await axios.get<TicketResponse>(
+  const response = await apiClient.get<TicketResponse>(
     `${apiUrl}/api/tickets/events/${id}`
   );
   return response.data;
@@ -54,7 +54,7 @@ export const getTickets = async ({ id }: { id: string }) => {
 //     { rejectWithValue }
 //   ) => {
 //     try {
-//       const response = await axios.get<SingleTicketResponse>(
+//       const response = await apiClient.get<SingleTicketResponse>(
 //         `${apiUrl}/api/tickets/events/${id}/ticket/${ticketId}`
 //       );
 //       return response.data;
@@ -71,7 +71,7 @@ export const getSingleTickets = async ({
   id: string;
   ticketId: string;
 }) => {
-  const response = await axios.get<SingleTicketResponse>(
+  const response = await apiClient.get<SingleTicketResponse>(
     `${apiUrl}/api/tickets/events/${id}/ticket/${ticketId}`
   );
   return response.data;

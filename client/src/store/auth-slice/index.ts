@@ -6,7 +6,7 @@ import {
 } from "@/utils/types";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 // import axios from "axios";
-import axios from "@/utils/axios-interceptor";
+import apiClient from "@/api/client";
 import { AxiosError } from "axios";
 import { LoginSchema, RegisterSchema } from "@/utils/validationSchema";
 
@@ -35,7 +35,7 @@ export const registerUser = createAsyncThunk(
   "auth/register",
   async (formData: RegisterSchema, { rejectWithValue }) => {
     try {
-      const response = await axios.post<AuthResponse>(
+      const response = await apiClient.post<AuthResponse>(
         `${apiUrl}/api/auth/register`,
         formData,
         {
@@ -53,7 +53,7 @@ export const loginUser = createAsyncThunk(
   "auth/login",
   async (formData: LoginSchema, { rejectWithValue }) => {
     try {
-      const response = await axios.post<AuthResponse>(
+      const response = await apiClient.post<AuthResponse>(
         `${apiUrl}/api/auth/login`,
         formData,
         {
@@ -80,7 +80,7 @@ export const logoutUser = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
+      const response = await apiClient.post(
         `${apiUrl}/api/auth/logout`,
         {},
         {
@@ -98,7 +98,7 @@ export const refreshTokenThunk = createAsyncThunk(
   "auth/refreshToken",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
+      const response = await apiClient.post(
         `${apiUrl}/api/auth/refresh-token`,
         {},
         {
@@ -116,7 +116,7 @@ export const checkAuthStatus = createAsyncThunk(
   "auth/checkStatus",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${apiUrl}/api/auth/me`, {
+      const response = await apiClient.get(`${apiUrl}/api/auth/me`, {
         withCredentials: true,
       });
       return response.data;
@@ -130,7 +130,7 @@ export const changePassword = createAsyncThunk(
   "auth/changePassword",
   async (formData: ChangePasswordFormData, { rejectWithValue }) => {
     try {
-      const response = await axios.patch<ChangePasswordResponse>(
+      const response = await apiClient.patch<ChangePasswordResponse>(
         `${apiUrl}/api/auth/change-password`,
         formData,
         {

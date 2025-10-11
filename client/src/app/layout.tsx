@@ -5,7 +5,7 @@ import Navbar from "@/components/common/Navbar";
 import ConditionalFooter from "@/components/common/conditionalFooter";
 import Providers from "./provider";
 import { Toaster } from "sonner";
-import "@/utils/axios-interceptor";
+import "@/api/client";
 import AuthInitializer from "./AuthInitializer";
 
 const raleway = Raleway({
@@ -34,7 +34,7 @@ export default function RootLayout({
 
         <Providers>
           <AuthInitializer />
-          {/* <Navbar /> */}
+          <Navbar />
           {children}
           <ConditionalFooter />
         </Providers>

@@ -11,6 +11,13 @@ export const injectStore = (_store: any) => {
   store = _store;
 };
 
+// Create axios instance
+const apiClient = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  timeout: 10000,
+  withCredentials: true, // Important for refresh token cookies
+});
+
 let isRefreshing = false;
 
 ////here we create a queue that stores falied requests with 401 while refreshing token
@@ -33,7 +40,20 @@ const processQueue = (error: any) => {
   failedQueue = [];
 };
 
-axios.interceptors.response.use(
+///Request interceptors also added auth token
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+///Response interceptors where auth refresh is handled
+apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
@@ -56,7 +76,7 @@ axios.interceptors.response.use(
           failedQueue.push({ resolve, reject });
         })
           .then(() => {
-            return axios(originalRequest);
+            return apiClient(originalRequest);
           })
           .catch((error) => {
             return Promise.reject(error);
@@ -72,7 +92,7 @@ axios.interceptors.response.use(
       try {
         await store.dispatch(refreshTokenThunk()).unwrap();
         processQueue(null);
-        return axios(originalRequest);
+        return apiClient(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError);
         store.dispatch(logout());
@@ -83,8 +103,17 @@ axios.interceptors.response.use(
       }
     }
 
+    // Handle network errors
+    if (!error.response) {
+      if (error.code === "ECONNABORTED") {
+        error.message = "Request timeout. Please check your connection.";
+      } else if (error.message === "Network Error") {
+        error.message = "No internet connection. Please check your network.";
+      }
+    }
+
     return Promise.reject(error);
   }
 );
 
-export default axios;
+export default apiClient;
