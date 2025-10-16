@@ -1,9 +1,6 @@
 "use client";
 import PurchaseForm from "@/components/explore/PurchaseForm";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { getSingleTickets } from "@/store/tickets-slice";
 import { useParams } from "next/navigation";
-import { useEffect } from "react";
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import {
@@ -12,12 +9,12 @@ import {
 } from "@/utils/validationSchema";
 import Toggle from "@/components/dashboard/Toggle";
 import { toast } from "sonner";
-import { purchaseTickets } from "@/store/order-slice";
-import { useQuery } from "@tanstack/react-query";
+import { useSingleTicket } from "@/hooks/useTickets";
+import { usePurchaseTickets } from "@/hooks/useOrder";
+import { handleApiError } from "@/utils/helperFunction";
 
 const TicketPurchaePage = () => {
   const params = useParams();
-  const dispatch = useAppDispatch();
 
   const eventId = params.id as string;
   const ticketId = params.ticketId as string;
@@ -31,62 +28,42 @@ const TicketPurchaePage = () => {
       info: "",
       sendToMultipleRecipients: false,
       recipients: undefined,
-      // recipients: [
-      //   {
-      //     firstName: "",
-      //     lastName: "",
-      //     email: "",
-      //   },
-      // ],
     },
     validationSchema: toFormikValidationSchema(ticketPurchaseSchema),
     onSubmit: (values) => {
-      console.log("Formik onSubmit triggered ✅");
-      console.log("Values:", values);
-      console.log("Errors:", formik.errors);
-      console.log("sendToMultipleRecipients:", values.sendToMultipleRecipients);
-      console.log("recipients:", values.recipients);
       handleSubmit(values);
     },
   });
+  const {
+    mutate: purchaseTickets,
+    isPending,
+    isSuccess,
+  } = usePurchaseTickets();
 
   const handleSubmit = async (data: any) => {
-    try {
-      console.log("Submitting:", data);
-      const result = await dispatch(
-        purchaseTickets({
-          id: eventId,
-          ticketId: ticketId,
-          form: data,
-        })
-      ).unwrap();
-      console.log("Purchase result:", result);
+    purchaseTickets(
+      { id: eventId, ticketId, form: data },
+      {
+        onSuccess: (data) => {
+          toast.success(data.message);
+          // Redirect to payment URL
+          if (data?.data.paymentUrl)
+            window.location.href = data?.data.paymentUrl;
+        },
 
-      // Redirect to payment URL
-      if (result.data?.paymentUrl) {
-        window.location.href = result.data.paymentUrl;
+        onError: (error: any) => {
+          const message = handleApiError(error);
+          toast.error(message);
+        },
       }
-    } catch (error) {
-      console.error("Purchase failed:", error);
-      const message =
-        typeof error === "string" ? error : "An unexpected error occurred";
-      toast.error(message);
-    }
+    );
   };
-
   const {
     data: currentTicket,
     isLoading,
     isError,
     error,
-  } = useQuery({
-    queryKey: ["event", eventId],
-    queryFn: () => getSingleTickets({ id: eventId, ticketId }),
-    enabled: !!eventId,
-    staleTime: 1000 * 60 * 5,
-    retry: 2,
-  });
-  console.log(currentTicket);
+  } = useSingleTicket(eventId, ticketId);
 
   const fees = 250 * formik.values.numberOfTickets + 100;
   const subTotal =

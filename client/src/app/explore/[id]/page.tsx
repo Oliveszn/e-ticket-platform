@@ -1,42 +1,26 @@
 "use client";
 import Countdown from "@/components/explore/CountDown";
 import { Button } from "@/components/ui/button";
-import { getAnEvent } from "@/store/event-slice";
-import { getTickets } from "@/store/tickets-slice";
-import { useQuery } from "@tanstack/react-query";
+import { useGetAnEvent } from "@/hooks/useEvent";
+import { useTickets } from "@/hooks/useTickets";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 const EventDetails = () => {
   const params = useParams();
   const router = useRouter();
 
   const eventId = params.id as string;
-  ///// Fetch Event
   const {
     data: currentEvent,
     isLoading: isEventLoading,
     isError: isEventError,
-  } = useQuery({
-    queryKey: ["event", eventId],
-    queryFn: () => getAnEvent({ id: eventId }),
-    enabled: !!eventId, // only run if eventId exists
-  });
-  console.log(currentEvent);
-
-  ///// Fetch Tickets (depends on eventId)
+  } = useGetAnEvent(eventId);
   const {
     data: ticket,
     isLoading: isTicketsLoading,
     isError: isTicketsError,
-  } = useQuery({
-    queryKey: ["tickets", eventId],
-    queryFn: () => getTickets({ id: eventId }),
-    enabled: !!eventId, // only run if eventId exists
-    staleTime: 1000 * 60 * 5,
-    retry: 2,
-  });
+  } = useTickets(eventId);
 
   const date = new Date(currentEvent?.data?.eventDate || "");
   // Get month name

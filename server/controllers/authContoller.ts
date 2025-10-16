@@ -9,6 +9,8 @@ import { asyncHandler } from "../middleware/errorHandler";
 import { UnauthorizedError, ValidationError } from "../utils/error";
 import { emailJobs } from "../jobs/emailQueues";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const resgiterUser = asyncHandler(async (req: Request, res: Response) => {
   logger.info("Registration endpoint hit...");
   //validate the schema
@@ -70,8 +72,6 @@ const resgiterUser = asyncHandler(async (req: Request, res: Response) => {
     success: true,
     message: "User registered successfully!",
     user: safeUser,
-    accessToken,
-    refreshToken,
   });
 });
 
@@ -141,25 +141,24 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
     maxAge: 15 * 60 * 1000, // 15 min
     path: "/",
   });
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    path: "/",
   });
 
   res.json({
     success: true,
     message: "Login successful!",
     user: safeUser,
-    accessToken,
-    refreshToken,
   });
 });
 
@@ -206,23 +205,24 @@ const refreshTokenUser = asyncHandler(async (req: Request, res: Response) => {
 
   res.cookie("accessToken", newAccessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
     maxAge: 15 * 60 * 1000, // 15 min
     path: "/",
   });
 
   res.cookie("refreshToken", newRefreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    path: "/",
   });
 
   //send tokens back
   res.json({
-    accessToken: newAccessToken,
-    refreshToken: newRefreshToken,
+    success: true,
+    message: "Tokens refreshed successfully",
   });
 });
 

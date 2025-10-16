@@ -546,6 +546,37 @@ const getPromoterSingleEvent = asyncHandler(
   }
 );
 
+const trackEventView = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const viewTimestamps = req.cookies.viewTimestamps
+    ? JSON.parse(req.cookies.viewTimestamps)
+    : {};
+
+  const now = Date.now();
+  const lastViewTime = viewTimestamps[id as any] || 0;
+  const fiveMinutes = 5 * 60 * 1000;
+
+  // Only count if more than 5 minutes since last view
+  if (now - lastViewTime > fiveMinutes) {
+    const event = await Event.findById(id);
+    if (!event) throw new NotFoundError("Event not found");
+
+    event.views = (event.views || 0) + 1;
+    await event.save();
+
+    // Update timestamp
+    viewTimestamps[id as any] = now;
+    res.cookie("viewTimestamps", JSON.stringify(viewTimestamps), {
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    });
+  }
+
+  res.status(200).json({ success: true });
+});
+
 export {
   createEvent,
   getSingleEvent,
@@ -557,4 +588,5 @@ export {
   getEventsByCategory,
   getPromoterSingleEvent,
   getTrendingEvents,
+  trackEventView,
 };

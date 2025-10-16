@@ -13,17 +13,11 @@ import {
   REGISTER,
 } from "redux-persist";
 import authReducer from "./auth-slice";
-import eventReducer from "./event-slice";
-import ticketReducer from "./tickets-slice";
-import paymentReducer from "./order-slice";
 import { injectStore } from "@/api/client";
 
 const rootReducer = combineReducers({
   form: formReducer,
   auth: authReducer, // not persisted
-  event: eventReducer,
-  ticket: ticketReducer,
-  payment: paymentReducer,
 });
 
 const persistConfig = {

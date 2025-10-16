@@ -10,12 +10,15 @@ import {
   getEventsByCategory,
   getTrendingEvents,
   getPromoterSingleEvent,
+  trackEventView,
 } from "../controllers/eventController";
 import requireAuth from "../middleware/auth";
 import multer from "multer";
 const router = express.Router();
 
 const upload = multer({ storage: multer.memoryStorage() });
+
+router.post("/events/:id/track-view", trackEventView);
 
 router.post("/create", requireAuth, upload.single("image"), createEvent);
 router.delete("/:id", requireAuth, deleteEvent);

@@ -2,44 +2,32 @@
 
 import { useAppSelector } from "@/store/hooks";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { type ReactNode } from "react";
 
 interface CheckAuthProps {
-  isAuthenticated: boolean;
-
   children: ReactNode;
 }
 
-const CheckAuth = ({ isAuthenticated, children }: CheckAuthProps) => {
+const CheckAuth = ({ children }: CheckAuthProps) => {
   const router = useRouter();
   const pathname = usePathname();
-  const { status } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, status } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    if (status === "loading") {
-      return;
-    }
-
-    // Only redirect after auth check is complete
+    // Don’t redirect until the auth check is complete
+    // Once loading is done, handle redirects properly
     if (status === "succeeded") {
-      // Not authenticated, trying to access restricted areas
       if (!isAuthenticated && pathname.startsWith("/dashboard")) {
-        router.replace("/");
-        return;
+        router.replace("/auth/login");
       }
-
-      // If authenticated and trying to access auth pages
-      if (
-        isAuthenticated &&
-        (pathname.startsWith("/auth/login") ||
-          pathname.startsWith("/auth/register"))
-      ) {
+      if (isAuthenticated && pathname.startsWith("/auth")) {
         router.replace("/dashboard");
-        return;
       }
     }
-  }, [isAuthenticated, pathname, router, status]);
+  }, [isAuthenticated, status, pathname, router]);
+
+  if (status === "idle" || status === "loading") return null;
 
   return <>{children}</>;
 };

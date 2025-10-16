@@ -1,4 +1,28 @@
+"use client";
+import { useProfile } from "@/hooks/useUser";
+import { useAppSelector } from "@/store/hooks";
+
 const Profile = () => {
+  const { user } = useAppSelector((state) => state.auth);
+  const userId = user?._id;
+  const { data, isLoading, isError, error } = useProfile();
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    <div className="container mx-auto px-4 py-8">
+      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        Error: {(error as Error).message}
+      </div>
+    </div>;
+  }
+
   return (
     <main>
       <div className="space-y-8">
@@ -31,33 +55,10 @@ const Profile = () => {
         <div className="space-y-8">
           <div className="border rounded dark:border-gray-600 dark:bg-secondary-alt bg-white text-black dark:text-gray-50 undefined">
             <div className="rounded-xl p-5 sm:p-8 flex flex-col sm:flex-row gap-4">
-              <div className="flex-shrink-0 relative">
-                <img
-                  src="https://lh3.googleusercontent.com/a/ACg8ocI9SGE_DlfPSH21TToDH5aRZBYRtLf7a7Q-ug-OrdxiZ8AlzA=s96-c"
-                  className="h-72 w-full sm:w-72 object-cover rounded"
-                />
-                <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300 bg-blue-500 text-white hover:bg-blue-500/90 dark:bg-blue-50 dark:text-white dark:hover:bg-blue-50/90 h-10 absolute bottom-0 p-4 right-0">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-6 w-6"
-                  >
-                    <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path>
-                    <circle cx="12" cy="13" r="3"></circle>
-                  </svg>
-                </button>
-              </div>
               <div className="sm:col-span-9 font-montserrat space-y-5">
                 <div className="flex items-center gap-3">
                   <p className="text-2xl md:text-4xl font-semibold capitalize">
-                    Micheal Ekpeala
+                    {data?.firstName} {data?.lastName}
                   </p>
                   <button
                     className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300 border text-blue-500 border-blue-500 hover:bg-blue-500 hover:text-white dark:border-blue-500 dark:bg-blue-500 dark:hover:bg-blue-500/90 rounded-md h-8 w-8 p-0"
@@ -85,24 +86,6 @@ const Profile = () => {
                   </button>
                 </div>
                 <div className="flex justify-start gap-5">
-                  <p className="flex items-center text-sm gap-2 bg-blue-100 px-2 py-1 rounded-lg">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                      className="h-5 w-5 text-pry"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path>
-                    </svg>{" "}
-                    <span>Mon 25th Aug, 2025</span>
-                  </p>
                   <p className="flex items-center text-sm gap-2 bg-blue-100 px-2 py-1 rounded-lg">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -149,23 +132,21 @@ const Profile = () => {
               </li>
               <li className="px-6 py-4 flex justify-between items-center border-b border-gray-200 w-full">
                 <span>Name:</span>
-                <span>Olive Ekpeala </span>
+                <span>
+                  {data?.firstName} {data?.lastName}{" "}
+                </span>
               </li>
               <li className="px-6 py-4 flex justify-between items-center border-b border-gray-200 w-full">
                 <span>Email:</span>
-                <span>ekpealamicheal@gmail.com</span>
+                <span>{data?.email}</span>
               </li>
               <li className="px-6 py-4 flex justify-between items-center border-b border-gray-200 w-full">
                 <span>Mobile:</span>
-                <span>09050237788</span>
+                <span>{data?.number}</span>
               </li>
               <li className="px-6 py-4 flex justify-between items-center border-b border-gray-200 w-full">
                 <span>ID:</span>
-                <span>68ac1bf0f745102eaff65f46</span>
-              </li>
-              <li className="px-6 py-4 flex justify-between items-center border-b border-gray-200 w-full">
-                <span>Location:</span>
-                <span>ugbowo, benin</span>
+                <span>{data?._id}</span>
               </li>
             </ul>
           </div>

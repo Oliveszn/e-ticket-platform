@@ -37,7 +37,7 @@ export type FormValues = {
 
 ///THIS IS FOR AUTH
 export interface User {
-  id: string;
+  _id: string;
   email: string;
   firstName: string;
   lastName: string;
@@ -52,6 +52,22 @@ export interface AuthResponse {
   user: User;
   refreshToken: string;
   accessToken: string;
+}
+
+//FOR USER
+export interface UserProfile {
+  _id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  businessName: string;
+  address: string;
+  number: string;
+}
+
+export interface UserResponse {
+  success: boolean;
+  data: UserProfile;
 }
 
 export interface AuthState {
@@ -125,20 +141,20 @@ export interface EventsListResponse {
   };
 }
 
-export interface EventState {
-  status: "idle" | "loading" | "succeeded" | "failed";
-  error?: string | null;
-  data: Event[] | null;
-  currentEvent: Event | null;
-  trendingEvents: Event[] | null;
-  promoterEvents: Event[] | null;
-  pagination: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
+// export interface EventState {
+//   status: "idle" | "loading" | "succeeded" | "failed";
+//   error?: string | null;
+//   data: Event[] | null;
+//   currentEvent: Event | null;
+//   trendingEvents: Event[] | null;
+//   promoterEvents: Event[] | null;
+//   pagination: {
+//     total: number;
+//     page: number;
+//     limit: number;
+//     totalPages: number;
+//   };
+// }
 
 ///THIS FOR TICKET SLICE
 export interface Ticket {
@@ -165,20 +181,20 @@ export interface SingleTicketResponse {
   data: Ticket;
 }
 
-export interface TicketState {
-  status: "idle" | "loading" | "succeeded" | "failed";
-  error?: string | null;
-  data: Ticket[] | null;
-  currentTicket: Ticket | null;
-}
+// export interface TicketState {
+//   status: "idle" | "loading" | "succeeded" | "failed";
+//   error?: string | null;
+//   data: Ticket[] | null;
+//   currentTicket: Ticket | null;
+// }
 
 ///THIS IS FOR ORDER SLICE FOR PURCHASING TICKETS
-export interface PaymentState {
-  status: "idle" | "loading" | "succeeded" | "failed";
-  error: string | null;
-  success: boolean;
-  paymentUrl: string | null;
-  reference: string | null;
-  orderId: string | null;
-  order: any;
-}
+// export interface PaymentState {
+//   status: "idle" | "loading" | "succeeded" | "failed";
+//   error: string | null;
+//   success: boolean;
+//   paymentUrl: string | null;
+//   reference: string | null;
+//   orderId: string | null;
+//   order: any;
+// }

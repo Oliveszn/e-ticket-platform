@@ -5,8 +5,7 @@ import {
   ChangePasswordResponse,
 } from "@/utils/types";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-// import axios from "axios";
-import apiClient from "@/api/client";
+import apiClient, { resetLogoutFlag } from "@/api/client";
 import { AxiosError } from "axios";
 import { LoginSchema, RegisterSchema } from "@/utils/validationSchema";
 
@@ -60,17 +59,9 @@ export const loginUser = createAsyncThunk(
           withCredentials: true,
         }
       );
+      resetLogoutFlag();
       return response.data;
     } catch (error: any) {
-      // Check for network-related errors
-      // if (error.code === "ERR_NETWORK") {
-      //   return rejectWithValue(
-      //     "No internet connection. Please check your network."
-      //   );
-      // }
-      // if (error.message?.includes("timeout")) {
-      //   return rejectWithValue("Request timed out. Try again.");
-      // }
       return rejectWithValue(handleApiError(error));
     }
   }

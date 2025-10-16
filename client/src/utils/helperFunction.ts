@@ -1,3 +1,5 @@
+import { AxiosError } from "axios";
+
 // Helper function to convert File to base64
 export const convertFileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -47,4 +49,14 @@ export const markTouched = (fields: any): any => {
     }, {} as any);
   }
   return true;
+};
+
+export const handleApiError = (error: unknown): string => {
+  if (error instanceof AxiosError) {
+    return error.response?.data?.message || error.message;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return "An unexpected error occurred";
 };

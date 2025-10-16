@@ -6,7 +6,6 @@ import ConditionalFooter from "@/components/common/conditionalFooter";
 import Providers from "./provider";
 import { Toaster } from "sonner";
 import "@/api/client";
-import AuthInitializer from "./AuthInitializer";
 
 const raleway = Raleway({
   subsets: ["latin"],
@@ -33,8 +32,7 @@ export default function RootLayout({
         <Toaster position="top-right" richColors />
 
         <Providers>
-          <AuthInitializer />
-          <Navbar />
+          {/* <Navbar /> */}
           {children}
           <ConditionalFooter />
         </Providers>

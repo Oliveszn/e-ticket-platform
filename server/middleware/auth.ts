@@ -23,28 +23,45 @@ const requireAuth = asyncHandler(
       throw new ValidationError("Malformed token.", 401);
     }
 
-    ///Verify JWt and decode payload
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
-      userId: string;
-    };
-    if (!decoded?.userId) {
-      throw new ValidationError("Invalid token payload.", 401);
+    try {
+      ///Verify JWt and decode payload
+      const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+        userId: string;
+      };
+      if (!decoded?.userId) {
+        throw new ValidationError("Invalid token payload.", 401);
+      }
+
+      // Fetch user from MongoDB
+      const user = await User.findById(decoded.userId).select(
+        "id email firstName lastName role"
+      );
+
+      if (!user) {
+        throw new ValidationError("Invalid token. User not found.", 401);
+      }
+
+      // Attach user data to the request
+      (req as any).user = user;
+      (req as any).isAuthenticated = true;
+
+      next();
+    } catch (error: unknown) {
+      if (error instanceof jwt.TokenExpiredError) {
+        // 👇 Special case — token expired
+        return res.status(401).json({
+          success: false,
+          message: "Access token expired",
+          code: "TOKEN_EXPIRED",
+        });
+      }
+
+      return res.status(401).json({
+        success: false,
+        message: "Invalid token",
+        code: "TOKEN_INVALID",
+      });
     }
-
-    // Fetch user from MongoDB
-    const user = await User.findById(decoded.userId).select(
-      "id email firstName lastName role"
-    );
-
-    if (!user) {
-      throw new ValidationError("Invalid token. User not found.", 401);
-    }
-
-    // Attach user data to the request
-    (req as any).user = user;
-    (req as any).isAuthenticated = true;
-
-    next();
   }
 );
 

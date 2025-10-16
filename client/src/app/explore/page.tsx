@@ -1,11 +1,10 @@
 "use client";
-import { getAllEvents, getEventsByCategory } from "@/store/event-slice";
-import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { categories } from "@/config/explore";
 import { useCategoryNavigation } from "@/hooks/useCategoryNavigation";
+import { useEventsCategory, useGetEvents } from "@/hooks/useEvent";
 
 const Explore = () => {
   const searchParams = useSearchParams();
@@ -17,22 +16,11 @@ const Explore = () => {
   const limit = parseInt(searchParams.get("limit") || "10");
   const category = searchParams.get("category") || "";
 
-  //fetching all events and category events
-  const { data, isLoading, error, isError, isFetching } = useQuery({
-    queryKey: ["events", category, page],
-    queryFn: () => {
-      if (category && category !== "all") {
-        return getEventsByCategory({
-          category,
-          page,
-          limit,
-        });
-      }
-      return getAllEvents({ page, limit });
-    },
-    staleTime: 1000 * 60 * 5,
-    retry: 2,
-  });
+  const query =
+    category && category !== "all"
+      ? useEventsCategory(category, page, limit)
+      : useGetEvents(page, limit);
+  const { data, isLoading, error, isError, isFetching } = query;
   const pagination = data?.pagination;
 
   useEffect(() => {

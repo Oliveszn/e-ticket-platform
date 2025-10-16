@@ -1,28 +1,57 @@
 "use client";
 
-import { useAppSelector } from "@/store/hooks";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useVerifyTicketPurchase } from "@/hooks/useOrder";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function PaymentSuccessPage() {
   const router = useRouter();
-  const { order } = useAppSelector((state) => state.payment);
+  const searchParams = useSearchParams();
+  const reference = searchParams.get("reference");
 
-  useEffect(() => {
-    /////If no order in state, redirect home
-    if (!order) {
-      router.push("/");
-    }
-  }, [order, router]);
+  const {
+    data: verifyData,
+    isPending,
+    isError,
+    error,
+  } = useVerifyTicketPurchase(reference ?? "");
 
-  /////Show loading state while checking
-  if (!order) {
+  // Handle loading / missing reference
+  if (!reference) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <p className="text-lg">Loading...</p>
+        <p className="text-lg">Missing payment reference.</p>
       </div>
     );
   }
+
+  if (isPending) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-lg">Loading payment details...</p>
+      </div>
+    );
+  }
+
+  if (isError || !verifyData?.success) {
+    return (
+      <div className="flex flex-col justify-center items-center h-screen space-y-3">
+        <p className="text-red-500 text-lg font-semibold">
+          Could not verify payment
+        </p>
+        <p className="text-gray-600">
+          {error instanceof Error ? error.message : "Something went wrong."}
+        </p>
+        <button
+          onClick={() => router.push("/")}
+          className="mt-4 px-6 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800"
+        >
+          Go Home
+        </button>
+      </div>
+    );
+  }
+
+  const order = verifyData?.data?.order;
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50 p-6">

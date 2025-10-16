@@ -17,7 +17,7 @@ export default function DashBoardLayout({
 }) {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
   return (
-    <CheckAuth isAuthenticated={isAuthenticated}>
+    <CheckAuth>
       <SidebarProvider>
         <div className="flex h-screen w-full bg-gray-100">
           <AppSidebar />

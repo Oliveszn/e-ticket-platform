@@ -4,7 +4,7 @@ import EventDetails from "@/components/dashboard/create/EventDetails";
 import Tickets from "@/components/dashboard/create/Tickets";
 import { resetForm, saveData, setStep } from "@/store/createevent-slice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { FormSchema, formSchema } from "@/utils/validationSchema";
+import { formSchema } from "@/utils/validationSchema";
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { useRouter } from "next/navigation";
@@ -15,15 +15,20 @@ import {
   hasNestedError,
   markTouched,
 } from "@/utils/helperFunction";
-import { createEvent, resetEvent } from "@/store/event-slice";
-import { toast } from "sonner";
+import { useCreateEvent } from "@/hooks/useEvent";
 
 const CreateEvent = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const step = useAppSelector((state) => state.form.step);
   const formData = useAppSelector((state) => state.form.data);
-
+  const {
+    mutate: createEvent,
+    isPending,
+    isError,
+    error,
+    isSuccess,
+  } = useCreateEvent();
   const formik = useFormik<FormValues>({
     initialValues: {
       title: formData.title || "",
@@ -55,20 +60,10 @@ const CreateEvent = () => {
       handleSubmit(values);
     },
   });
-
   const handleSubmit = async (data: any) => {
-    try {
-      const result = await dispatch(createEvent(data)).unwrap();
-
-      toast.success(result.message);
-      dispatch(resetForm());
-      dispatch(resetEvent());
-      router.push("/dashboard/events");
-    } catch (error) {
-      const message =
-        typeof error === "string" ? error : "An unexpected error occurred";
-      toast.error(message);
-    }
+    createEvent(data);
+    dispatch(resetForm());
+    router.push("/dashboard/events");
   };
 
   const nextStep = async () => {
@@ -206,6 +201,7 @@ const CreateEvent = () => {
                 </button>
               ) : (
                 <button
+                  disabled={isPending}
                   type="button"
                   onClick={async () => {
                     const errors = await formik.validateForm();
@@ -227,7 +223,7 @@ const CreateEvent = () => {
                   }}
                   className="px-6 py-2 rounded bg-green-500 text-white hover:bg-green-600"
                 >
-                  Submit
+                  {isPending ? "Creating..." : "Create Event"}
                 </button>
               )}
             </div>
