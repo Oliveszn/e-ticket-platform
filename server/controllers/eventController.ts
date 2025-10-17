@@ -299,13 +299,7 @@ const getTrendingEvents = asyncHandler(async (req: Request, res: Response) => {
 });
 
 ////edit event for promoters
-const editEvent = asyncHandler(async (req: Request, res: Response) => {
-  //   const { error } = validateEvent(req.body);
-  //   if (error) {
-  //     logger.warn("Validation error", error.details[0].message);
-  //     throw new ValidationError(error.details[0].message, 400);
-  //   }
-
+const editEvent = asyncHandler(async (req: MulterRequest, res: Response) => {
   const organizerId = req.user?._id;
   if (!organizerId) {
     throw new NotFoundError("User not found");
@@ -322,44 +316,35 @@ const editEvent = asyncHandler(async (req: Request, res: Response) => {
     throw new ValidationError("Invalid event ID", 400);
   }
 
-  const {
-    title,
-    slug,
-    eventDate,
-    eventTime,
-    venue,
-    charge,
-    category,
-    description,
-    image,
-    ticket,
-  } = req.body;
-  if (
-    !title &&
-    !slug &&
-    !eventDate &&
-    !eventTime &&
-    !venue &&
-    !charge &&
-    !category &&
-    !description &&
-    !image &&
-    !ticket
-  ) {
-    throw new ValidationError("No update fields provided", 400);
-  }
+  // Parse nested data
+  let parsedVenue;
+  let parsedTickets;
+  if (req.body.venue) parsedVenue = JSON.parse(req.body.venue);
+  if (req.body.tickets) parsedTickets = JSON.parse(req.body.tickets);
+
+  const { title, slug, eventDate, eventTime, charge, category, description } =
+    req.body;
 
   const updateEvent: Record<string, any> = {};
   if (title) updateEvent.title = title;
   if (slug) updateEvent.slug = slug;
   if (eventDate) updateEvent.eventDate = eventDate;
   if (eventTime) updateEvent.eventTime = eventTime;
-  if (venue) updateEvent.venue = venue;
+  if (parsedVenue) updateEvent.venue = parsedVenue;
   if (charge) updateEvent.charge = charge;
   if (category) updateEvent.category = category;
   if (description) updateEvent.description = description;
-  if (image) updateEvent.image = image;
-  if (ticket) updateEvent.ticket = ticket;
+  if (parsedTickets) updateEvent.ticket = parsedTickets;
+
+  if (req.file) {
+    const uploadResult: any = await uploadMediaToCloudinary(req.file);
+    updateEvent.image = {
+      publicId: uploadResult.public_id,
+      mimeType: req.file.mimetype,
+      url: uploadResult.secure_url,
+      originalName: req.file.originalname,
+    };
+  }
 
   // we first find the event to check ownership
   const event = await Event.findById(id);

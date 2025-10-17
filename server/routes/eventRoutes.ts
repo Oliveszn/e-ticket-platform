@@ -22,7 +22,7 @@ router.post("/events/:id/track-view", trackEventView);
 
 router.post("/create", requireAuth, upload.single("image"), createEvent);
 router.delete("/:id", requireAuth, deleteEvent);
-router.put("/:id", requireAuth, editEvent);
+router.put("/:id", requireAuth, upload.single("image"), editEvent);
 router.get("/my-events", requireAuth, getPromoterEvent);
 router.get("/my-event/:id", requireAuth, getPromoterSingleEvent);
 

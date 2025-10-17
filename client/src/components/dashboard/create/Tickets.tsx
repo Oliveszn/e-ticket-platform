@@ -28,7 +28,7 @@ const Tickets = ({ formik }: TicketProps) => {
     price: "",
     quantity: "",
     description: "",
-    personsPerTicket: "",
+    personsPerTicket: 1,
     showVolume: false,
   });
 
@@ -42,7 +42,7 @@ const Tickets = ({ formik }: TicketProps) => {
       price: "",
       quantity: "",
       description: "",
-      personsPerTicket: "",
+      personsPerTicket: 1,
       showVolume: false,
     });
   };

@@ -1,3 +1,4 @@
+"use client";
 import { getSingleTickets, getTickets } from "@/api/endpoints/tickets";
 import { useQuery } from "@tanstack/react-query";
 

@@ -1,3 +1,4 @@
+"use client";
 import { userApi } from "@/api/endpoints/user";
 import { User } from "@/utils/types";
 import {

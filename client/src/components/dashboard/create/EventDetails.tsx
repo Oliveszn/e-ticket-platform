@@ -381,7 +381,7 @@ const EventDetails = ({ formik }: EventDetailsProps) => {
                   imageLoadingState={formik.isSubmitting}
                 />
               </div>
-              <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+              {/* <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p> */}
             </div>
             {formik.errors.image && formik.touched.image && (
               <p className="text-red-500 text-sm">{formik.errors.image}</p>

@@ -1,9 +1,14 @@
 import { Label } from "../ui/label";
-import { useEffect, useRef, type ChangeEvent, type DragEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type DragEvent,
+} from "react";
 import { Input } from "../ui/input";
 import { FileIcon, UploadCloudIcon, XIcon } from "lucide-react";
 import { Button } from "../ui/button";
-import axios from "axios";
 import { Skeleton } from "../ui/skeleton";
 
 interface ImageUploadProps {
@@ -27,6 +32,20 @@ const ImageUpload = ({
   isCustomStyling = false,
 }: ImageUploadProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+
+  // 🔹 Generate preview for either existing URL or uploaded File
+  useEffect(() => {
+    if (typeof imageFile === "string") {
+      setPreviewUrl(imageFile); // existing image from backend
+    } else if (imageFile instanceof File) {
+      const fileUrl = URL.createObjectURL(imageFile);
+      setPreviewUrl(fileUrl);
+      return () => URL.revokeObjectURL(fileUrl);
+    } else {
+      setPreviewUrl("");
+    }
+  }, [imageFile]);
 
   const handleImageFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -46,6 +65,7 @@ const ImageUpload = ({
   const handleRemoveImage = () => {
     setImageFile(null);
     setUploadedImageUrl("");
+    setPreviewUrl("");
     if (inputRef.current) {
       inputRef.current.value = "";
     }
@@ -68,34 +88,39 @@ const ImageUpload = ({
           ref={inputRef}
           onChange={handleImageFileChange}
         />
-        {!imageFile ? (
-          <Label
-            htmlFor="image-upload"
-            className="flex flex-col items-center justify-center h-32 cursor-pointer"
-          >
-            <UploadCloudIcon className="w-10 h-10 text-muted-foreground mb-2" />
-            <span>Drag & drop or click to upload image</span>
-          </Label>
-        ) : imageLoadingState ? (
-          <Skeleton className="h-10 bg-gray-100" />
-        ) : (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <FileIcon className="w-8 text-primary mr-2 h-8" />
-            </div>
-            <p className="text-sm font-medium">{imageFile.name}</p>
+        {imageLoadingState ? (
+          <Skeleton className="h-32 w-full bg-gray-100 rounded-md" />
+        ) : previewUrl ? (
+          <div className="relative w-full flex flex-col items-center">
+            <img
+              src={previewUrl}
+              alt="Uploaded"
+              className="w-full h-48 object-cover rounded-md shadow-sm"
+            />
             <Button
+              type="button"
               variant="ghost"
               size="icon"
-              className="text-muted-foreground hover:text-foreground"
               onClick={handleRemoveImage}
+              className="absolute top-2 right-2 bg-white/80 hover:bg-white text-red-500 rounded-full"
             >
-              <XIcon className="w-4 h-4" />
-              <span className="sr-only">Remove File</span>
+              <XIcon className="w-5 h-5" />
             </Button>
           </div>
+        ) : (
+          <Label
+            htmlFor="image-upload"
+            className="flex flex-col items-center justify-center h-32 cursor-pointer text-gray-600"
+          >
+            <UploadCloudIcon className="w-10 h-10 mb-2" />
+            <span>Drag & drop or click to upload image</span>
+          </Label>
         )}
       </div>
+
+      <p className="text-xs text-gray-500 mt-2 text-center">
+        PNG, JPG, GIF, or WebP up to 5MB
+      </p>
     </div>
   );
 };

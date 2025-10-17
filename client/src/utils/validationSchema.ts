@@ -68,7 +68,7 @@ export const formSchema = z.object({
 
   image: z
     .union([
-      // Handle File object
+      // ✅ Case 1: File object
       z.any().refine(
         (file) => {
           return (
@@ -82,14 +82,19 @@ export const formSchema = z.object({
         },
         { message: "Select at least one image" }
       ),
-      // Handle base64 stored object
+
+      // ✅ Case 2: base64 stored object
       z.object({
         base64: z.string(),
         name: z.string(),
         type: z.string(),
         size: z.number(),
       }),
+      // ✅ Case 3: already uploaded image URL
+      z.string().url().min(1),
     ])
+    .optional()
+    // ✅ Keep your refinements intact
     .refine(
       (file: any) => {
         if (file?.size) return file.size <= 5 * 1024 * 1024;

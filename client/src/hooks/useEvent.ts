@@ -1,5 +1,7 @@
+"use client";
 import {
   createEvent,
+  editEventApi,
   getAllEvents,
   getAnEvent,
   getEventsByCategory,
@@ -24,10 +26,11 @@ export const usePromoterEvents = () => {
 };
 
 //GET SINLE EVENT FOR PROMOTER
-export const useSinglePromoterEvent = (userId: string) => {
+export const useSinglePromoterEvent = (eventId: string) => {
   return useQuery({
-    queryKey: ["event"],
-    queryFn: () => getPromoterSingleEvent(userId),
+    queryKey: ["event", eventId],
+    queryFn: () => getPromoterSingleEvent(eventId),
+    enabled: !!eventId,
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
     retry: 2,
   });
@@ -112,6 +115,25 @@ export const useCreateEvent = () => {
 
   return useMutation({
     mutationFn: (form: FormSchema) => createEvent(form),
+
+    onSuccess: (data) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+    },
+
+    onError: (error: unknown) => {
+      const message = handleApiError(error);
+      toast.error(message);
+    },
+  });
+};
+
+export const useEditEvent = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ eventId, form }: { eventId: string; form: FormSchema }) =>
+      editEventApi(eventId, form),
 
     onSuccess: (data) => {
       toast.success(data.message);

@@ -24,13 +24,14 @@ export type FormValues = {
   image:
     | File
     | { base64: string; name: string; type: string; size: number }
+    | string
     | null;
   tickets: {
     name: string;
     price: number;
     quantity: number;
     description?: string;
-    personsPerTicket?: string[];
+    personsPerTicket?: number;
     showVolume?: boolean; // optional because backend defaults to false
   }[];
 };
@@ -99,6 +100,7 @@ interface EventImage {
 }
 
 export interface Event {
+  _id: string;
   title: string;
   slug: string;
   eventDate: string;

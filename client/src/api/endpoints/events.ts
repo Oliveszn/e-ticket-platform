@@ -120,3 +120,49 @@ export const createEvent = async (form: FormSchema) => {
 
   return response.data;
 };
+
+export const editEventApi = async (eventId: string, form: FormSchema) => {
+  const fd = new FormData();
+
+  // append simple fields
+  fd.append("title", form.title);
+  fd.append("slug", form.slug);
+  fd.append("eventDate", form.date);
+  fd.append("eventTime", form.time);
+  fd.append("category", form.category);
+  fd.append("charge", form.charge);
+
+  if (form.description) {
+    fd.append("description", form.description);
+  }
+
+  // append nested venue (stringify)
+  fd.append("venue", JSON.stringify(form.venue));
+
+  // handle image logic (same as create)
+  if (form.image instanceof File) {
+    fd.append("image", form.image);
+  } else if (
+    form.image &&
+    typeof form.image === "object" &&
+    "base64" in form.image
+  ) {
+    const imageFile = base64ToFile(
+      form.image.base64,
+      form.image.name,
+      form.image.type
+    );
+    fd.append("image", imageFile);
+  }
+
+  // append tickets array
+  fd.append("tickets", JSON.stringify(form.tickets));
+  const response = await apiClient.put(`/api/events/${eventId}`, fd, {
+    withCredentials: true,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response.data;
+};

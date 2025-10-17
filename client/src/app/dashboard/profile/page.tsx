@@ -3,8 +3,6 @@ import { useProfile } from "@/hooks/useUser";
 import { useAppSelector } from "@/store/hooks";
 
 const Profile = () => {
-  const { user } = useAppSelector((state) => state.auth);
-  const userId = user?._id;
   const { data, isLoading, isError, error } = useProfile();
 
   if (isLoading) {
