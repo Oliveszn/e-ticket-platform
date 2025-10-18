@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Popover } from "../ui/popover";
 import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
 import { Separator } from "@radix-ui/react-separator";
-import { useEditEvent } from "@/hooks/useEvent";
+import { useEditEvent } from "@/hooks/endpoints/useEvent";
 
 interface EventCardProps {
   event: Event;

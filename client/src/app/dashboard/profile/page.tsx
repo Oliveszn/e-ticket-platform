@@ -1,5 +1,5 @@
 "use client";
-import { useProfile } from "@/hooks/useUser";
+import { useProfile } from "@/hooks/endpoints/useUser";
 import { useAppSelector } from "@/store/hooks";
 
 const Profile = () => {

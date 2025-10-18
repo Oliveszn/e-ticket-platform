@@ -1,6 +1,6 @@
 "use client";
 
-import { useVerifyTicketPurchase } from "@/hooks/useOrder";
+import { useVerifyTicketPurchase } from "@/hooks/endpoints/useOrder";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function PaymentSuccessPage() {

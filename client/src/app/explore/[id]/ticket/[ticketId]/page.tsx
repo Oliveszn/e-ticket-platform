@@ -9,8 +9,8 @@ import {
 } from "@/utils/validationSchema";
 import Toggle from "@/components/dashboard/Toggle";
 import { toast } from "sonner";
-import { useSingleTicket } from "@/hooks/useTickets";
-import { usePurchaseTickets } from "@/hooks/useOrder";
+import { useSingleTicket } from "@/hooks/endpoints/useTickets";
+import { usePurchaseTickets } from "@/hooks/endpoints/useOrder";
 import { handleApiError } from "@/utils/helperFunction";
 
 const TicketPurchaePage = () => {

@@ -1,7 +1,7 @@
 "use client";
 import PaymentHistoryCard from "@/components/dashboard/PaymentHistoryCard";
-import { usePromoterEvents } from "@/hooks/useEvent";
-import { useProfile } from "@/hooks/useUser";
+import { usePromoterEvents } from "@/hooks/endpoints/useEvent";
+import { useProfile } from "@/hooks/endpoints/useUser";
 import Link from "next/link";
 import React from "react";
 
@@ -170,7 +170,6 @@ const DashboardPage = () => {
           </div>
         </div>
 
-       
         <PaymentHistoryCard />
       </div>
     </main>

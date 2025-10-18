@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useVerifyTicketPurchase } from "@/hooks/useOrder";
+import { useVerifyTicketPurchase } from "@/hooks/endpoints/useOrder";
 
 export default function PaymentCallbackPage() {
   const searchParams = useSearchParams();

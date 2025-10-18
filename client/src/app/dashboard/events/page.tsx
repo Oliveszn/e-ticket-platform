@@ -1,6 +1,6 @@
 "use client";
 import EventCard from "@/components/dashboard/EventCard";
-import { usePromoterEvents } from "@/hooks/useEvent";
+import { usePromoterEvents } from "@/hooks/endpoints/useEvent";
 import { useState, useMemo } from "react";
 
 const Events = () => {

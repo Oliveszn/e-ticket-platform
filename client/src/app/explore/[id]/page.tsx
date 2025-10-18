@@ -1,8 +1,8 @@
 "use client";
 import Countdown from "@/components/explore/CountDown";
 import { Button } from "@/components/ui/button";
-import { useGetAnEvent } from "@/hooks/useEvent";
-import { useTickets } from "@/hooks/useTickets";
+import { useGetAnEvent } from "@/hooks/endpoints/useEvent";
+import { useTickets } from "@/hooks/endpoints/useTickets";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 

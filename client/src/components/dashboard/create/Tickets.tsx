@@ -15,55 +15,22 @@ import Toggle from "../Toggle";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useTicketDialog } from "@/hooks/useTicketDialog";
 
 interface TicketProps {
   formik: any;
 }
 
 const Tickets = ({ formik }: TicketProps) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [generalError, setGeneralError] = useState("");
-  const [newTicket, setNewTicket] = useState({
-    name: "",
-    price: "",
-    quantity: "",
-    description: "",
-    personsPerTicket: 1,
-    showVolume: false,
-  });
-
-  const handleInputChange = (field: string, value: any) => {
-    setNewTicket((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const resetNewTicket = () => {
-    setNewTicket({
-      name: "",
-      price: "",
-      quantity: "",
-      description: "",
-      personsPerTicket: 1,
-      showVolume: false,
-    });
-  };
-
-  const handleSaveTicket = async () => {
-    if (!newTicket.name || !newTicket.price || !newTicket.quantity) {
-      toast.error("Please fill in ticket name, price, and quantity.");
-      setGeneralError("Please fill in ticket name, price, and quantity.");
-      return;
-    }
-
-    // add ticket into Formik
-    const currentTickets = formik.values.tickets;
-    formik.setFieldValue("tickets", [...currentTickets, newTicket]);
-
-    //reset local state and close dialog
-    resetNewTicket();
-    setIsDialogOpen(false);
-
-    toast.success("Ticket saved!");
-  };
+  const {
+    isDialogOpen,
+    setIsDialogOpen,
+    generalError,
+    newTicket,
+    handleInputChange,
+    handleSaveTicket,
+    handleDeleteTicket,
+  } = useTicketDialog(formik);
 
   return (
     <div className="space-y-8">
@@ -316,12 +283,7 @@ const Tickets = ({ formik }: TicketProps) => {
                       <div>
                         <button
                           type="button"
-                          onClick={() => {
-                            const updatedTickets = formik.values.tickets.filter(
-                              (_: any, i: number) => i !== index
-                            );
-                            formik.setFieldValue("tickets", updatedTickets);
-                          }}
+                          onClick={() => handleDeleteTicket(index)}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"

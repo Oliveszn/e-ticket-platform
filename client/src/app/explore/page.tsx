@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { categories } from "@/config/explore";
 import { useCategoryNavigation } from "@/hooks/useCategoryNavigation";
-import { useEventsCategory, useGetEvents } from "@/hooks/useEvent";
+import { useEventsCategory, useGetEvents } from "@/hooks/endpoints/useEvent";
 
 const Explore = () => {
   const searchParams = useSearchParams();
