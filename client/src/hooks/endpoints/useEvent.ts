@@ -73,11 +73,11 @@ export const useGetEvents = (page: number, limit: number) => {
   });
 };
 
-export const useGetAnEvent = (id: string) => {
+export const useGetAnEvent = (slug: string) => {
   return useQuery({
-    queryKey: ["event", id],
-    queryFn: () => getAnEvent({ id }),
-    enabled: !!id,
+    queryKey: ["event", slug],
+    queryFn: () => getAnEvent({ slug }),
+    enabled: !!slug,
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
     retry: 2,
   });

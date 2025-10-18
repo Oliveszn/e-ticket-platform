@@ -30,7 +30,8 @@ router.get("/my-event/:id", requireAuth, getPromoterSingleEvent);
 router.get("/category", getEventsByCategory);
 router.get("/trending", getTrendingEvents);
 router.get("/search", searchEvents);
-router.get("/:id", getSingleEvent);
+// router.get("/:id", getSingleEvent);
+router.get("/:slug", getSingleEvent);
 router.get("/", getAllEvents);
 
 export default router;

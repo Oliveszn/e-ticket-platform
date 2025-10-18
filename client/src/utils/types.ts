@@ -143,21 +143,6 @@ export interface EventsListResponse {
   };
 }
 
-// export interface EventState {
-//   status: "idle" | "loading" | "succeeded" | "failed";
-//   error?: string | null;
-//   data: Event[] | null;
-//   currentEvent: Event | null;
-//   trendingEvents: Event[] | null;
-//   promoterEvents: Event[] | null;
-//   pagination: {
-//     total: number;
-//     page: number;
-//     limit: number;
-//     totalPages: number;
-//   };
-// }
-
 ///THIS FOR TICKET SLICE
 export interface Ticket {
   id?: number;
@@ -182,21 +167,3 @@ export interface SingleTicketResponse {
   message: string;
   data: Ticket;
 }
-
-// export interface TicketState {
-//   status: "idle" | "loading" | "succeeded" | "failed";
-//   error?: string | null;
-//   data: Ticket[] | null;
-//   currentTicket: Ticket | null;
-// }
-
-///THIS IS FOR ORDER SLICE FOR PURCHASING TICKETS
-// export interface PaymentState {
-//   status: "idle" | "loading" | "succeeded" | "failed";
-//   error: string | null;
-//   success: boolean;
-//   paymentUrl: string | null;
-//   reference: string | null;
-//   orderId: string | null;
-//   order: any;
-// }

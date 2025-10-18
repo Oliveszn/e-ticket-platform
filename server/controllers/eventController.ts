@@ -205,14 +205,15 @@ const getEventsByCategory = asyncHandler(
 
 ///get a particular event for public
 const getSingleEvent = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const eventkey = `event:${id}`;
+  // const { id } = req.params;
+  const { slug } = req.params;
+  const eventkey = `event:${slug}`;
   const cachedPost = await req.redisClient.get(eventkey);
 
   //to check if theres an id
-  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
-    throw new ValidationError("Invalid or No event ID", 400);
-  }
+  // if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+  //   throw new ValidationError("Invalid or No event ID", 400);
+  // }
   if (cachedPost) {
     return res.status(200).json({
       success: true,
@@ -221,7 +222,8 @@ const getSingleEvent = asyncHandler(async (req: Request, res: Response) => {
     });
   }
 
-  const event = await Event.findById(id);
+  // const event = await Event.findById(id);
+  const event = await Event.findOne({ slug });
   if (!event) {
     throw new NotFoundError("Event not found");
   }

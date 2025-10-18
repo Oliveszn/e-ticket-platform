@@ -10,17 +10,22 @@ const EventDetails = () => {
   const params = useParams();
   const router = useRouter();
 
-  const eventId = params.id as string;
+  const slug = params.slug as string;
   const {
     data: currentEvent,
     isLoading: isEventLoading,
     isError: isEventError,
-  } = useGetAnEvent(eventId);
+  } = useGetAnEvent(slug);
+  console.log(currentEvent);
+
+  const eventId = currentEvent?.data._id as string;
   const {
     data: ticket,
     isLoading: isTicketsLoading,
     isError: isTicketsError,
-  } = useTickets(eventId);
+  } = useTickets(eventId || "", {
+    enabled: !!eventId,
+  });
 
   const date = new Date(currentEvent?.data?.eventDate || "");
   // Get month name
@@ -337,7 +342,7 @@ const EventDetails = () => {
                         </Button>
                       ) : (
                         <Link
-                          href={`/explore/${eventId}/ticket/${ticket.id}`}
+                          href={`/explore/${slug}/ticket/${ticket.id}`}
                           className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 bg-blue-500 text-white hover:bg-blue-500/90 h-10 px-4 py-2 cursor-pointer"
                         >
                           Select

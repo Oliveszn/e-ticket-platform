@@ -4,8 +4,8 @@ import {
   TrendingEventsResponse,
 } from "@/utils/types";
 import apiClient from "../client";
-import { base64ToFile } from "@/utils/helperFunction";
 import { FormSchema } from "@/utils/validationSchema";
+import { base64ToFile } from "@/utils/formHelpers";
 
 export const getPromoterEvent = async () => {
   const response = await apiClient.get<EventsListResponse>(
@@ -44,9 +44,9 @@ export const getAllEvents = async ({
   return response.data;
 };
 
-export const getAnEvent = async ({ id }: { id: string }) => {
+export const getAnEvent = async ({ slug }: { slug: string }) => {
   const response = await apiClient.get<SingleEventResponse>(
-    `/api/events/${id}`
+    `/api/events/${slug}`
   );
   return response.data;
 };

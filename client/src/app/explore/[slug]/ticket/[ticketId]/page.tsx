@@ -12,12 +12,17 @@ import { toast } from "sonner";
 import { useSingleTicket } from "@/hooks/endpoints/useTickets";
 import { usePurchaseTickets } from "@/hooks/endpoints/useOrder";
 import { handleApiError } from "@/utils/helperFunction";
+import { useGetAnEvent } from "@/hooks/endpoints/useEvent";
 
 const TicketPurchaePage = () => {
   const params = useParams();
 
-  const eventId = params.id as string;
+  ///we fetch the slug from params so as to access the id
+  const slug = params.slug as string;
   const ticketId = params.ticketId as string;
+
+  const { data: eventData, isLoading: isEventLoading } = useGetAnEvent(slug);
+  const eventId = eventData?.data?._id as string;
 
   const formik = useFormik<TicketPurchaseSchema>({
     initialValues: {
@@ -63,7 +68,9 @@ const TicketPurchaePage = () => {
     isLoading,
     isError,
     error,
-  } = useSingleTicket(eventId, ticketId);
+  } = useSingleTicket(eventId, ticketId, {
+    enabled: !!eventId,
+  });
 
   const fees = 250 * formik.values.numberOfTickets + 100;
   const subTotal =

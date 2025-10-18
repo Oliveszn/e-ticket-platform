@@ -264,7 +264,7 @@ const EventCard = ({ event }: EventCardProps) => {
           </div>
           <div className="py-4 flex justify-between px-4">
             <Link
-              href={`/events/${event.slug}`}
+              href={`/explore/${event.slug}`}
               className="flex flex-row-reverse items-center justify-center gap-2 text-blue-500"
             >
               View Event{" "}
@@ -286,7 +286,7 @@ const EventCard = ({ event }: EventCardProps) => {
             <button
               onClick={() =>
                 navigator.clipboard.writeText(
-                  `${window.location.origin}/events/${event.slug}`
+                  `${window.location.origin}/explore/${event.slug}`
                 )
               }
               className="flex flex-row-reverse items-center justify-center gap-2 text-blue-500"

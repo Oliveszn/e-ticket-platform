@@ -334,7 +334,7 @@ const Explore = () => {
                   <Link
                     key={event._id}
                     className="w-full min-h-[198px] p-4 rounded-lg border border-[#f0f1f1] flex justify-between gap-10 shadow-[0_1px_3px_rgba(16,24,40,0.1)]"
-                    href={`/explore/${event._id}`}
+                    href={`/explore/${event.slug}`}
                   >
                     <div className="flex flex-col justify-between gap-5">
                       <div className="flex flex-col gap-3">
