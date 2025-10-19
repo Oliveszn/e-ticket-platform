@@ -1,5 +1,6 @@
 "use client";
 import Countdown from "@/components/explore/CountDown";
+import EventBreadCrumb from "@/components/explore/EventBreadCrumb";
 import { Button } from "@/components/ui/button";
 import { useGetAnEvent } from "@/hooks/endpoints/useEvent";
 import { useTickets } from "@/hooks/endpoints/useTickets";
@@ -87,7 +88,8 @@ const EventDetails = () => {
     );
   }
   return (
-    <main className="px-6 sm:px-8 lg:px-10 py-16">
+    <main className="px-6 sm:px-8 lg:px-10 pb-16">
+      <EventBreadCrumb eventTitle={currentEvent?.data.title} />
       <div className="max-w-6xl mx-auto">
         {/* HEADER  */}
         <div className="flex gap-4 sm:gap-6 mb-4">

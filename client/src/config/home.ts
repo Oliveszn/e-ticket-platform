@@ -42,3 +42,17 @@ export const features = [
     content: "Export data Something will be here.",
   },
 ];
+
+export const heroConfig = {
+  image: {
+    src: "/hero-img.jpg",
+    alt: "Hero background showcasing exciting events",
+  },
+  title: "Bringing you closer to all the events you love",
+  description:
+    "Find events and make memories that last a lifetime. Your next great experience is just a click away.",
+  cta: {
+    text: "Discover events",
+    href: "/explore",
+  },
+} as const;

@@ -13,6 +13,7 @@ import { useSingleTicket } from "@/hooks/endpoints/useTickets";
 import { usePurchaseTickets } from "@/hooks/endpoints/useOrder";
 import { handleApiError } from "@/utils/helperFunction";
 import { useGetAnEvent } from "@/hooks/endpoints/useEvent";
+import EventBreadCrumb from "@/components/explore/EventBreadCrumb";
 
 const TicketPurchaePage = () => {
   const params = useParams();
@@ -84,7 +85,11 @@ const TicketPurchaePage = () => {
     return <div>Ticket not found</div>;
   }
   return (
-    <main className="px-6 sm:px-8 lg:px-10 py-16">
+    <main className="px-6 sm:px-8 lg:px-10 pb-16">
+      <EventBreadCrumb
+        eventTitle={eventData?.data?.title}
+        ticketName={currentTicket?.data?.name}
+      />
       <div className="max-w-6xl mx-auto">
         <form onSubmit={formik.handleSubmit}>
           <div className="grid sm:grid-cols-12 gap-4">

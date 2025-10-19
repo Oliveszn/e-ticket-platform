@@ -32,7 +32,7 @@ export default function RootLayout({
         <Toaster position="top-right" richColors />
 
         <Providers>
-          {/* <Navbar /> */}
+          <Navbar />
           {children}
           <ConditionalFooter />
         </Providers>

@@ -2,7 +2,8 @@
 import { categories } from "@/config/explore";
 import { useCategoryNavigation } from "@/hooks/useCategoryNavigation";
 import Image from "next/image";
-import Link from "next/link";
+import EventCreationCTA from "./categories/EventCreation";
+import CategoryCard from "./categories/CategoryCard";
 
 const Categories = () => {
   const { goToCategory } = useCategoryNavigation();
@@ -22,52 +23,15 @@ const Categories = () => {
         {categories
           .filter((cat) => cat.name !== "All Events")
           .map((cat) => (
-            <div
+            <CategoryCard
               key={cat.query}
+              name={cat.name}
+              image={cat.img}
               onClick={() => goToCategory(cat.name, "/explore")}
-              className="flex flex-col items-center group"
-            >
-              <div className="rounded-lg transition-colors group-hover:bg-blue-100/30 p-3">
-                <Image
-                  src={cat.img}
-                  alt={`${cat.name} image`}
-                  width={0}
-                  height={0}
-                  sizes="100vw"
-                  className="size-24 sm:size-32 md:size-40 object-contain"
-                />
-              </div>
-              <div className="mt-2">{cat.name}</div>
-            </div>
+            />
           ))}
       </div>
-
-      <div className="w-full overflow-hidden py-8">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex flex-col items-start">
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-semibold md:font-bold lg:font-extrabold max-w-lg mb-6">
-              Planning an event? Selling tickets has never been easier
-            </h2>
-            <p className="text-base md:text-lg font-normal max-w-lg">
-              Sell tickets online, promote your event, and manage everything in
-              one place.
-            </p>
-
-            <div className="mt-14 w-full flex justify-center md:justify-start">
-              <Link
-                className="block bg-transparent text-base font-normal leading-5 rounded-lg cursor-pointer text-center py-4 px-8 text-blue border border-blue w-full md:w-auto hover:bg-blue hover:text-white transition-all duration-300"
-                href="/dashboard"
-              >
-                Create an event
-              </Link>
-            </div>
-          </div>
-
-          <div className="mt-14">
-            <Image src="/event.jpg" alt="image" width={400} height={250} />
-          </div>
-        </div>
-      </div>
+      <EventCreationCTA />
     </section>
   );
 };
