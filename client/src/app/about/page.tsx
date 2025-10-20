@@ -24,7 +24,6 @@ const About = () => {
         <section className="grid grid-cols-1 sm:grid-cols-2 gap-6 z-20 relative py-16">
           <div>
             <Image
-              // src="/event.jpg"
               src={eventImage}
               alt="about"
               loading="lazy"

@@ -145,7 +145,7 @@ export interface EventsListResponse {
 
 ///THIS FOR TICKET SLICE
 export interface Ticket {
-  id?: number;
+  id?: string;
   name: string;
   price: number;
   quantity: number;

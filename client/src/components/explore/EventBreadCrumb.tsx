@@ -49,7 +49,7 @@ export default function EventBreadCrumb({
     });
   }
   return (
-    <Breadcrumb className="-mx-6 sm:-mx-8 pb-6">
+    <Breadcrumb className="">
       <BreadcrumbList className="bg-blue-200 capitalize px-5 sm:px-20 py-6 sm:py-8 sm:text-sm md:text-base font-semibold flex overflow-hidden items-center gap-1 sm:gap-4">
         {breadcrumbs.map((crumb, index) => (
           <Fragment key={index}>

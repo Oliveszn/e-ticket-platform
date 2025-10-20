@@ -50,11 +50,6 @@ const Pricing = () => {
               <div className="p-5 flex flex-col gap-5">
                 {plan.features.map((feature, i) => (
                   <div key={i} className="flex items-center gap-4">
-                    <img
-                      src="/icons/pricing.svg"
-                      alt="star"
-                      className="w-5 h-5"
-                    />
                     <p className="text-gray-500">{feature}</p>
                   </div>
                 ))}

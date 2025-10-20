@@ -1,6 +1,7 @@
 import FaqAccordion from "@/components/common/FaqAccordion";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 
 const Works = () => {
   return (
@@ -16,12 +17,18 @@ const Works = () => {
             Here's how it all comes together:
           </p>
           <div className="flex items-center justify-center gap-4">
-            <Button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-50 h-10 px-4 py-2 sm:w-48">
+            <Link
+              href={"/auth/login"}
+              className="inline-flex bg-black text-white items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-slate-100 hover:text-slate-900 h-10 px-4 py-2 sm:w-48"
+            >
               Create Event
-            </Button>
-            <Button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300 bg-blue-500 text-white hover:bg-blue-500/90 dark:bg-blue-50 dark:text-white dark:hover:bg-blue-50/90 h-10 px-4 py-2 sm:w-48">
+            </Link>
+            <Link
+              href={"/explore"}
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-500 text-white hover:bg-blue-500/90 h-10 px-4 py-2 sm:w-48"
+            >
               Explore
-            </Button>
+            </Link>
           </div>
         </section>
 
@@ -221,108 +228,7 @@ const Works = () => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 sm:py-24 gap-5 items-center">
-              <div className="space-y-3 pl-5 md:pl-24">
-                <div className="flex flex-col items-start gap-4">
-                  <span className="bg-blue-50 p-3 rounded-full">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-blue-400 w-6 h-6"
-                    >
-                      <path d="m9 12 2 2 4-4"></path>
-                      <path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7Z"></path>
-                      <path d="M22 19H2"></path>
-                    </svg>
-                  </span>
-                  <span className="text-lg sm:text-2xl font-semibold text-gray-900 font-figtree">
-                    Step 2: Set Up Voting (If You Want)
-                  </span>
-                </div>
-                <p className="text-gray-600 text-sm">
-                  Want to make things interactive? Turn on voting and let your
-                  audience have their say! You are in control—set the rules and
-                  watch the excitement build.
-                </p>
-                <ul className="space-y-2 text-gray-600 text-sm">
-                  <li className="flex items-start gap-3">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-blue-500 w-4 h-4 mt-1"
-                    >
-                      <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
-                      <path d="m9 12 2 2 4-4"></path>
-                    </svg>
-                    <span>Enable online voting with a single click</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-blue-500 w-4 h-4 mt-1"
-                    >
-                      <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
-                      <path d="m9 12 2 2 4-4"></path>
-                    </svg>
-                    <span>Customize how voting works for your event</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-blue-500 w-4 h-4 mt-1"
-                    >
-                      <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
-                      <path d="m9 12 2 2 4-4"></path>
-                    </svg>
-                    <span>Preview and make sure everything looks perfect</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="flex justify-center items-center">
-                {/* <img
-                  src="/step2.png"
-                  alt="Step 2: Set Up Voting (If You Want) Screenshot"
-                  className="w-full h-full object-cover"
-                /> */}
-                <Image
-                  src="/step2.png"
-                  alt="Step 2: Set Up Voting (If You Want) Screenshot"
-                  width={500}
-                  height={500}
-                  className="object-cover"
-                />
-              </div>
-            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 sm:py-24 gap-5 items-center">
               <div className="space-y-3 pl-5 md:pl-24">
                 <div className="flex flex-col items-start gap-4">
@@ -346,7 +252,7 @@ const Works = () => {
                     </svg>
                   </span>
                   <span className="text-lg sm:text-2xl font-semibold text-gray-900 font-figtree">
-                    Step 3: Create Awesome Tickets
+                    Step 2: Create Awesome Tickets
                   </span>
                 </div>
                 <p className="text-gray-600 text-sm">
