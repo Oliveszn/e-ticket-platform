@@ -3,9 +3,11 @@ import Link from "next/link";
 import { StagePassLogo } from "./Stagepass-logo";
 import { Button } from "../ui/button";
 import { useState } from "react";
+import SearchModal from "../search/SearchModal";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchModal, setSearchModal] = useState(false);
   let links = [
     { name: "Home", link: "/" },
     { name: "Explore", link: "/explore" },
@@ -37,7 +39,10 @@ export default function Navbar() {
           ))}
 
           {/* search button */}
-          <button>
+          <button
+            className="cursor-pointer"
+            onClick={() => setSearchModal(true)}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -129,6 +134,7 @@ export default function Navbar() {
           onClick={() => setIsOpen(false)}
         />
       )}
+      <SearchModal open={searchModal} onClose={() => setSearchModal(false)} />
     </nav>
   );
 }

@@ -166,3 +166,10 @@ export const editEventApi = async (eventId: string, form: FormSchema) => {
 
   return response.data;
 };
+
+export const searchEventApi = async (keyword: string) => {
+  const response = await apiClient.get(`/api/events/search`, {
+    params: { keyword },
+  });
+  return response.data;
+};

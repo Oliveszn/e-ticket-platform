@@ -8,6 +8,7 @@ import {
   getPromoterEvent,
   getPromoterSingleEvent,
   getTrendingEvents,
+  searchEventApi,
   trackEventView,
 } from "@/api/endpoints/events";
 import { handleApiError } from "@/utils/helperFunction";
@@ -144,5 +145,15 @@ export const useEditEvent = () => {
       const message = handleApiError(error);
       toast.error(message);
     },
+  });
+};
+
+export const useSearchEvents = (keyword: string, options?: any) => {
+  return useQuery({
+    queryKey: ["search", keyword],
+    queryFn: () => searchEventApi(keyword),
+    enabled: (options?.enabled ?? true) && keyword.trim().length >= 2,
+    staleTime: 1000, /////Consider data fresh for 1 second
+    gcTime: 5 * 60 * 1000, /////Keep cached for 5 minutes
   });
 };
