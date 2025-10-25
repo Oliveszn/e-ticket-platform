@@ -37,7 +37,7 @@ export default function PaymentHistoryCard() {
     <div className="rounded-lg border border-slate-200 bg-white text-slate-950 shadow-sm">
       <div className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-          <h3 className="text-2xl font-semibold leading-none tracking-tight">
+          <h3 className="text-xl md:text-2xl font-medium lg:font-semibold leading-none tracking-tight">
             Payment History
           </h3>
           <p className="text-sm text-slate-500">
@@ -52,7 +52,8 @@ export default function PaymentHistoryCard() {
             <span className="text-xs text-muted-foreground">Ticketing</span>
             <span className="text-lg font-bold leading-none sm:text-3xl">
               <span>₦</span>
-              {data.reduce((sum, d) => sum + d.ticketing, 0).toLocaleString()}
+              {/* {data.reduce((sum, d) => sum + d.ticketing, 0).toLocaleString()} */}
+              0
             </span>
           </button>
         </div>
@@ -67,7 +68,7 @@ export default function PaymentHistoryCard() {
               axisLine={{ stroke: "#ccc" }}
               tickLine={false}
             />
-            <YAxis tick={{ fill: "#666" }} axisLine={{ stroke: "#ccc" }} />
+            {/* <YAxis tick={{ fill: "#666" }} axisLine={{ stroke: "#ccc" }} /> */}
             <Tooltip
               formatter={(value: number) => [
                 `₦${value.toLocaleString()}`,
@@ -75,7 +76,7 @@ export default function PaymentHistoryCard() {
               ]}
               labelStyle={{ color: "#333" }}
             />
-            <Bar dataKey="ticketing" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            {/* <Bar dataKey="ticketing" fill="#6366f1" radius={[4, 4, 0, 0]} /> */}
           </BarChart>
         </ResponsiveContainer>
       </div>

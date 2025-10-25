@@ -1,4 +1,5 @@
 "use client";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 import EventCard from "@/components/dashboard/EventCard";
 import { usePromoterEvents } from "@/hooks/endpoints/useEvent";
 import { useState, useMemo } from "react";
@@ -26,11 +27,7 @@ const Events = () => {
   console.log(22);
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (isError) {

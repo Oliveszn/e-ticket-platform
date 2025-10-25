@@ -103,10 +103,6 @@ const Profile = () => {
                     Email Unverified
                   </p>
                 </div>
-                <div className="space-y-3">
-                  <p className="font-semibold">Description</p>
-                  <p>fun loving party goer</p>
-                </div>
               </div>
             </div>
           </div>
