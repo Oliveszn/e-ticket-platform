@@ -8,6 +8,7 @@ import type { Request, Response, NextFunction } from "express";
 import { asyncHandler } from "../middleware/errorHandler";
 import { UnauthorizedError, ValidationError } from "../utils/error";
 import { emailJobs } from "../jobs/emailQueues";
+import { isTokenExpired } from "../utils/helper";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -72,6 +73,8 @@ const resgiterUser = asyncHandler(async (req: Request, res: Response) => {
     success: true,
     message: "User registered successfully!",
     user: safeUser,
+    accessToken,
+    refreshToken,
   });
 });
 
@@ -159,6 +162,8 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     success: true,
     message: "Login successful!",
     user: safeUser,
+    accessToken,
+    refreshToken,
   });
 });
 
@@ -223,12 +228,78 @@ const refreshTokenUser = asyncHandler(async (req: Request, res: Response) => {
   res.json({
     success: true,
     message: "Tokens refreshed successfully",
+    accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
   });
 });
 
 const getMe = asyncHandler(async (req: Request, res: Response) => {
   logger.info("getme endpoint hit...");
-  // Send the user data back to frontend
+  let token = req.cookies?.accessToken;
+
+  // If no access token or expired, try to refresh
+  if (!token || isTokenExpired(token)) {
+    const refreshToken = req.cookies?.refreshToken;
+
+    if (refreshToken) {
+      try {
+        // Validate refresh token and get user
+        const storedToken = await RefreshToken.findOne({ token: refreshToken });
+
+        if (storedToken && storedToken.expiresAt > new Date()) {
+          const user = await User.findById(storedToken.user);
+
+          if (user) {
+            // Generate new tokens
+            const { accessToken, refreshToken: newRefreshToken } =
+              await generateTokens(user);
+
+            // Delete old refresh token
+            await RefreshToken.deleteOne({ _id: storedToken._id });
+
+            // Set new cookies
+            res.cookie("accessToken", accessToken, {
+              httpOnly: true,
+              secure: isProduction,
+              sameSite: isProduction ? "none" : "lax",
+              maxAge: 15 * 60 * 1000,
+              path: "/",
+            });
+
+            res.cookie("refreshToken", newRefreshToken, {
+              httpOnly: true,
+              secure: isProduction,
+              sameSite: isProduction ? "none" : "lax",
+              maxAge: 7 * 24 * 60 * 60 * 1000,
+              path: "/",
+            });
+
+            // Return user data
+            return res.json({
+              success: true,
+              user: {
+                _id: user._id,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                role: user.role,
+              },
+              isAuthenticated: true,
+              accessToken,
+              refreshToken: newRefreshToken,
+              message: "Session restored successfully",
+            });
+          }
+        }
+      } catch (error) {
+        throw new UnauthorizedError("Session expired");
+      }
+    }
+
+    throw new UnauthorizedError("Access token missing");
+  }
+
+  // Token is valid, return user data
   res.json({
     success: true,
     user: (req as any).user,

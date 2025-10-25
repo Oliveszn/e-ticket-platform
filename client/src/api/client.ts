@@ -1,9 +1,10 @@
 ///this thunk is to et our refreshtoken thunk and we call it in our app/layout.tsx
 import axios from "axios";
-import { logout, refreshTokenThunk } from "@/store/auth-slice";
+import { clearAuth, setAuth } from "@/store/auth-slice";
+import { authApi } from "./endpoints/auth";
+import { authTracker } from "@/utils/authTracker";
 
 let store: any;
-
 export const injectStore = (_store: any) => {
   store = _store;
 };
@@ -36,10 +37,6 @@ const processQueue = (error: any) => {
 ///Request interceptors also added auth token
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
     return config;
   },
   (error) => Promise.reject(error)
@@ -51,33 +48,32 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    ///////don't retry if it's the refresh endpoint itself failing else e go be infinte loop
+    // Don't retry refresh endpoint
     if (
-      originalRequest.url?.includes("/refresh-token") &&
+      originalRequest?.url?.includes("/refresh-token") &&
       error.response?.status === 401
     ) {
-      store.dispatch(logout());
-      window.location.href = "/auth/login";
+      store.dispatch(clearAuth());
+      authTracker.clearAuthenticated();
       return Promise.reject(error);
     }
 
-    ///if its a 401 and we havent retired before the atempt to refresh again
     if (
-      error.response?.status === 401 &&
-      error.response?.data?.code === "TOKEN_EXPIRED" &&
-      !originalRequest._retry
+      originalRequest?.url?.includes("/auth/me") &&
+      error.response?.status === 401
     ) {
+      if (!authTracker.wasEverAuthenticated()) {
+        return Promise.reject(error); // Let the 401 pass through for guests
+      }
+    }
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
-          ////but if theres a request in progress we push to the queue
           failedQueue.push({ resolve, reject });
         })
-          .then(() => {
-            return apiClient(originalRequest);
-          })
-          .catch((error) => {
-            return Promise.reject(error);
-          });
+          .then(() => apiClient(originalRequest))
+          .catch((err) => Promise.reject(err));
       }
 
       originalRequest._retry = true;
@@ -87,13 +83,19 @@ apiClient.interceptors.response.use(
       ///if it succeds clear the queue then retey the original request
       ///if not redirect to login and logout
       try {
-        await store.dispatch(refreshTokenThunk()).unwrap();
+        // await store.dispatch(refreshTokenThunk()).unwrap();
+        const data = await authApi.refreshToken();
+
+        if (data.user) {
+          store.dispatch(setAuth({ user: data.user }));
+        }
         processQueue(null);
         return apiClient(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError);
-        store.dispatch(logout());
-        window.location.href = "/auth/login";
+        store.dispatch(clearAuth());
+        authTracker.clearAuthenticated();
+        // window.location.href = "/auth/login";
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
@@ -112,10 +114,5 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-export const resetLogoutFlag = () => {
-  isRefreshing = false;
-  failedQueue = [];
-};
 
 export default apiClient;

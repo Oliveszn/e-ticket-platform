@@ -1,36 +1,55 @@
+import { authApi } from "@/api/endpoints/auth";
+import { setAuth } from "@/store/auth-slice";
 import { store } from "@/store/store";
-import { refreshTokenThunk } from "@/store/auth-slice";
 
-let refreshTimer: NodeJS.Timeout | null = null;
+let refreshInterval: NodeJS.Timeout | null = null;
 let isRefreshing = false;
 
-// Refresh token every 14 minutes (access token expires in 15)
-export const setupTokenRefresh = () => {
-  clearTokenRefresh();
-  refreshTimer = setInterval(async () => {
-    const state = store.getState();
-    if (state.auth.isAuthenticated && !isRefreshing) {
-      isRefreshing = true;
-      try {
-        await store.dispatch(refreshTokenThunk()).unwrap();
-      } catch (error) {
-        clearTokenRefresh();
-      } finally {
-        isRefreshing = false;
-      }
+const refreshTokens = async (): Promise<void> => {
+  // Don't refresh if already refreshing
+  if (isRefreshing) {
+    return;
+  }
+
+  isRefreshing = true;
+
+  try {
+    const data = await authApi.refreshToken();
+
+    if (data.user) {
+      store.dispatch(setAuth({ user: data.user }));
     }
+  } catch (error) {
+    console.log("🔐 Silent refresh failed - user may need to login:", error);
+    // Don't clear auth here - let the interceptor handle it
+  } finally {
+    isRefreshing = false;
+  }
+};
+
+// Start the silent refresh service
+export const startSilentRefresh = (): void => {
+  // Clear any existing interval
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+  }
+
+  // Refresh every 14 minutes (14 * 60 * 1000)
+  refreshInterval = setInterval(() => {
+    refreshTokens();
   }, 14 * 60 * 1000); // 14 minutes
 };
 
-export const clearTokenRefresh = () => {
-  if (refreshTimer) {
-    clearInterval(refreshTimer);
-    refreshTimer = null;
+// Stop the silent refresh service
+export const stopSilentRefresh = (): void => {
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+    refreshInterval = null;
   }
-  isRefreshing = false;
 };
 
-export const startTokenRefreshCycle = () => {
-  clearTokenRefresh(); // Clear any existing timer
-  setupTokenRefresh();
+// Export for testing and manual control
+export const silentRefreshService = {
+  start: startSilentRefresh,
+  stop: stopSilentRefresh,
 };

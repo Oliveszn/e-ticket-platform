@@ -5,7 +5,6 @@ import Navbar from "@/components/common/Navbar";
 import ConditionalFooter from "@/components/common/conditionalFooter";
 import Providers from "./provider";
 import { Toaster } from "sonner";
-import "@/api/client";
 
 const raleway = Raleway({
   subsets: ["latin"],

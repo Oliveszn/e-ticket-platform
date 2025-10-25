@@ -51,8 +51,6 @@ export interface AuthResponse {
   success: boolean;
   message: string;
   user: User;
-  refreshToken: string;
-  accessToken: string;
 }
 
 //FOR USER
@@ -76,8 +74,6 @@ export interface AuthState {
   status: "idle" | "loading" | "succeeded" | "failed";
   user: User | null;
   error?: string | null;
-  accessToken: string | null;
-  refreshToken: string | null;
 }
 
 export interface ChangePasswordFormData {

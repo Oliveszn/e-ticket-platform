@@ -1,9 +1,9 @@
 "use client";
 
-import { useAppSelector } from "@/store/hooks";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { type ReactNode } from "react";
+import { useAuthState } from "@/hooks/endpoints/useAuth";
 
 interface CheckAuthProps {
   children: ReactNode;
@@ -12,22 +12,27 @@ interface CheckAuthProps {
 const CheckAuth = ({ children }: CheckAuthProps) => {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated, status } = useAppSelector((state) => state.auth);
-
+  const { isAuthenticated } = useAuthState();
+  console.log(isAuthenticated);
   useEffect(() => {
-    // Don’t redirect until the auth check is complete
-    // Once loading is done, handle redirects properly
-    if (status === "succeeded") {
-      if (!isAuthenticated && pathname.startsWith("/dashboard")) {
-        router.replace("/auth/login");
-      }
-      if (isAuthenticated && pathname.startsWith("/auth")) {
-        router.replace("/dashboard");
-      }
-    }
-  }, [isAuthenticated, status, pathname, router]);
+    const protectedRoutes = ["/dashboard"];
+    const authRoutes = ["/auth", "/login", "/register"];
 
-  if (status === "idle" || status === "loading") return null;
+    const isProtectedRoute = protectedRoutes.some((route) =>
+      pathname.startsWith(route)
+    );
+    const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
+
+    if (!isAuthenticated && isProtectedRoute) {
+      router.replace("/auth/login");
+      return;
+    }
+
+    if (isAuthenticated && isAuthRoute) {
+      router.replace("/dashboard");
+      return;
+    }
+  }, [isAuthenticated, pathname, router]);
 
   return <>{children}</>;
 };

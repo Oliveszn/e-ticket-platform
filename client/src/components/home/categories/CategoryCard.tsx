@@ -23,7 +23,8 @@ export default function CategoryCard({
           alt={`${name} category icon`}
           width={160}
           height={160}
-          className="size-24 sm:size-32 md:size-40 object-contain"
+          // className="size-24 sm:size-32 md:size-40 object-contain"
+          className="h-auto w-24 sm:w-32 md:w-40 object-contain"
         />
       </div>
       <span className="mt-2 text-center">{name}</span>

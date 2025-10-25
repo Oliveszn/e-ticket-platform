@@ -3,22 +3,15 @@ import { StagePassLogo } from "@/components/common/Stagepass-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { registerUser } from "@/store/auth-slice";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { registerSchema, RegisterSchema } from "@/utils/validationSchema";
 import { useFormik } from "formik";
 import { CircleAlert, LockOpen } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toFormikValidationSchema } from "zod-formik-adapter";
-import { toast } from "sonner";
+import { useRegister } from "@/hooks/endpoints/useAuth";
 
 const Register = () => {
-  const dispatch = useAppDispatch();
-  const router = useRouter();
-  const { status } = useAppSelector((state) => state.auth);
-  const isLoading = status === "loading";
   ////password checks
   const [passwordChecks, setPasswordChecks] = useState({
     minLength: false,
@@ -43,20 +36,9 @@ const Register = () => {
       handleSubmit(values);
     },
   });
-
+  const register = useRegister();
   const handleSubmit = async (data: RegisterSchema) => {
-    console.log(data);
-    try {
-      const result = await dispatch(registerUser(data)).unwrap();
-
-      toast.success(result.message || "Registration Successful");
-      formik.resetForm();
-      router.push("/dashboard");
-    } catch (error) {
-      const message =
-        typeof error === "string" ? error : "An unexpected error occurred";
-      toast.error(message);
-    }
+    register.mutate(data);
   };
 
   ///had to do this to manipulate formiks handlechaneg on password, just to get the inputs
@@ -335,14 +317,14 @@ const Register = () => {
         {/* Submit Button */}
         <Button
           type="submit"
-          disabled={isLoading || !formik.isValid}
+          disabled={register.isPending || !formik.isValid}
           className={`w-full text-white transition-colors ${
-            isLoading
+            register.isPending
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700"
           }`}
         >
-          {isLoading ? (
+          {register.isPending ? (
             <div className="flex items-center justify-center gap-2">
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               Creating Account...

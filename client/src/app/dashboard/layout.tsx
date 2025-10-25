@@ -3,8 +3,6 @@ import AppSidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import type { Metadata } from "next";
-import { useAppSelector } from "@/store/hooks";
-import CheckAuth from "@/components/common/CheckAuth";
 
 // export const metadata: Metadata = {
 //   title: "Dashboard",
@@ -15,22 +13,17 @@ export default function DashBoardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
   return (
-    <CheckAuth>
-      <SidebarProvider>
-        <div className="flex h-screen w-full bg-gray-100">
-          <AppSidebar />
+    <SidebarProvider>
+      <div className="flex h-screen w-full bg-gray-100">
+        <AppSidebar />
 
-          <div className="flex-1 flex flex-col">
-            <Header />
+        <div className="flex-1 flex flex-col">
+          <Header />
 
-            <main className="flex-1 overflow-y-auto p-4 md:p-6">
-              {children}
-            </main>
-          </div>
+          <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
         </div>
-      </SidebarProvider>
-    </CheckAuth>
+      </div>
+    </SidebarProvider>
   );
 }
