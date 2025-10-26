@@ -1,6 +1,6 @@
 import Queue from "bull";
 import EmailService from "../services/emailService";
-import connectRedis from "../config/redis";
+import MailingService from "../services/nodeMailerService";
 import logger from "../utils/logger";
 import type { OrderData, PromoterData } from "../types";
 
@@ -24,10 +24,10 @@ emailQueue.process("ticket-confirmation", 5, async (job) => {
 
   try {
     // Send main confirmation email
-    await EmailService.sendTicketConfirmation(orderData);
+    await MailingService.sendTicketConfirmation(orderData);
 
     // Send individual tickets to each recipient
-    // await EmailService.sendIndividualTickets(orderData.tickets);
+    // await MailingService.sendIndividualTickets(orderData.tickets);
 
     // return { success: true, emailsSent: orderData.tickets.length + 1 };
     return { success: true, emailSent: orderData.customerEmail };
@@ -42,7 +42,7 @@ emailQueue.process("individual-ticket", 10, async (job) => {
   const { ticketData } = job.data;
 
   try {
-    await EmailService.sendIndividualTicket(ticketData);
+    await MailingService.sendIndividualTicket(ticketData);
     console.log(`Individual ticket sent to ${ticketData.recipientEmail}`);
     return { success: true, emailSent: ticketData.recipientEmail };
   } catch (error) {
@@ -82,7 +82,7 @@ emailQueue.process("event-reminder", 3, async (job) => {
   const { eventData, customerEmails } = job.data;
 
   try {
-    await EmailService.sendEventReminder(eventData, customerEmails);
+    await MailingService.sendEventReminder(eventData, customerEmails);
     return { success: true, emailsSent: customerEmails.length };
   } catch (error) {
     logger.error("Reminder email job failed:", error);
@@ -94,7 +94,7 @@ emailQueue.process("promoter-welcome", 10, async (job) => {
   const { promoterData } = job.data;
 
   try {
-    await EmailService.sendPromoterWelcome(promoterData);
+    await MailingService.sendPromoterWelcome(promoterData);
     return { success: true, emailsSent: 1 };
   } catch (error) {
     logger.error("Welcome email job failed:", error);
