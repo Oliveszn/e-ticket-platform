@@ -516,12 +516,33 @@ const verifyTicketPurchase = asyncHandler(
         throw new NotFoundError("Order not found for this payment");
       }
 
+      ///find event update ticket sold count
+      const event = await Event.findById(order.eventId);
+      if (!event) throw new NotFoundError("Event not found");
+
       // we check if its already marked as paid to avoid doule paying
       if (order.paymentStatus === "PAID") {
         return res.json({
           success: true,
           message: "Payment already verified",
-          data: order,
+          // data: order,
+          data: {
+            order: {
+              ...order.toObject(),
+              eventTitle: event.title, // ⬅️ Add event title to order
+            },
+            breakdown: {
+              subtotal: order.subtotal,
+              serviceFee: order.serviceFee,
+              totalAmount: order.totalAmount,
+            },
+            paymentDetails: {
+              reference: order.paymentId,
+              amount: order.totalAmount,
+              paidAt: order.updatedAt,
+              channel: "card",
+            },
+          },
         });
       }
 
@@ -535,8 +556,8 @@ const verifyTicketPurchase = asyncHandler(
       }
 
       // Find event and update ticket sold count
-      const event = await Event.findById(order.eventId);
-      if (!event) throw new NotFoundError("Event not found");
+      // const event = await Event.findById(order.eventId);
+      // if (!event) throw new NotFoundError("Event not found");
 
       const ticket = event.tickets.id(result.metadata.ticketId);
       if (!ticket) throw new NotFoundError("Ticket type not found");
@@ -607,7 +628,10 @@ const verifyTicketPurchase = asyncHandler(
         success: true,
         message: "Payment verified successfully! Your tickets are confirmed.",
         data: {
-          order: order.toObject(),
+          order: {
+            ...order.toObject(),
+            eventTitle: event.title,
+          },
           breakdown: {
             subtotal: order.subtotal,
             serviceFee: order.serviceFee,

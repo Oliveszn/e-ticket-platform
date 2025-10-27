@@ -52,15 +52,25 @@ export default function PaymentSuccessPage() {
   }
 
   const order = verifyData?.data?.order;
+  if (!order) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-lg">Order data not found.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50 p-6">
-      <div className="bg-white p-8 rounded-2xl shadow-md w-full max-w-md text-center">
-        <h1 className="text-2xl font-semibold text-green-600 mb-3">
-          Payment Successful 🎉
-        </h1>
-        <p className="text-gray-700 mb-6">
-          Your tickets for <strong>{order.eventTitle}</strong> are confirmed.
+      <div className="p-8 w-full max-w-md text-center">
+        <h1 className="text-2xl font-semibold mb-3">Payment Successful 🎉</h1>
+
+        <p className="text-base leading-6 sm:text-lg mb-8">
+          Your order was successful. We've also sent a copy to your email
+          address{" "}
+          <span className="text-base leading-6 sm:text-lg text-blue">
+            {order.buyer.email}
+          </span>
         </p>
 
         <div className="text-left space-y-2 text-gray-600">
