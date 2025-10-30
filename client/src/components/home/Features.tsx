@@ -14,7 +14,7 @@ const Features = () => {
       setActiveTab((prevTab) => (prevTab + 1) % features.length);
     }, 5000); // 5 seconds
 
-    return () => clearInterval(timer); // Cleanup on unmount
+    return () => clearInterval(timer); 
   }, [isPaused]);
 
   return (

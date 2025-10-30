@@ -27,7 +27,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        <div className="hidden md:flex items-center justify-between space-x-8">
+        <div className="hidden lg:flex items-center justify-end space-x-4 lg:space-x-8">
           {links.map((items) => (
             <Link
               key={items.name}
@@ -70,7 +70,7 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 rounded-md hover:bg-gray-100"
+            className="lg:hidden p-2 rounded-md hover:bg-gray-100"
             onClick={() => setIsOpen(!isOpen)}
           >
             <svg

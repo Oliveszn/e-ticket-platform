@@ -25,21 +25,21 @@ export const features = [
     title: "Instant Payouts",
     description:
       "Receive your earnings instantly, ensuring fast and seamless payments without delays.",
-    content: "Instant payout Something will be here ",
+    content: "Instant payout ",
   },
   {
     id: 1,
     title: "QR Code",
     description:
       "Streamline your transactions by easily generating and scanning QR codes for quick payments.",
-    content: "QR code Something will be here",
+    content: "QR code",
   },
   {
     id: 2,
     title: "Export Data",
     description:
       "Quickly export your transaction and sales data in multiple formats for easy analysis and reporting.",
-    content: "Export data Something will be here.",
+    content: "Export data.",
   },
 ];
 

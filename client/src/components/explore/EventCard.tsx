@@ -17,7 +17,7 @@ export default function EventCard({ event }: any) {
     >
       <div className="flex flex-col justify-between gap-5 flex-1">
         <div className="flex flex-col gap-3">
-          <h3 className="text-xl font-black leading-7 tracking-wide overflow-hidden line-clamp-1">
+          <h3 className="text-xl font-black leading-7 tracking-wide overflow-hidden line-clamp-1 capitalize">
             {event.title}
           </h3>
 

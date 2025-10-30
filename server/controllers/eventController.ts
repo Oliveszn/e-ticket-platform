@@ -261,12 +261,13 @@ const getTrendingEvents = asyncHandler(async (req: Request, res: Response) => {
         category: { $first: "$category" },
         description: { $first: "$description" },
         image: { $first: "$image" },
-        allTickets: { $push: "$tickets" },
+        // allTickets: { $push: "$tickets" },
         createdAt: { $first: "$createdAt" },
         updatedAt: { $first: "$updatedAt" },
+        tickets: { $push: "$tickets" },
       },
     },
-    //sort by total sold
+    ////sort by total sold, most sold comes first
     { $sort: { totalSold: -1 } },
     { $limit: 5 },
     {
@@ -282,7 +283,8 @@ const getTrendingEvents = asyncHandler(async (req: Request, res: Response) => {
         category: 1,
         description: 1,
         image: 1,
-        tickets: "$allTickets",
+        // tickets: "$allTickets",
+        tickets: 1,
         totalSold: 1,
         createdAt: 1,
         updatedAt: 1,

@@ -422,14 +422,6 @@ const initializeTicketPurchase = asyncHandler(
     await order.save();
 
     try {
-      // initialize paystack payment
-      // const paymentInit = await initializePayment(email, totalAmount, {
-      //   orderNumber,
-      //   eventId: id,
-      //   ticketId,
-      //   orderId: order._id.toString(),
-      // });
-
       const { authorization_url, reference } = await initializePayment(
         email,
         totalAmount, // amount in Naira
@@ -529,7 +521,7 @@ const verifyTicketPurchase = asyncHandler(
           data: {
             order: {
               ...order.toObject(),
-              eventTitle: event.title, // ⬅️ Add event title to order
+              eventTitle: event.title,
             },
             breakdown: {
               subtotal: order.subtotal,
@@ -554,10 +546,6 @@ const verifyTicketPurchase = asyncHandler(
           400
         );
       }
-
-      // Find event and update ticket sold count
-      // const event = await Event.findById(order.eventId);
-      // if (!event) throw new NotFoundError("Event not found");
 
       const ticket = event.tickets.id(result.metadata.ticketId);
       if (!ticket) throw new NotFoundError("Ticket type not found");

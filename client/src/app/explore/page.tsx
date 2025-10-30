@@ -1,11 +1,17 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEventsCategory, useGetEvents } from "@/hooks/endpoints/useEvent";
+import {
+  useEventsCategory,
+  useGetEvents,
+  useTrendingEvents,
+} from "@/hooks/endpoints/useEvent";
 import ContentWrapper from "@/components/common/ContentWrapper";
 import EventCard from "@/components/explore/EventCard";
 import Pagination from "@/components/explore/Pagination";
 import { useCategoryFilter } from "@/hooks/useCategoryFilter";
 import CategoryDrawer from "@/components/explore/CategoryDrawer";
+import Link from "next/link";
+import TrendingEventsCard from "@/components/explore/TrendingEventsCard";
 
 const Explore = () => {
   const searchParams = useSearchParams();
@@ -29,6 +35,9 @@ const Explore = () => {
       : useGetEvents(page, limit);
   const { data, isLoading, error, isError, isFetching } = query;
   const pagination = data?.pagination;
+
+  const { data: trendingEvents } = useTrendingEvents();
+  console.log(trendingEvents);
 
   ///function that handles page change(pagination) and sets the path to url
   const handlePageChange = (newPage: number) => {
@@ -56,8 +65,17 @@ const Explore = () => {
   }
 
   return (
-    <main className="">
+    <main>
       <ContentWrapper>
+        <div className="w-full overflow-x-auto mb-8">
+          <h1 className="text-3xl font-bold mb-8">Trending Events</h1>
+          <div className="w-full flex items-center justify-start gap-5 mb-14 overflow-x-auto snap-x snap-mandatory scrollbar-hide md:overflow-x-visible">
+            {trendingEvents &&
+              trendingEvents.data.map((event: any) => (
+                <TrendingEventsCard key={event._id} event={event} />
+              ))}
+          </div>
+        </div>
         <h1 className="text-3xl font-bold mb-8">Explore Events</h1>
         <div className="flex gap-4 items-center my-14">
           <button

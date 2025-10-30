@@ -9,27 +9,40 @@ export function formatEventDateTime(eventDate: string, eventTime: string) {
     return s[(v - 20) % 10] || s[v] || s[0];
   };
 
-  const formattedDate = date.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-  });
+  // const formattedDate = date.toLocaleDateString("en-US", {
+  //   weekday: "short",
+  //   month: "short",
+  // });
+  // Extract weekday and month separately to control the order
+  const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
+  const month = date.toLocaleDateString("en-US", { month: "short" });
 
   const [hours, minutes] = eventTime.split(":").map(Number);
   date.setHours(hours, minutes);
 
-  const formattedTime = date.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
+  const formattedTime = date
+    .toLocaleTimeString("en-US", {
+      hour: "numeric",
+      // minute: "2-digit",
+      hour12: true,
+    })
+    .replace(" ", "")
+    .toUpperCase();
+
+  const formattedDateTime = `${weekday}, ${month} ${day}${getOrdinal(
+    day
+  )}, ${formattedTime}`;
 
   return {
-    formattedDateTime: `${formattedDate} ${day}${getOrdinal(
-      day
-    )} · ${formattedTime}`,
+    // formattedDateTime: `${formattedDate} ${day}${getOrdinal(
+    //   day
+    // )} · ${formattedTime}`,
+    formattedDateTime,
     date,
     day,
-    formattedDate,
+    weekday,
+    month,
+    // formattedDate,
     formattedTime,
   };
 }

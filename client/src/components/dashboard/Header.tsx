@@ -9,8 +9,14 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import Link from "next/link";
+import { useLogout } from "@/hooks/endpoints/useAuth";
+import LoadingSpinner from "../common/LoadingSpinner";
 
 const Header = () => {
+  const { mutate: logout, isPending } = useLogout();
+  if (isPending) {
+    return <LoadingSpinner />;
+  }
   return (
     <header className="flex items-center justify-between px-4 py-3 shadow-md bg-white">
       <SidebarTrigger />
@@ -57,7 +63,9 @@ const Header = () => {
             <DropdownMenuItem>My Profile</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <span className="text-red-400 ">Logout</span>
+              <button onClick={() => logout()} className="text-red-400 ">
+                Logout
+              </button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
