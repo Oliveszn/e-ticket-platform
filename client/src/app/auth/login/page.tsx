@@ -10,30 +10,45 @@ import { Aperture, KeyRound, LockOpen, Mail } from "lucide-react";
 import Link from "next/link";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 
+const INITIAL_VALUES: LoginSchema = {
+  email: "",
+  password: "",
+};
+
 const Login = () => {
+  const { mutate: login, isPending } = useLogin();
   const formik = useFormik<LoginSchema>({
-    initialValues: {
-      email: "",
-      password: "",
-    },
+    // initialValues: {
+    //   email: "",
+    //   password: "",
+    // },
+    initialValues: INITIAL_VALUES,
     validationSchema: toFormikValidationSchema(loginSchema),
+
     onSubmit: (values) => {
       handleSubmit(values);
     },
   });
 
-  const login = useLogin();
+  // const login = useLogin();
   const handleSubmit = async (data: any) => {
-    login.mutate(data);
+    login(data);
   };
+  const getFieldError = (field: keyof LoginSchema) => {
+    return formik.touched[field] && formik.errors[field]
+      ? formik.errors[field]
+      : null;
+  };
+
+  const isSubmitDisabled = isPending || !formik.isValid;
   return (
     <div className="w-full max-w-lg space-y-6 bg-white shadow-lg rounded-xl p-8">
-      <div className="flex flex-col items-center gap-2 my-6">
+      <header className="flex flex-col items-center gap-2 my-6">
         <StagePassLogo size="large" />
         <h2 className="text-2xl font-bold text-gray-900 text-center">
           Login to your account
         </h2>
-      </div>
+      </header>
 
       {/* Form */}
       <form onSubmit={formik.handleSubmit} className="space-y-4 py-4">
@@ -53,10 +68,19 @@ const Login = () => {
               onChange={formik.handleChange}
               value={formik.values.email}
               onBlur={formik.handleBlur}
+              aria-invalid={!!getFieldError("email")}
+              aria-describedby={
+                getFieldError("email") ? "email-error" : undefined
+              }
             />
           </div>
-          {formik.errors.email && formik.touched.email && (
+          {/* {formik.errors.email && formik.touched.email && (
             <p className="text-red-500 text-sm">{formik.errors.email}</p>
+          )} */}
+          {getFieldError("email") && (
+            <p id="email-error" className="text-red-500 text-sm" role="alert">
+              {getFieldError("email")}
+            </p>
           )}
         </div>
 
@@ -76,24 +100,38 @@ const Login = () => {
               onChange={formik.handleChange}
               value={formik.values.password}
               onBlur={formik.handleBlur}
+              aria-invalid={!!getFieldError("password")}
+              aria-describedby={
+                getFieldError("password") ? "password-error" : undefined
+              }
             />
           </div>
-          {formik.errors.password && formik.touched.password && (
+          {/* {formik.errors.password && formik.touched.password && (
             <p className="text-red-500 text-sm">{formik.errors.password}</p>
+          )} */}
+          {getFieldError("password") && (
+            <p
+              id="password-error"
+              className="text-red-500 text-sm"
+              role="alert"
+            >
+              {getFieldError("password")}
+            </p>
           )}
         </div>
 
         {/* Login button */}
         <Button
           type="submit"
-          disabled={login.isPending || !formik.isValid}
+          // disabled={login.isPending || !formik.isValid}
+          disabled={isSubmitDisabled}
           className={`w-full text-white transition-colors ${
-            login.isPending
+            isPending
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700"
           }`}
         >
-          {login.isPending ? (
+          {isPending ? (
             <div className="flex items-center justify-center gap-2">
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               Logging...
