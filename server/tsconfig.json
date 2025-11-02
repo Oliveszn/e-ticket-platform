@@ -6,11 +6,11 @@
     "outDir": "./dist",
 
     // Environment Settings
-    "module": "ESNext",
-    "target": "ESNext",
+    "module": "CommonJS",
+    "target": "ES2020",
     "moduleResolution": "node",
     "types": ["node", "express", "multer"],
-    "lib": ["ESNext"],
+    "lib": ["ES2020"],
 
     // Other Outputs
     "sourceMap": true,
@@ -23,10 +23,10 @@
 
     // Recommended Options
     "strict": true,
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
+    // "verbatimModuleSyntax": true,
+    // "isolatedModules": true,
+    // "noUncheckedSideEffectImports": true,
+    // "moduleDetection": "force",
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true
@@ -35,6 +35,6 @@
   "include": ["**/*.ts"],
   "exclude": ["node_modules", "dist"],
   "ts-node": {
-    "esm": true
+    "esm": false
   }
 }
