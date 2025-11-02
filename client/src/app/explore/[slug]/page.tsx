@@ -90,7 +90,6 @@ const EventDetails = () => {
           {/* RIGHT CONTENT  */}
           <EventSidebar
             eventDate={event.eventDate}
-            organizer="afrospook" // TODO: Get from event data
             formattedDate={formattedDate}
             formattedTime={formattedTime}
             venue={event.venue}
