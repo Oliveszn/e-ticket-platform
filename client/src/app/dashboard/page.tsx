@@ -41,11 +41,6 @@ const DashboardPage = () => {
       <div className="space-y-8">
         <div className="p-5 border border-gray-200 rounded-lg shadow-sm bg-white flex justify-between">
           <div className="flex gap-2">
-            <img
-              src="https://lh3.googleusercontent.com/a/ACg8ocI9SGE_DlfPSH21TToDH5aRZBYRtLf7a7Q-ug-OrdxiZ8AlzA=s96-c"
-              alt="user"
-              className="size-10 rounded-full"
-            />
             <div className="flex flex-col">
               <span className="font-bold capitalize">
                 {data?.firstName} {data?.lastName}

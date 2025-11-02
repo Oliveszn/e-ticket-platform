@@ -31,7 +31,7 @@ export const useDeleteProfile = () => {
     },
 
     onError: (error: any) => {
-      console.error("Delete profile failed:", error);
+      throw error;
     },
   });
 };
@@ -44,7 +44,6 @@ export const useEditProfile = () => {
       userApi.editUserProfile(payload),
 
     onSuccess: (data, variables) => {
-      console.log(data);
       // Invalidate the specific user's profile
       queryClient.invalidateQueries({
         queryKey: ["getProfile"],
@@ -54,7 +53,7 @@ export const useEditProfile = () => {
       queryClient.setQueryData(["getProfile"], data);
     },
     onError: (error) => {
-      console.error("Edit profile failed:", error);
+      throw error;
     },
   });
 };

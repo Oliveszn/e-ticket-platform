@@ -22,7 +22,6 @@ export const useScroller = () => {
           const duplicatedItem = item.cloneNode(true) as HTMLElement;
           duplicatedItem.setAttribute("aria-hidden", "true");
           scrollerInner.appendChild(duplicatedItem);
-          console.log(duplicatedItem.getAttribute("aria-hidden"));
         });
       }
     }

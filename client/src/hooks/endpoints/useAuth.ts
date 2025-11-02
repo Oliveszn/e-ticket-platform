@@ -21,14 +21,15 @@ export const useRegister = () => {
     onSuccess: (data) => {
       toast.success(data.message);
 
-      // Update Redux state with user data
+      // Update Redux
       if (data.success && data.user) {
         dispatch(
           setAuth({
             user: data.user,
           })
         );
-
+        authTracker.setAuthenticated();
+        startSilentRefresh();
         queryClient.invalidateQueries({ queryKey: ["authstatus"] });
 
         router.push("/dashboard");
@@ -53,7 +54,7 @@ export const useLogin = () => {
     onSuccess: (data) => {
       toast.success(data.message);
 
-      // Update Redux state with user data
+      // Update Redux
       if (data.success && data.user) {
         dispatch(
           setAuth({
@@ -89,7 +90,11 @@ export const useLogout = () => {
       stopSilentRefresh();
       queryClient.clear();
 
-      router.push("/login");
+      if (typeof window !== "undefined") {
+        localStorage.clear(); // or specifically remove your auth flag
+      }
+
+      router.push("/");
     },
 
     onError: (error: unknown) => {

@@ -53,12 +53,8 @@ export async function verifyPayment(reference: string) {
       }
     );
 
-    return response.data.data; // contains status, amount, etc.
+    return response.data.data;
   } catch (error: any) {
-    console.error(
-      "Paystack verification error:",
-      error.response?.data || error.message
-    );
     throw new Error("Payment verification failed");
   }
 }

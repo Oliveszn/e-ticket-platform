@@ -43,7 +43,6 @@ emailQueue.process("individual-ticket", 10, async (job) => {
 
   try {
     await MailingService.sendIndividualTicket(ticketData);
-    console.log(`Individual ticket sent to ${ticketData.recipientEmail}`);
     return { success: true, emailSent: ticketData.recipientEmail };
   } catch (error) {
     logger.info("Individual ticket email failed:", error);
@@ -73,7 +72,6 @@ emailQueue.process("ticket-distribution", 3, async (job) => {
     logger.info(`Distributed ${tickets.length} individual tickets`);
     return { success: true, ticketsDistributed: tickets.length };
   } catch (error) {
-    console.error("Ticket distribution failed:", error);
     throw error;
   }
 });
@@ -189,7 +187,6 @@ const emailJobs = {
         totalEmails: tickets.length + 1, // +1 for confirmation
       };
     } catch (error) {
-      console.error("Complete ticket purchase workflow failed:", error);
       throw error;
     }
   },

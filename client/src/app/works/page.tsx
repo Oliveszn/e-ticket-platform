@@ -1,5 +1,4 @@
 import FaqAccordion from "@/components/common/FaqAccordion";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -214,17 +213,12 @@ const Works = () => {
                 </ul>
               </div>
               <div className="flex justify-center items-center">
-                {/* <img
-                  src="/step1.png"
-                  alt="Step 1: Tell Us About Your Event Screenshot"
-                  className="w-full h-full object-cover"
-                /> */}
                 <Image
                   src="/step1.png"
                   alt="Step 1: Tell Us About Your Event Screenshot"
-                  width={500}
-                  height={500}
-                  className="object-cover"
+                  width={400}
+                  height={400}
+                  className="object-cover w-auto h-auto"
                 />
               </div>
             </div>
@@ -357,17 +351,12 @@ const Works = () => {
                 </ul>
               </div>
               <div className="flex justify-center items-center">
-                {/* <img
-                  src="/step3.png"
-                  alt="Step 3: Create Awesome Tickets Screenshot"
-                  className="w-full h-full object-cover"
-                /> */}
                 <Image
                   src="/step3.png"
                   alt="Step 3: Create Awesome Tickets Screenshot"
-                  width={500}
-                  height={500}
-                  className="object-cover"
+                  width={400}
+                  height={400}
+                  className="object-cover w-auto h-auto"
                 />
               </div>
             </div>

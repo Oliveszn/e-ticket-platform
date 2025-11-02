@@ -24,7 +24,6 @@ const Events = () => {
   }, [data?.data, searchTerm]);
   const noOfEvents = data?.data.length;
   const filteredCount = filteredEvents.length;
-  console.log(22);
 
   if (isLoading) {
     return <LoadingSpinner />;

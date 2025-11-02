@@ -28,9 +28,9 @@ export default function EventCreationCTA() {
           <Image
             src="/event.jpg"
             alt="Event organizer managing tickets"
-            width={400}
+            width={350}
             height={250}
-            className="rounded-lg object-contain"
+            className="rounded-lg object-contain w-auto h-auto"
           />
         </div>
       </div>

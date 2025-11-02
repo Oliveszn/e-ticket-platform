@@ -205,15 +205,10 @@ const getEventsByCategory = asyncHandler(
 
 ///get a particular event for public
 const getSingleEvent = asyncHandler(async (req: Request, res: Response) => {
-  // const { id } = req.params;
   const { slug } = req.params;
   const eventkey = `event:${slug}`;
   const cachedPost = await req.redisClient.get(eventkey);
 
-  //to check if theres an id
-  // if (!id || !mongoose.Types.ObjectId.isValid(id)) {
-  //   throw new ValidationError("Invalid or No event ID", 400);
-  // }
   if (cachedPost) {
     return res.status(200).json({
       success: true,
@@ -222,7 +217,6 @@ const getSingleEvent = asyncHandler(async (req: Request, res: Response) => {
     });
   }
 
-  // const event = await Event.findById(id);
   const event = await Event.findOne({ slug });
   if (!event) {
     throw new NotFoundError("Event not found");
@@ -261,7 +255,6 @@ const getTrendingEvents = asyncHandler(async (req: Request, res: Response) => {
         category: { $first: "$category" },
         description: { $first: "$description" },
         image: { $first: "$image" },
-        // allTickets: { $push: "$tickets" },
         createdAt: { $first: "$createdAt" },
         updatedAt: { $first: "$updatedAt" },
         tickets: { $push: "$tickets" },
@@ -283,7 +276,6 @@ const getTrendingEvents = asyncHandler(async (req: Request, res: Response) => {
         category: 1,
         description: 1,
         image: 1,
-        // tickets: "$allTickets",
         tickets: 1,
         totalSold: 1,
         createdAt: 1,

@@ -37,22 +37,6 @@ export const useSinglePromoterEvent = (eventId: string) => {
   });
 };
 
-// export const useTrackEventView = (eventId: string | undefined) => {
-//   const trackViewMutation = useMutation({
-//     mutationFn: () => trackEventView(eventId!),
-//     onError: (error) => {
-//       console.error("Failed to track view:", error);
-//     },
-//   });
-
-//   useEffect(() => {
-//     if (eventId) {
-//       trackViewMutation.mutate();
-//     }
-//   }, [eventId]);
-
-//   return trackViewMutation;
-// };
 export const useTrackEventView = (eventId: string | undefined) => {
   return useQuery({
     queryKey: ["trackEventView", eventId],

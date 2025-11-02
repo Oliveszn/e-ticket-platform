@@ -4,8 +4,11 @@ import { StagePassLogo } from "./Stagepass-logo";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import SearchModal from "../search/SearchModal";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
+  const pathname = usePathname();
+
   const [isOpen, setIsOpen] = useState(false);
   const [searchModal, setSearchModal] = useState(false);
   let links = [
@@ -15,6 +18,7 @@ export default function Navbar() {
     { name: "How it works", link: "/works" },
     { name: "Pricing", link: "/pricing" },
   ];
+  if (pathname.startsWith("/dashboard")) return null;
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200 px-6 sm:px-8 lg:px-10 z-50">
       <div className="max-w-6xl mx-auto py-4 flex justify-between items-center">

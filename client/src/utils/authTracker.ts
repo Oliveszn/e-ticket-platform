@@ -1,4 +1,3 @@
-// utils/authTracker.ts
 const AUTH_FLAG_KEY = "wasEverAuthenticated";
 
 export const authTracker = {

@@ -20,8 +20,8 @@ const refreshTokens = async (): Promise<void> => {
       store.dispatch(setAuth({ user: data.user }));
     }
   } catch (error) {
-    console.log("🔐 Silent refresh failed - user may need to login:", error);
     // Don't clear auth here - let the interceptor handle it
+    throw error;
   } finally {
     isRefreshing = false;
   }

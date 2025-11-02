@@ -37,7 +37,6 @@ const Explore = () => {
   const pagination = data?.pagination;
 
   const { data: trendingEvents } = useTrendingEvents();
-  console.log(trendingEvents);
 
   ///function that handles page change(pagination) and sets the path to url
   const handlePageChange = (newPage: number) => {

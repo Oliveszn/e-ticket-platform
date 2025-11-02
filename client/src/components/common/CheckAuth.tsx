@@ -13,7 +13,6 @@ const CheckAuth = ({ children }: CheckAuthProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated } = useAuthState();
-  console.log(isAuthenticated);
   useEffect(() => {
     const protectedRoutes = ["/dashboard"];
     const authRoutes = ["/auth", "/login", "/register"];

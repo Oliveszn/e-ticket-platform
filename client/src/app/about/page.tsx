@@ -28,17 +28,17 @@ const About = () => {
               alt="about"
               loading="lazy"
               placeholder="blur"
-              width={500}
-              height={400}
-              className="object-cover rounded-2xl"
+              width={350}
+              height={250}
+              className="object-cover rounded-2xl w-auto h-auto"
             />
           </div>
           <div className="rounded-2xl p-4 flex flex-col gap-4 items-center justify-center">
             <p className="text-gray-800">
-              At Pevent.ng, we understand the challenges event organizers and
+              At StagePass, we understand the challenges event organizers and
               ticket resellers face—from geographical barriers to inefficient
               record-keeping and difficulties in fund collection. Our team of
-              passionate event enthusiasts developed Pevent.ng to simplify event
+              passionate event enthusiasts developed StagePass to simplify event
               curation, planning, and execution.
             </p>
             <p className="text-gray-800">
@@ -62,8 +62,8 @@ const About = () => {
             <p className="text-3xl font-semibold">Onsite Experiences</p>
             <p className="w-3/5 mx-auto text-sm sm:text-base text-gray-500">
               Whether you're planning a corporate conference, a grand
-              celebration, a trade show, or a virtual webinar, Pevent simplifies
-              the entire process.
+              celebration, a trade show, or a virtual webinar, StagePass
+              simplifies the entire process.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -75,10 +75,9 @@ const About = () => {
                 <Image
                   alt={exp.alt}
                   loading="lazy"
-                  width={500}
-                  height={400}
-                  decoding="async"
-                  className="w-full h-full object-cover rounded-2xl hover:scale-105 transition-all duration-300"
+                  width={400}
+                  height={300}
+                  className="object-cover rounded-2xl hover:scale-105 transition-all duration-300"
                   src={exp.src}
                 />
               </div>

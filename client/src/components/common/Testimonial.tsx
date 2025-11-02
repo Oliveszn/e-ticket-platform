@@ -24,10 +24,9 @@ const Testimonial = () => {
               <Image
                 alt={exp.alt}
                 loading="lazy"
-                width={150}
-                height={150}
-                decoding="async"
-                className="object-cover flex-shrink-0 max-h-20 max-w-[150px] filter grayscale hover:grayscale-0 transition duration-300"
+                width={100}
+                height={20}
+                className="object-cover flex-shrink-0 filter grayscale hover:grayscale-0 transition duration-300 h-auto w-auto"
                 src={exp.src}
               />
             </div>

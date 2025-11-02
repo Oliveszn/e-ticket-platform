@@ -6,7 +6,6 @@ interface EventImageProps {
 }
 
 export default function EventImage({ imageUrl, title }: EventImageProps) {
-  console.log(imageUrl);
   return (
     <div className="relative bg-blue-100 h-72 sm:h-[36rem] w-full rounded">
       {imageUrl ? (

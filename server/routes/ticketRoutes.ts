@@ -1,7 +1,5 @@
 import express from "express";
 import {
-  buyTicket,
-  ticketAvailability,
   getTicket,
   getSingleTicket,
   initializeTicketPurchase,
@@ -10,10 +8,7 @@ import {
 import { purchaseLimiter } from "../middleware/rateLimit";
 const router = express.Router();
 
-//check available
-router.get("/events/:id/tickets/:ticketId", ticketAvailability);
 // purchase ticket
-router.post("/events/:id/tickets/:ticketId", buyTicket);
 router.post(
   "/events/:id/tickets/:ticketId/purchase",
   purchaseLimiter,

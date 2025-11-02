@@ -5,10 +5,10 @@ import Link from "next/link";
 export default function HeroSection() {
   const { image, title, description, cta } = heroConfig;
   return (
-    <section className="min-h-screen relative w-full">
+    <section className="h-[550px] relative w-full">
       <Image
-        alt="Hero background showcasing exciting events"
-        src="/hero-img.jpg"
+        alt={image.alt}
+        src={image.src}
         fill
         className="object-cover"
         priority

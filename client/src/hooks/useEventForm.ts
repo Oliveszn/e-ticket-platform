@@ -83,10 +83,8 @@ export const useEventForm = (eventId: string | string[]) => {
   // Load data from API in edit mode
   useEffect(() => {
     if (isEditMode && data?.data) {
-      console.log("API data:", data.data); // 👈 ADD THIS
-
       const transformedData = transformApiEventToFormValues(data.data);
-      console.log("Transformed data:", transformedData);
+
       formik.setValues(transformedData as FormValues);
       dispatch(saveData(transformedData));
     }

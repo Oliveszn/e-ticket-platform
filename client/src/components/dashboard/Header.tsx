@@ -1,6 +1,6 @@
 import { Button } from "../ui/button";
 import { SidebarTrigger } from "../ui/sidebar";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Avatar } from "../ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,9 +11,11 @@ import {
 import Link from "next/link";
 import { useLogout } from "@/hooks/endpoints/useAuth";
 import LoadingSpinner from "../common/LoadingSpinner";
+import { useProfile } from "@/hooks/endpoints/useUser";
 
 const Header = () => {
   const { mutate: logout, isPending } = useLogout();
+  const { data } = useProfile();
   if (isPending) {
     return <LoadingSpinner />;
   }
@@ -35,9 +37,10 @@ const Header = () => {
               variant="outline"
               className="cursor-pointer outline-none border-none bg-transparent"
             >
-              <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>CN</AvatarFallback>
+              <Avatar className="flex items-center text-center font-bold">
+                {`${data?.firstName?.[0] ?? ""}${
+                  data?.lastName?.[0] ?? ""
+                }`.toUpperCase() || "?"}
               </Avatar>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -56,11 +59,17 @@ const Header = () => {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent className="w-56" align="end">
-            <DropdownMenuItem>Create Event</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href="/dashboard/events/create">Create Event</Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>My Event</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href="/dashboard/events">My Event</Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>My Profile</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href="/dashboard/profile">My Profile</Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <button onClick={() => logout()} className="text-red-400 ">

@@ -18,7 +18,6 @@ export default function PaymentCallbackPage() {
 
   useEffect(() => {
     if (isSuccess && verifyData?.success) {
-      console.log("✅ Payment verified successfully:", verifyData);
       router.push(`/payment-success?reference=${reference}`);
     }
   }, [isSuccess, verifyData, router]);

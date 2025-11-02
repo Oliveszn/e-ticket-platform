@@ -10,7 +10,7 @@ export const pricingPlans = [
       "1 Image Per Contestant",
       "Result Public Display",
       "Email Notifications",
-      "Public Listing on Pevent",
+      "Public Listing on Stage Pass",
       "Search Engine Optimization",
     ],
   },

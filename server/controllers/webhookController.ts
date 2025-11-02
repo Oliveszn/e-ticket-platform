@@ -1,4 +1,3 @@
-// webhookController.ts
 import crypto from "crypto";
 import type { NextFunction, Request, Response } from "express";
 import { asyncHandler } from "../middleware/errorHandler";
@@ -7,7 +6,7 @@ import Event from "../models/Events";
 import { emailJobs } from "../jobs/emailQueues";
 import logger from "../utils/logger";
 
-// Middleware to verify Paystack webhook signature
+///midlewaree to vwerify paystack
 export const verifyPaystackSignature = (
   req: Request,
   res: Response,
@@ -31,7 +30,7 @@ export const verifyPaystackSignature = (
   next();
 };
 
-// Webhook handler for Paystack events
+/////webhook handler for paystack events
 export const handlePaystackWebhook = asyncHandler(
   async (req: Request, res: Response) => {
     const { event, data } = req.body;
@@ -51,7 +50,7 @@ export const handlePaystackWebhook = asyncHandler(
         break;
 
       case "transfer.success":
-        // Handle successful transfers (if you implement payouts to organizers)
+        // Handle successful transfers
         logger.info("Transfer successful:", data.reference);
         break;
 
@@ -78,7 +77,6 @@ async function handleSuccessfulPayment(paymentData: any) {
       return;
     }
 
-    // Find the order
     let order = null;
 
     if (metadata?.orderNumber) {
@@ -133,7 +131,7 @@ async function handleSuccessfulPayment(paymentData: any) {
         requested: order.tickets.length,
       });
 
-      // Mark order as failed - you might want to initiate refund here
+      // Mark order as failed - need to initialize refund here
       order.paymentStatus = "FAILED";
       order.orderStatus = "CANCELLED";
       await order.save();
@@ -226,7 +224,6 @@ async function handleFailedPayment(paymentData: any) {
     logger.info("Payment marked as failed:", reference);
 
     // Optionally send failure notification email
-    // You might want to implement this based on your business needs
   } catch (error) {
     logger.error("Error processing failed payment:", error);
   }

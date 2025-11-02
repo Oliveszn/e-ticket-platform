@@ -18,10 +18,6 @@ const INITIAL_VALUES: LoginSchema = {
 const Login = () => {
   const { mutate: login, isPending } = useLogin();
   const formik = useFormik<LoginSchema>({
-    // initialValues: {
-    //   email: "",
-    //   password: "",
-    // },
     initialValues: INITIAL_VALUES,
     validationSchema: toFormikValidationSchema(loginSchema),
 
@@ -74,9 +70,7 @@ const Login = () => {
               }
             />
           </div>
-          {/* {formik.errors.email && formik.touched.email && (
-            <p className="text-red-500 text-sm">{formik.errors.email}</p>
-          )} */}
+
           {getFieldError("email") && (
             <p id="email-error" className="text-red-500 text-sm" role="alert">
               {getFieldError("email")}
@@ -106,9 +100,7 @@ const Login = () => {
               }
             />
           </div>
-          {/* {formik.errors.password && formik.touched.password && (
-            <p className="text-red-500 text-sm">{formik.errors.password}</p>
-          )} */}
+
           {getFieldError("password") && (
             <p
               id="password-error"
@@ -123,7 +115,6 @@ const Login = () => {
         {/* Login button */}
         <Button
           type="submit"
-          // disabled={login.isPending || !formik.isValid}
           disabled={isSubmitDisabled}
           className={`w-full text-white transition-colors ${
             isPending
@@ -152,7 +143,10 @@ const Login = () => {
         </div>
 
         {/* Sign in with Google */}
-        <Button className="w-full flex items-center gap-2 bg-[#EF4444] hover:bg-red-500">
+        <Button
+          type="button"
+          className="w-full flex items-center gap-2 bg-[#EF4444] hover:bg-red-500"
+        >
           <Aperture className="size-5 " />
           Sign in with Google
         </Button>

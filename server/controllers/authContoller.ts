@@ -68,6 +68,22 @@ const resgiterUser = asyncHandler(async (req: Request, res: Response) => {
     createdAt: user.createdAt,
   };
 
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    maxAge: 15 * 60 * 1000, // 15 min
+    path: "/",
+  });
+
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    path: "/",
+  });
+
   ///here we send both tokens to frontend
   res.status(201).json({
     success: true,
@@ -77,34 +93,6 @@ const resgiterUser = asyncHandler(async (req: Request, res: Response) => {
     refreshToken,
   });
 });
-
-const registerWithClerk = async (req: Request, res: Response) => {
-  const { userId, sessionId } = req.auth!; // Clerk adds this
-
-  // Clerk also exposes more user data via their SDK if needed
-  // e.g. const clerkUser = await clerkClient.users.getUser(userId);
-
-  // Check if user exists in Mongo
-  let user = await User.findOne({ clerkId: userId });
-
-  if (!user) {
-    user = new User({
-      clerkId: userId,
-      // You could also sync name/email from Clerk
-      email: req.body.email,
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-    });
-    await user.save();
-  }
-
-  res.status(200).json({
-    success: true,
-    message: "User authenticated via Clerk",
-    user,
-    sessionId,
-  });
-};
 
 const loginUser = asyncHandler(async (req: Request, res: Response) => {
   logger.info("Login endpoint hit...");
@@ -311,7 +299,7 @@ const getMe = asyncHandler(async (req: Request, res: Response) => {
 //logout
 const logoutUser = asyncHandler(async (req: Request, res: Response) => {
   logger.info("Logout endpoint hit...");
-  const { refreshToken } = req.body;
+  const refreshToken = req.cookies?.refreshToken;
   if (!refreshToken) {
     logger.warn("Refresh token missing");
     throw new ValidationError("Refresh token missing", 400);
@@ -326,6 +314,18 @@ const logoutUser = asyncHandler(async (req: Request, res: Response) => {
   }
   logger.info("Refresh token deleted for logout");
 
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: isProduction ? "none" : "lax",
+    path: "/", // must match how it was set
+  });
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: isProduction ? "none" : "lax",
+    path: "/", // must match how it was set
+  });
   res.json({
     success: true,
     message: "Logged out successfully!",
@@ -365,7 +365,6 @@ const changePassword = asyncHandler(async (req: Request, res: Response) => {
 ///reset password
 
 export {
-  registerWithClerk,
   resgiterUser,
   loginUser,
   refreshTokenUser,

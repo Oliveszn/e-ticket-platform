@@ -115,7 +115,6 @@ const EmailService = {
   //welcome email when a user(promoter) reisters
   async sendPromoterWelcome(promoterData: PromoterData) {
     if (!promoterData) {
-      console.error("❌ promoterData is undefined in sendPromoterWelcome");
       return;
     }
     const { email, firstName } = promoterData;
