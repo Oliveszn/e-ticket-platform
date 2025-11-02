@@ -18,6 +18,5 @@ router.get("/events/verify-purchase", verifyTicketPurchase);
 // get tickets
 router.get("/events/:id", getTicket);
 router.get("/events/:id/ticket/:ticketId", getSingleTicket);
-// /api/tickets/my-ticket?email=...&ref=...
 
 export default router;

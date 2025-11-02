@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "start": "node dist/server.js",
     "dev": "tsx watch server.ts"
   },
@@ -14,12 +14,12 @@
   "dependencies": {
     "@clerk/express": "^1.7.24",
     "@sendgrid/mail": "^8.1.5",
-    "@types/express": "^5.0.5",
-    "@types/multer": "^2.0.0",
-    "@types/node": "^24.9.2",
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.9.2",
     "@types/nodemailer": "^7.0.3",
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
@@ -45,6 +45,7 @@
   "devDependencies": {
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.16",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2"
   }
