@@ -1,7 +1,11 @@
 import { optionsData, pricingPlans } from "@/config/pricing";
+import { Metadata } from "next";
 import Image from "next/image";
 import React from "react";
-
+export const metadata: Metadata = {
+  title: "StagePass",
+  description: "Ticket Purchase",
+};
 const Pricing = () => {
   return (
     <main className="py-16 bg-[url('/pricingpattern.png')] bg-no-repeat bg-top bg-contain px-6 sm:px-8 lg:px-10">
