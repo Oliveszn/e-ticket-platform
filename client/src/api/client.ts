@@ -9,11 +9,10 @@ export const injectStore = (_store: any) => {
   store = _store;
 };
 
-// Create axios instance
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   timeout: 10000,
-  withCredentials: true, // Important for refresh token cookies
+  withCredentials: true,
 });
 
 let isRefreshing = false;

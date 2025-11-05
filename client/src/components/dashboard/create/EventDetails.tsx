@@ -12,7 +12,7 @@ const EventDetails = ({ formik }: EventDetailsProps) => {
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>("");
   const [imageLoadingState, setImageLoadingState] = useState(false);
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Event Name */}
       <div className="space-y-2">
         <label htmlFor="event-name" className="text-sm font-bold leading-none">
@@ -26,7 +26,7 @@ const EventDetails = ({ formik }: EventDetailsProps) => {
           value={formik.values.title}
           onBlur={formik.handleBlur}
           placeholder="Enter event name here"
-          className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-base placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50 md:text-sm
+          className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50
             ${
               formik.errors.title && formik.touched.title
                 ? "border-red-500 focus-visible:ring-red-500"
@@ -55,14 +55,14 @@ const EventDetails = ({ formik }: EventDetailsProps) => {
           value={formik.values.slug}
           onBlur={formik.handleBlur}
           placeholder="Unique slug for your event"
-          className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-base placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50 md:text-sm
+          className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50
             ${
               formik.errors.slug && formik.touched.slug
                 ? "border-red-500 focus-visible:ring-red-500"
                 : "border-slate-200 focus-visible:ring-slate-950 "
             }`}
         />
-        <p className="text-slate-500 text-xs">
+        <p className="text-slate-500 text-xs break-words">
           This will be part of your event link, e.g.
           <span className="text-blue-500">
             www.stagepass.com/your-slug-name
@@ -79,7 +79,7 @@ const EventDetails = ({ formik }: EventDetailsProps) => {
         <p className="text-sm text-gray-800">
           Tell your attendees when your event starts so they can get ready.
         </p>
-        <div className="grid grid-cols-2 gap-3 py-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-4">
           <div className="space-y-2">
             <label htmlFor="date" className="text-sm font-semibold">
               Event Date*
@@ -90,7 +90,7 @@ const EventDetails = ({ formik }: EventDetailsProps) => {
               type="date"
               onChange={formik.handleChange}
               value={formik.values.date}
-              className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-base placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50 md:text-sm
+              className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50
             ${
               formik.errors.date && formik.touched.date
                 ? "border-red-500 focus-visible:ring-red-500"
@@ -112,7 +112,7 @@ const EventDetails = ({ formik }: EventDetailsProps) => {
               type="time"
               onChange={formik.handleChange}
               value={formik.values.time}
-              className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-base placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50 md:text-sm
+              className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50
             ${
               formik.errors.time && formik.touched.time
                 ? "border-red-500 focus-visible:ring-red-500"
@@ -145,7 +145,7 @@ const EventDetails = ({ formik }: EventDetailsProps) => {
               type="text"
               onChange={formik.handleChange}
               value={formik.values.venue.name}
-              className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-base placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50 md:text-sm
+              className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50
             ${
               formik.errors.venue?.name && formik.touched.venue?.name
                 ? "border-red-500 focus-visible:ring-red-500"
@@ -173,7 +173,7 @@ const EventDetails = ({ formik }: EventDetailsProps) => {
               type="text"
               onChange={formik.handleChange}
               value={formik.values.venue.address}
-              className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-base placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50 md:text-sm
+              className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50
             ${
               formik.errors.venue?.address && formik.touched.venue?.address
                 ? "border-red-500 focus-visible:ring-red-500"
@@ -197,7 +197,7 @@ const EventDetails = ({ formik }: EventDetailsProps) => {
               type="text"
               onChange={formik.handleChange}
               value={formik.values.venue.city}
-              className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-base placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50 md:text-sm
+              className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50
             ${
               formik.errors.venue?.city && formik.touched.venue?.city
                 ? "border-red-500 focus-visible:ring-red-500"
@@ -221,7 +221,7 @@ const EventDetails = ({ formik }: EventDetailsProps) => {
               type="text"
               onChange={formik.handleChange}
               value={formik.values.venue.state}
-              className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-base placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50 md:text-sm
+              className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50
             ${
               formik.errors.venue?.state && formik.touched.venue?.state
                 ? "border-red-500 focus-visible:ring-red-500"
@@ -271,7 +271,7 @@ const EventDetails = ({ formik }: EventDetailsProps) => {
             onChange={formik.handleChange}
             value="Host"
             checked={formik.values.charge === "Host"}
-            className={`h-5 text-blue-600 focus:ring-2 focus:ring-blue-500
+            className={`size-4 sm:size-5 text-blue-600 focus:ring-2 focus:ring-blue-500
       ${formik.errors.charge && formik.touched.charge ? "border-red-500" : ""}`}
           />
           <label htmlFor="host" className="text-sm font-bold leading-none">
@@ -287,7 +287,7 @@ const EventDetails = ({ formik }: EventDetailsProps) => {
             onChange={formik.handleChange}
             value="Buyer"
             checked={formik.values.charge === "Buyer"}
-            className={`h-5 text-blue-600 focus:ring-2 focus:ring-blue-500
+            className={`size-4 sm:size-5 text-blue-600 focus:ring-2 focus:ring-blue-500
       ${formik.errors.charge && formik.touched.charge ? "border-red-500" : ""}`}
           />
           <label htmlFor="buyer" className="text-sm font-bold leading-none">
@@ -344,7 +344,8 @@ const EventDetails = ({ formik }: EventDetailsProps) => {
           value={formik.values.description}
           onBlur={formik.handleBlur}
           placeholder="About Event"
-          className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-base placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50 md:text-sm
+          rows={4}
+          className={`flex min-h-[100px] w-full rounded-md border bg-white px-3 py-2 text-sm placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50
             ${
               formik.errors.description && formik.touched.description
                 ? "border-red-500 focus-visible:ring-red-500"

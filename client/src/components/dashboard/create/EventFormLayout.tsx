@@ -30,18 +30,18 @@ const EventFormLayout: React.FC<EventFormLayoutProps> = ({
   isEditMode,
 }) => {
   return (
-    <div className="px-3 py-8 space-y-8">
+    <div className="px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       <h1 className="text-base md:text-lg font-semibold">{title}</h1>
 
-      <div className="border rounded bg-white text-black sm:w-4/5 mx-auto">
+      <div className="border rounded bg-white text-black w-full md:w-4/5 mx-auto">
         <form onSubmit={formik.handleSubmit}>
           {/* Stepper Header */}
-          <div className="p-5">
+          <div className="p-4 sm:p-6">
             <div className="flex justify-between items-center mb-6">
               {steps.map((s, i) => (
                 <div key={s.id} className="flex flex-col gap-2 items-center">
                   <div
-                    className={`h-10 w-10 rounded-full border border-primary flex items-center justify-center ${
+                    className={`size-8 sm:size-10 rounded-full border border-primary flex items-center justify-center ${
                       i === currentStep
                         ? "bg-blue text-white" // current step
                         : i < currentStep
@@ -75,7 +75,7 @@ const EventFormLayout: React.FC<EventFormLayoutProps> = ({
                 <button
                   type="button"
                   onClick={onPrev}
-                  className="px-6 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                  className="px-4 sm:px py-2 rounded bg-gray-200 hover:bg-gray-300 text-sm sm:text-base"
                 >
                   Back
                 </button>
@@ -87,7 +87,7 @@ const EventFormLayout: React.FC<EventFormLayoutProps> = ({
                 <button
                   type="button"
                   onClick={onNext}
-                  className="px-6 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                  className="px-4 sm:px py-2 rounded bg-blue-500 text-white hover:bg-blue-600 text-sm sm:text-base"
                 >
                   Next
                 </button>
@@ -96,7 +96,7 @@ const EventFormLayout: React.FC<EventFormLayoutProps> = ({
                   disabled={isPending}
                   type="button"
                   onClick={onSubmit}
-                  className="px-6 py-2 rounded bg-green-500 text-white hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 sm:px py-2 rounded bg-green-500 text-white hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                 >
                   {isPending
                     ? isEditMode
