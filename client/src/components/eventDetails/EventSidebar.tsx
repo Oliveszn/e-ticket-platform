@@ -26,7 +26,7 @@ export default function EventSidebar({
   eventSlug,
 }: EventSidebarProps) {
   return (
-    <div className="sm:col-span-4 hidden sm:block space-y-5">
+    <div className="sm:col-span-4 space-y-5">
       {/* Event Details Card */}
       <div className="bg-white border rounded">
         <h2 className="p-5 border-b font-bold sm:text-lg">Event Details</h2>
@@ -40,7 +40,7 @@ export default function EventSidebar({
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                className="h-7 text-blue-500"
+                className="size-5 sm:size-7 text-blue-500"
               >
                 <path d="M12.75 12.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM7.5 15.75a.75.75 0 100-1.5.75.75 0 000 1.5z" />
                 <path
@@ -61,7 +61,7 @@ export default function EventSidebar({
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                className="h-7 text-blue-500"
+                className="size-5 sm:size-7 text-blue-500"
               >
                 <path
                   fillRule="evenodd"

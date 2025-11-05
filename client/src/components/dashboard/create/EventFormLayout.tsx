@@ -30,7 +30,7 @@ const EventFormLayout: React.FC<EventFormLayoutProps> = ({
   isEditMode,
 }) => {
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="space-y-8">
       <h1 className="text-base md:text-lg font-semibold">{title}</h1>
 
       <div className="border rounded bg-white text-black w-full md:w-4/5 mx-auto">
@@ -66,7 +66,7 @@ const EventFormLayout: React.FC<EventFormLayoutProps> = ({
           <hr />
 
           {/* Form Content */}
-          <div className="py-5 sm:w-4/5 mx-auto divide-y">
+          <div className="p-5 sm:w-4/5 mx-auto divide-y">
             {steps[currentStep].component}
 
             {/* Navigation Buttons */}

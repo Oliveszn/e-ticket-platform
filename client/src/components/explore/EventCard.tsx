@@ -17,7 +17,7 @@ export default function EventCard({ event }: any) {
     >
       <div className="flex flex-col justify-between gap-5 flex-1">
         <div className="flex flex-col gap-3">
-          <h3 className="text-xl font-black leading-7 tracking-wide overflow-hidden line-clamp-1 capitalize">
+          <h3 className="text-base sm:text-xl font-black leading-7 tracking-wide overflow-hidden line-clamp-1 capitalize">
             {event.title}
           </h3>
 
@@ -76,7 +76,7 @@ export default function EventCard({ event }: any) {
           <img
             src={event.image.url}
             alt={event.title}
-            className="h-full w-40 max-h-40 rounded overflow-hidden object-cover flex-shrink-0 max-w-full"
+            className="h-full w-24 max-h-24 sm:w-40 sm:max-h-40 rounded overflow-hidden object-cover flex-shrink-0 max-w-full"
           />
         ) : (
           <div className="flex items-center justify-center h-full w-full bg-gray-100 rounded">
