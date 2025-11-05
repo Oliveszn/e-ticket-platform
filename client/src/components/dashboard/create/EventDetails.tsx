@@ -127,14 +127,14 @@ const EventDetails = ({ formik }: EventDetailsProps) => {
       </div>
 
       {/* VENUE  */}
-      <div className="py-4">
+      <div className="py-2 sm:py-4">
         <p className="text-sm font-bold">Where is your event?*</p>
         <p className="text-sm text-gray-800">
           Tell your attendees where your event is located so they can get ready
           to attend.
         </p>
 
-        <div className="grid grid-cols-2 gap-3 py-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-4">
           <div className="space-y-2">
             <label htmlFor="event-name" className="text-sm font-semibold">
               Venue*
