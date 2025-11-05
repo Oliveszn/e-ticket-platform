@@ -29,7 +29,7 @@ let redisClient: Redis;
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.CLIENT_BASE_URL,
+    origin: [process.env.CLIENT_BASE_URL as string, "http://localhost:3000"],
     methods: ["POST", "GET", "PUT", "DELETE"],
     allowedHeaders: [
       "Content-Type",
